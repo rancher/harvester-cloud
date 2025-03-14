@@ -145,9 +145,9 @@ variable "startup_script" {
 }
 
 variable "harvester_version" {
-  description = "Specifies the Harvester version. Default is 'v1.4.1'."
+  description = "Specifies the Harvester version. Default is 'v1.4.2'."
   type        = string
-  default     = "v1.4.1"
+  default     = "v1.4.2"
   validation {
     condition     = can(regex("^v.*$", var.harvester_version))
     error_message = "The Harvester version must start with 'v' (e.g., v1.4.1, v1.4.2-rc2, v1.5.0-dev-20250217)."

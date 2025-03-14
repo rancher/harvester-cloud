@@ -50,7 +50,7 @@ data_disk_size = 350
 startup_script = null
 
 ## -- Specifies the Harvester version.
-harvester_version = "v1.4.1"
+harvester_version = "v1.4.2"
 
 ## -- Specifies the number of Harvester nodes to create (1 or 3).
 harvester_node_count = 1
