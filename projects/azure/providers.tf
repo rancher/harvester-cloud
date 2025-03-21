@@ -24,7 +24,11 @@ terraform {
 }
 
 provider "azurerm" {
-  features {}
+  features {
+    virtual_machine {
+      skip_shutdown_and_force_delete = true
+    }
+  }
   subscription_id = var.subscription_id
 }
 
