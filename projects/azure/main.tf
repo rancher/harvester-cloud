@@ -14,6 +14,7 @@ locals {
   harvester_startup_script_template_file = "../../modules/harvester/deployment-script/harvester_startup_script_sh.tpl"
   harvester_startup_script_file          = "${path.cwd}/harvester_startup_script.sh"
   data_disk_size                         = var.data_disk_size * 0.9
+  harvester_number_data_disks            = var.create_additional_disks ? var.harvester_node_count * 2 : var.harvester_node_count
   harvester_cpu                          = var.harvester_cluster_size == "small" ? 8 : 16
   harvester_memory                       = var.harvester_cluster_size == "small" ? 32768 : 65536
   create_ssh_key_pair                    = var.create_ssh_key_pair == true ? false : true
@@ -31,7 +32,7 @@ locals {
 resource "local_file" "sles_startup_script_config" {
   content = templatefile("${local.sles_startup_script_template_file}", {
     version        = var.harvester_version,
-    count          = var.harvester_node_count,
+    count          = local.harvester_number_data_disks,
     disk_name      = local.data_disk_name,
     mount_point    = local.data_disk_mount_point,
     disk_structure = local.disk_structure
@@ -86,6 +87,7 @@ resource "local_file" "harvester_startup_script" {
     memory                      = local.harvester_memory
     password                    = var.harvester_password
     harvester_default_disk_size = local.data_disk_size
+    additional_disk             = var.create_additional_disks
   })
   file_permission = "0644"
   filename        = local.harvester_startup_script_file
@@ -105,7 +107,7 @@ module "harvester_node" {
   instance_type        = local.instance_type
   create_vnet          = var.create_vnet
   spot_instance        = var.spot_instance
-  data_disk_count      = var.harvester_node_count
+  data_disk_count      = local.harvester_number_data_disks
   data_disk_type       = var.data_disk_type
   data_disk_size       = var.data_disk_size
   startup_script       = data.local_file.sles_startup_script.content

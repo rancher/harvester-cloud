@@ -22,11 +22,11 @@ ssh_public_key_path = null
 ## -- Specifies the name of the DigitalOcean Droplet type.
 instance_type = "g-16vcpu-64gb"
 
-## -- Specifies the number of additional data disks to create (1 or 3).
-data_disk_count = 1
-
-## -- Specifies the size of each additional data disk attached to the Droplet, in GB.
+## -- Specifies the size of the data disk for each Harvester node, in GB.
 data_disk_size = 350
+
+## -- Specifies if one additional data disk for each harvester node is required.
+create_additional_disks = false
 
 ## -- Specifies a custom startup script to run when the Droplets start.
 startup_script = null

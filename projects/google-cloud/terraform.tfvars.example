@@ -43,8 +43,11 @@ os_disk_size = 50
 ## -- Specifies the type of the disk attached to each node (e.g., 'pd-standard', 'pd-ssd', or 'pd-balanced').
 data_disk_type = "pd-ssd"
 
-## -- Specifies the size of the additional data disk for each VM instance, in GB.
+## -- Specifies the size of the data disk for each Harvester node, in GB.
 data_disk_size = 350
+
+## -- Specifies if one additional data disk on each harvester node is required.
+create_additional_disks = false
 
 ## -- Specifies a custom startup script to run when the VMs start.
 startup_script = null
