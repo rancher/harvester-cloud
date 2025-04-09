@@ -70,5 +70,5 @@ sudo sed -i "/certificate-authority-data:/c\\    insecure-skip-tls-verify: true"
 
 # Adding GPT partition table to the additional disks if required.
 if [ "${additional_disk}" == "true" ]; then
-for i in $(sudo virsh net-dhcp-leases vlan1  | grep ${hostname} | grep -v "192.168.122.120" | awk '{print $5}' | awk -F "/" '{print $1}'); do sudo sshpass -p "${password}" ssh -oStrictHostKeyChecking=no "rancher@$i" "sudo parted /dev/vdb --script mklabel gpt && sudo parted /dev/vdb --script mkpart primary 0% 100%"; done
+for i in $(sudo virsh net-dhcp-leases vlan1  | grep ${hostname} | awk '{print $5}' | awk -F "/" '{print $1}'); do sudo sshpass -p "${password}" ssh -oStrictHostKeyChecking=no "rancher@$i" "sudo parted /dev/vdb --script mklabel gpt && sudo parted /dev/vdb --script mkpart primary 0% 100%"; done
 fi
