@@ -138,6 +138,12 @@ variable "data_disk_size" {
   default     = 350
 }
 
+variable "create_additional_disks" {
+  description = "Specifies if 1 additional data disk on each Harvester node is required"
+  type        = bool
+  default     = false
+}
+
 variable "startup_script" {
   description = "Specifies a custom startup script to run when the VMs start. Default is 'null'."
   type        = string
