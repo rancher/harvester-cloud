@@ -22,8 +22,8 @@ for i in $(seq 1 ${count}); do
     sleep 30
   else
     sudo cp /srv/www/harvester/join_cloud_config.yaml /srv/www/harvester/join_cloud_config_$((i - 1)).yaml
-    sudo sed -i "s/${hostname}-$((i - 1))/${hostname}-$i/g" /srv/www/harvester/join_cloud_config_$((i - 1)).yaml
-    sudo sed -i "s/join_cloud_config.yaml/join_cloud_config_$((i - 1)).yaml/g" /srv/www/harvester/default.ipxe
+    sudo sed -i "s/  hostname:.*/  hostname: ${hostname}-$i/" /srv/www/harvester/join_cloud_config_$((i - 1)).yaml
+    sudo sed -i "s|join_cloud_config[^ ]*\.yaml|join_cloud_config_$((i - 1)).yaml|" /srv/www/harvester/default.ipxe
     sudo virt-install --name harvester-node-$i --memory ${memory} --vcpus ${cpu} --cpu host-passthrough --disk path=/mnt/datadisk$i/harvester-data.qcow2,size=${harvester_default_disk_size},bus=virtio,format=qcow2 --os-type linux --os-variant generic --network bridge=virbr1,model=virtio --graphics vnc,listen=0.0.0.0,password=yourpass,port=$((5900 + i)) --console pty,target_type=serial --pxe --autostart &
     sleep 30
   fi
