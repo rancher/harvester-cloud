@@ -165,12 +165,12 @@ variable "harvester_version" {
 }
 
 variable "harvester_node_count" {
-  description = "Specifies the number of Harvester nodes to create (1 or 3). Default is '1'."
+  description = "Specifies the number of Harvester nodes to create (1, 3, or 5). Default is '1'."
   type        = number
   default     = 1
   validation {
-    condition     = contains([1, 3], var.harvester_node_count)
-    error_message = "The number of Harvester nodes must be 1 or 3."
+    condition     = contains([1, 3, 5], var.harvester_node_count)
+    error_message = "The number of Harvester nodes must be 1, 3, or 5."
   }
 }
 
