@@ -14,8 +14,9 @@ locals {
   harvester_startup_script_template_file = "../../modules/harvester/deployment-script/harvester_startup_script_sh.tpl"
   harvester_startup_script_file          = "${path.cwd}/harvester_startup_script.sh"
   data_disk_size                         = var.data_disk_size * 0.9
-  harvester_cpu                          = var.harvester_cluster_size == "small" ? 8 : 16
-  harvester_memory                       = var.harvester_cluster_size == "small" ? 32768 : 65536
+  harvester_cluster_size                 = var.harvester_node_count == 5 ? "small" : var.harvester_cluster_size
+  harvester_cpu                          = local.harvester_cluster_size == "small" ? 8 : 16
+  harvester_memory                       = local.harvester_cluster_size == "small" ? 32768 : 65536
   create_ssh_key_pair                    = var.create_ssh_key_pair == true ? false : true
   ssh_private_key_path                   = var.ssh_private_key_path == null ? "${path.cwd}/${var.prefix}-ssh_private_key.pem" : var.ssh_private_key_path
   ssh_public_key_path                    = var.ssh_public_key_path == null ? "${path.cwd}/${var.prefix}-ssh_public_key.pem" : var.ssh_public_key_path
@@ -26,8 +27,8 @@ locals {
   ssh_username                           = "sles"
   kubeconfig_file                        = "${path.cwd}/${var.prefix}_kube_config.yml"
   instance_type = (
-    var.harvester_node_count == 1 ? (var.harvester_cluster_size == "small" ? "n2-standard-16" : "n2-standard-32") :
-    var.harvester_node_count == 3 ? (var.harvester_cluster_size == "small" ? "n2-standard-32" : "n2-standard-64") :
+    var.harvester_node_count == 1 ? (local.harvester_cluster_size == "small" ? "n2-standard-16" : "n2-standard-32") :
+    var.harvester_node_count == 3 ? (local.harvester_cluster_size == "small" ? "n2-standard-32" : "n2-standard-64") :
     "n2-standard-64"
   )
 }
