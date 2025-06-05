@@ -118,6 +118,12 @@ variable "harvester_password" {
   default     = "SecretPassword.123"
 }
 
+variable "harvester_airgapped" {
+  description = "Specifies whether the Harvester cluster is deployed in an air-gapped environment without internet access. Set to true to disable internet connectivity on all nodes. Default is false."
+  type        = bool
+  default     = false
+}
+
 variable "harvester_cluster_size" {
   description = "Specifies the size of the Harvester cluster. Allowed values are 'small' (8 CPUs, 32 GB RAM) and 'medium' (16 CPUs, 64 GB RAM). Default is 'small'."
   type        = string
