@@ -12,8 +12,8 @@
 
 | Name | Version |
 |------|---------|
-| <a name="provider_local"></a> [local](#provider\_local) | n/a |
-| <a name="provider_null"></a> [null](#provider\_null) | n/a |
+| <a name="provider_local"></a> [local](#provider\_local) | 2.5.3 |
+| <a name="provider_null"></a> [null](#provider\_null) | 3.2.4 |
 | <a name="provider_rancher2"></a> [rancher2](#provider\_rancher2) | 7.0.0 |
 | <a name="provider_ssh"></a> [ssh](#provider\_ssh) | 2.7.0 |
 
@@ -50,6 +50,7 @@
 | <a name="input_data_disk_count"></a> [data\_disk\_count](#input\_data\_disk\_count) | Specifies the number of additional data disks to attach to each VM instance. Must be at least 1. | `number` | `1` | no |
 | <a name="input_data_disk_size"></a> [data\_disk\_size](#input\_data\_disk\_size) | Specifies the size of the additional data disks for each VM instance, in GB. Default is '350'. | `number` | `350` | no |
 | <a name="input_data_disk_type"></a> [data\_disk\_type](#input\_data\_disk\_type) | Specifies the type of the disks attached to each node ('Standard\_LRS, 'StandardSSD\_LRS', 'Premium\_LRS' or 'UltraSSD\_LRS'). Default is 'Premium\_LRS'. | `string` | `"Premium_LRS"` | no |
+| <a name="input_harvester_airgapped"></a> [harvester\_airgapped](#input\_harvester\_airgapped) | Specifies whether the Harvester cluster is deployed in an air-gapped environment without internet access. Set to true to disable internet connectivity on all nodes. Default is false. | `bool` | `false` | no |
 | <a name="input_harvester_cluster_size"></a> [harvester\_cluster\_size](#input\_harvester\_cluster\_size) | Specifies the size of the Harvester cluster. Allowed values are 'small' (8 CPUs, 32 GB RAM) and 'medium' (16 CPUs, 64 GB RAM). Default is 'small'. | `string` | `"small"` | no |
 | <a name="input_harvester_first_node_token"></a> [harvester\_first\_node\_token](#input\_harvester\_first\_node\_token) | Specifies the token used to join additional nodes to the Harvester cluster (HA setup). Default is 'SecretToken.123'. | `string` | `"SecretToken.123"` | no |
 | <a name="input_harvester_node_count"></a> [harvester\_node\_count](#input\_harvester\_node\_count) | Specifies the number of Harvester nodes to create (1 or 3). Default is '1'. | `number` | `1` | no |
