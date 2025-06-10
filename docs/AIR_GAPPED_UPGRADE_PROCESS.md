@@ -1,6 +1,6 @@
 # How to perform an upgrade in a Air gapped Harvester cluster deployed by using Harvester cloud project
 
-It is possible to restrict the internet access to the harvester nodes when deploying a Harvester cluster on the Harvester cloud project by defining variable harvester_airgapped as `true`
+It is possible to restrict the internet access on the harvester nodes when deploying a Harvester cluster on the Harvester cloud project by defining variable harvester_airgapped as `true`
 When a cluster is created by defining harvester_airgapped as `true` some iptables rules will be configured on the host denying all connectivity from/to Harvester nodes to/from Internet while keeping Harvester console and Command like accessible from outside of nodes network
 
 # Pre-requisites.
@@ -16,7 +16,7 @@ CLOUD VM --|→ Data Disk 2 → Harvester Node 2
 If variable Harvester_airgapped is false the harvester nodes can access internet because the host (cloud machine) works as gateway for the nodes and this connectivity is not denied.
 But when it comes to Harvester nodes without internet access we must ensure enough knowledge on how to perform specific operations like, for example, uploading an image as we won't be able to reach public repositories from Harvester.
 
-Luckily, to be able to install and configure automatically harvester nodes, the public host where Nested Harvester nodes are running already has a NGINX server configured serving on private IP `http://192.168.122.1` that is the same subnet where Harvester nodes are located which means that we can re-use this NGINX server as our entrypoint for images.
+Luckily, to be able to install and configure automatically harvester nodes, the public host where Nested Harvester nodes are running already has a NGINX server configured serving files on `/srv/www/harvester` on private IP `http://192.168.122.1` that is the same subnet where Harvester nodes are located which means that we can re-use this NGINX server as our entrypoint for images.
 
 ## How to upload an image on a Air-gapped environment deployed by Harvester-cloud project
 

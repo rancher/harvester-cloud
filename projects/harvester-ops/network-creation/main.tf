@@ -60,7 +60,7 @@ resource "ssh_resource" "create_iptables_rules" {
   private_key = file("${var.private_ssh_key_file_path}/${var.private_ssh_key_file_name}")
   commands = [
     "sudo iptables -I LIBVIRT_FWI 1 -d 192.168.122.0/24 -j ACCEPT",
-    "sudo iptables -I LIBVIRT_FWO 1 -s 192.168.122.0/24 -j ACCEPT",
+    "sudo iptables -I LIBVIRT_FWO 1 -s 192.168.122.0/24 -j ACCEPT"
   ]
 }
 
