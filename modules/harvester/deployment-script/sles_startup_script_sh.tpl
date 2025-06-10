@@ -3,9 +3,21 @@
 # Installation of pre-requisite packages
 sudo zypper --non-interactive addrepo https://download.opensuse.org/repositories/network/SLE_15/network.repo
 sudo zypper --non-interactive --gpg-auto-import-keys refresh
-sudo zypper --non-interactive install parted util-linux virt-install libvirt qemu-kvm python3-websockify novnc socat nginx sshpass
+sudo zypper --non-interactive install parted util-linux virt-install libvirt qemu-kvm python3-websockify novnc socat nginx sshpass chrony
 sudo systemctl enable --now libvirtd
 sudo mkdir -p /srv/www/harvester
+
+
+# Modifying Chronyd service when Harvester_airgapped is set as "true" so that Cloud host is configured as NTP server
+if [ ${harvester_airgapped} == true ]; then
+  sudo sed -i 's/^pool/#pool/' /etc/chrony.conf
+  sudo sed -i 's/^server/#server/' /etc/chrony.conf
+  sudo sed -i 's/^include/#include/' /etc/chrony.conf
+  echo "local stratum 10" | sudo tee -a /etc/chrony.conf
+  echo "allow 192.168.122.0/24" | sudo tee -a /etc/chrony.conf
+  sudo systemctl restart chronyd
+  sudo systemctl enable --now chronyd
+fi
 
 # Download the files needed to start the nested VM
 sudo curl -L -o /etc/nginx/nginx.conf \
