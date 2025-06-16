@@ -187,7 +187,7 @@ variable "harvester_password" {
 }
 
 variable "harvester_airgapped" {
-  description = "Specifies whether the Harvester cluster is deployed in an air-gapped environment without internet access. Set to true to disable internet connectivity on all nodes. Default is false."
+  description = "Specifies whether the Harvester cluster is deployed in an air-gapped environment without internet access. When set to 'true', internet connectivity is disabled on all nodes. Default is 'false'."
   type        = bool
   default     = false
 }

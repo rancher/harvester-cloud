@@ -75,7 +75,6 @@ resource "ssh_resource" "harvester_airgapped" {
   ]
 }
 
-
 resource "ssh_resource" "attach_network_interface" {
   depends_on  = [ssh_resource.create_vlanx]
   host        = local.harvester_public_ip

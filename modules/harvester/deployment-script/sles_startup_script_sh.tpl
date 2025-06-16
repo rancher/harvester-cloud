@@ -7,8 +7,7 @@ sudo zypper --non-interactive install parted util-linux virt-install libvirt qem
 sudo systemctl enable --now libvirtd
 sudo mkdir -p /srv/www/harvester
 
-
-# Modifying Chronyd service when Harvester_airgapped is set as "true" so that Cloud host is configured as NTP server
+# Configure Chrony for air-gapped setup (local NTP server)
 if [ ${harvester_airgapped} == true ]; then
   sudo sed -i 's/^pool/#pool/' /etc/chrony.conf
   sudo sed -i 's/^server/#server/' /etc/chrony.conf
