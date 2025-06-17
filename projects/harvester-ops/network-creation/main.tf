@@ -76,7 +76,7 @@ resource "ssh_resource" "harvester_airgapped" {
 }
 
 resource "ssh_resource" "attach_network_interface" {
-  depends_on  = [ssh_resource.create_vlanx]
+  depends_on  = [ssh_resource.create_iptables_rules]
   host        = local.harvester_public_ip
   user        = var.ssh_username
   private_key = file("${var.private_ssh_key_file_path}/${var.private_ssh_key_file_name}")
@@ -126,7 +126,7 @@ provider "harvester" {
 }
 
 module "harvester_network" {
-  depends_on                      = [ssh_resource.attach_network_interface]
+  depends_on                      = [null_resource.wait_harvester_services_startup]
   source                          = "../../../modules/harvester/network"
   cluster_network_name            = var.cluster_network_name
   cluster_network_vlanconfig_name = var.cluster_network_vlanconfig_name
