@@ -27,7 +27,6 @@
 | [null_resource.copy_qemu_vlanx_xml_file_to_first_node](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [null_resource.wait_harvester_services_startup](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [ssh_resource.attach_network_interface](https://registry.terraform.io/providers/loafoe/ssh/2.6.0/docs/resources/resource) | resource |
-| [ssh_resource.create_iptables_rules](https://registry.terraform.io/providers/loafoe/ssh/2.6.0/docs/resources/resource) | resource |
 | [ssh_resource.create_vlanx](https://registry.terraform.io/providers/loafoe/ssh/2.6.0/docs/resources/resource) | resource |
 | [ssh_resource.harvester_airgapped](https://registry.terraform.io/providers/loafoe/ssh/2.6.0/docs/resources/resource) | resource |
 | [local_file.load_kubeconfig_file](https://registry.terraform.io/providers/hashicorp/local/latest/docs/data-sources/file) | data source |
