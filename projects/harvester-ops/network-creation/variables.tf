@@ -88,3 +88,9 @@ variable "private_ssh_key_file_name" {
   description = "Specifies the name of the private SSH key file used for authentication."
   type        = string
 }
+
+variable "harvester_airgapped" {
+  description = "Specifies whether the Harvester cluster is deployed in an air-gapped environment without internet access. When set to 'true', internet connectivity is disabled on all nodes. Default is 'false'."
+  type        = bool
+  default     = false
+}

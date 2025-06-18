@@ -55,6 +55,9 @@ harvester_first_node_token = "SecretToken.123"
 ## -- Specifies the password used to access the Harvester nodes.
 harvester_password = "SecretPassword.123"
 
+## -- Specifies whether the Harvester cluster is deployed in an air-gapped environment without internet access. When set to 'true', internet connectivity is disabled on all nodes.
+harvester_airgapped = false
+
 ## -- Specifies the size of the Harvester cluster. Allowed values are 'small' (8 CPUs, 32 GB RAM) and 'medium' (16 CPUs, 64 GB RAM).
 harvester_cluster_size = "small"
 

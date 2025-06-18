@@ -45,3 +45,6 @@ private_ssh_key_file_path = ""
 
 ## -- Specifies the name of the private SSH key file used for authentication.
 private_ssh_key_file_name = ""
+
+## -- Specifies whether the Harvester cluster is deployed in an air-gapped environment without internet access. When set to 'true', internet connectivity is disabled on all nodes.
+harvester_airgapped = false

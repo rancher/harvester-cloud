@@ -31,11 +31,12 @@ locals {
 
 resource "local_file" "sles_startup_script_config" {
   content = templatefile("${local.sles_startup_script_template_file}", {
-    version        = var.harvester_version
-    count          = var.harvester_node_count * var.data_disk_count
-    disk_name      = local.data_disk_name
-    mount_point    = local.data_disk_mount_point
-    disk_structure = local.disk_structure
+    version             = var.harvester_version
+    count               = var.harvester_node_count * var.data_disk_count
+    disk_name           = local.data_disk_name
+    mount_point         = local.data_disk_mount_point
+    disk_structure      = local.disk_structure
+    harvester_airgapped = var.harvester_airgapped
   })
   file_permission = "0644"
   filename        = local.sles_startup_script_file
@@ -56,6 +57,7 @@ resource "local_file" "create_cloud_config_yaml" {
     token                    = var.harvester_first_node_token
     hostname                 = var.prefix
     password                 = var.harvester_password
+    harvester_airgapped      = var.harvester_airgapped
     cluster_registration_url = var.rancher_api_url != "" ? rancher2_cluster.rancher_cluster[0].cluster_registration_token[0].manifest_url : ""
   })
   file_permission = "0644"
@@ -64,10 +66,11 @@ resource "local_file" "create_cloud_config_yaml" {
 
 resource "local_file" "join_cloud_config_yaml" {
   content = templatefile("${local.join_cloud_config_template_file}", {
-    version  = var.harvester_version
-    token    = var.harvester_first_node_token
-    hostname = var.prefix
-    password = var.harvester_password
+    version             = var.harvester_version
+    token               = var.harvester_first_node_token
+    hostname            = var.prefix
+    password            = var.harvester_password
+    harvester_airgapped = var.harvester_airgapped
   })
   file_permission = "0644"
   filename        = local.join_cloud_config_file
@@ -84,6 +87,7 @@ resource "local_file" "harvester_startup_script" {
     memory                      = local.harvester_memory
     password                    = var.harvester_password
     harvester_default_disk_size = local.data_disk_size
+    harvester_airgapped         = var.harvester_airgapped
   })
   file_permission = "0644"
   filename        = local.harvester_startup_script_file

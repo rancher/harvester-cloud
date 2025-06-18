@@ -5,8 +5,12 @@ os:
   hostname: ${hostname}
   password: ${password}
   ntp_servers:
-  - 0.suse.pool.ntp.org
-  - 1.suse.pool.ntp.org
+  %{ if harvester_airgapped }
+    - 192.168.122.1
+  %{ else }
+    - 0.suse.pool.ntp.org
+    - 1.suse.pool.ntp.org
+  %{ endif }
 install:
   mode: create
   management_interface:

@@ -50,13 +50,23 @@ resource "ssh_resource" "create_vlanx" {
     "sudo virsh net-define /tmp/${basename(local_file.qemu_vlanx_config[each.key].filename)} || true",
     "sudo virsh net-start ${local.vlan_base}${each.key + 1} || true",
     "sudo virsh net-autostart ${local.vlan_base}${each.key + 1} || true",
-    "sudo iptables -I LIBVIRT_FWI 1 -d 192.168.122.0/24 -j ACCEPT",
-    "sudo iptables -I LIBVIRT_FWO 1 -s 192.168.122.0/24 -j ACCEPT"
+    "sudo iptables -I LIBVIRT_FWI 1 -d 192.168.0.0/16 -j ACCEPT",
+  ]
+}
+
+resource "ssh_resource" "harvester_airgapped" {
+  for_each    = var.harvester_airgapped ? local.vlanx_network_map : {}
+  depends_on  = [ssh_resource.create_vlanx]
+  host        = local.harvester_public_ip
+  user        = var.ssh_username
+  private_key = file("${var.private_ssh_key_file_path}/${var.private_ssh_key_file_name}")
+  commands = [
+    "sudo iptables -D LIBVIRT_FWO -s ${each.value.ip_base}/24 -i ${each.value.nic} -j ACCEPT"
   ]
 }
 
 resource "ssh_resource" "attach_network_interface" {
-  depends_on  = [ssh_resource.create_vlanx]
+  depends_on  = [ssh_resource.create_vlanx, ssh_resource.harvester_airgapped]
   host        = local.harvester_public_ip
   user        = var.ssh_username
   private_key = file("${var.private_ssh_key_file_path}/${var.private_ssh_key_file_name}")
@@ -106,7 +116,7 @@ provider "harvester" {
 }
 
 module "harvester_network" {
-  depends_on                      = [ssh_resource.attach_network_interface]
+  depends_on                      = [null_resource.wait_harvester_services_startup]
   source                          = "../../../modules/harvester/network"
   cluster_network_name            = var.cluster_network_name
   cluster_network_vlanconfig_name = var.cluster_network_vlanconfig_name
