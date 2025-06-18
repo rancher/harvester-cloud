@@ -41,7 +41,7 @@ sudo systemctl enable --now socat-proxy.service
 # Restrict internet access to Harvester nodes when harvester_airgapped variable is true
 if [ ${harvester_airgapped} == true ]; then
   sudo iptables -D LIBVIRT_FWO -s 192.168.122.0/24 -i virbr1 -j ACCEPT
-  sudo iptables -I LIBVIRT_FWO 1 -s 192.168.122.0/24 -d 192.168.122.0/16 -j ACCEPT
+  sudo iptables -I LIBVIRT_FWO 1 -s 192.168.122.0/16 -d 192.168.122.0/16 -j ACCEPT
 fi
 
 # Wait for the Harvester services to start
