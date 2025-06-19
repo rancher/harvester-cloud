@@ -3,7 +3,7 @@ locals {
   public_ssh_key_path  = var.ssh_public_key_path == null ? "${path.cwd}/${var.prefix}-ssh_public_key.pem" : var.ssh_public_key_path
   instance_count       = 1
   instance_os_type     = "sles"
-  os_image_family      = "sles-15"
+  os_image_family      = "sles-15-sp6"
   os_image_project     = "suse-cloud"
   ssh_username         = local.instance_os_type
 }
