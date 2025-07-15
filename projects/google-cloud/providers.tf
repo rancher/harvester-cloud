@@ -2,7 +2,7 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "6.32.0"
+      version = "6.43.0"
     }
     ssh = {
       source  = "loafoe/ssh"
@@ -10,15 +10,15 @@ terraform {
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = "2.36.0"
+      version = "2.37.1"
     }
     helm = {
       source  = "hashicorp/helm"
-      version = "3.0.0-pre2"
+      version = "3.0.2"
     }
     rancher2 = {
       source  = "rancher/rancher2"
-      version = "7.0.0"
+      version = "7.3.2"
     }
   }
 }
