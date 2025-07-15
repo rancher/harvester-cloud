@@ -2,13 +2,13 @@
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_harvester"></a> [harvester](#requirement\_harvester) | 0.6.6 |
+| <a name="requirement_harvester"></a> [harvester](#requirement\_harvester) | 0.6.7 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_harvester"></a> [harvester](#provider\_harvester) | 0.6.6 |
+| <a name="provider_harvester"></a> [harvester](#provider\_harvester) | 0.6.7 |
 
 ## Modules
 
@@ -18,7 +18,7 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [harvester_image.image](https://registry.terraform.io/providers/harvester/harvester/0.6.6/docs/resources/image) | resource |
+| [harvester_image.image](https://registry.terraform.io/providers/harvester/harvester/0.6.7/docs/resources/image) | resource |
 
 ## Inputs
 

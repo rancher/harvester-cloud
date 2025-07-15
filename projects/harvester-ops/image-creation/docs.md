@@ -2,7 +2,7 @@
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_harvester"></a> [harvester](#requirement\_harvester) | 0.6.6 |
+| <a name="requirement_harvester"></a> [harvester](#requirement\_harvester) | 0.6.7 |
 
 ## Providers
 

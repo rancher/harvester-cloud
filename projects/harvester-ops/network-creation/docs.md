@@ -2,8 +2,8 @@
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_harvester"></a> [harvester](#requirement\_harvester) | 0.6.6 |
-| <a name="requirement_ssh"></a> [ssh](#requirement\_ssh) | 2.6.0 |
+| <a name="requirement_harvester"></a> [harvester](#requirement\_harvester) | 0.6.7 |
+| <a name="requirement_ssh"></a> [ssh](#requirement\_ssh) | 2.7.0 |
 
 ## Providers
 
@@ -11,7 +11,7 @@
 |------|---------|
 | <a name="provider_local"></a> [local](#provider\_local) | n/a |
 | <a name="provider_null"></a> [null](#provider\_null) | n/a |
-| <a name="provider_ssh"></a> [ssh](#provider\_ssh) | 2.6.0 |
+| <a name="provider_ssh"></a> [ssh](#provider\_ssh) | 2.7.0 |
 
 ## Modules
 
@@ -26,9 +26,9 @@
 | [local_file.qemu_vlanx_config](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
 | [null_resource.copy_qemu_vlanx_xml_file_to_first_node](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [null_resource.wait_harvester_services_startup](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
-| [ssh_resource.attach_network_interface](https://registry.terraform.io/providers/loafoe/ssh/2.6.0/docs/resources/resource) | resource |
-| [ssh_resource.create_vlanx](https://registry.terraform.io/providers/loafoe/ssh/2.6.0/docs/resources/resource) | resource |
-| [ssh_resource.harvester_airgapped](https://registry.terraform.io/providers/loafoe/ssh/2.6.0/docs/resources/resource) | resource |
+| [ssh_resource.attach_network_interface](https://registry.terraform.io/providers/loafoe/ssh/2.7.0/docs/resources/resource) | resource |
+| [ssh_resource.create_vlanx](https://registry.terraform.io/providers/loafoe/ssh/2.7.0/docs/resources/resource) | resource |
+| [ssh_resource.harvester_airgapped](https://registry.terraform.io/providers/loafoe/ssh/2.7.0/docs/resources/resource) | resource |
 | [local_file.load_kubeconfig_file](https://registry.terraform.io/providers/hashicorp/local/latest/docs/data-sources/file) | data source |
 
 ## Inputs
