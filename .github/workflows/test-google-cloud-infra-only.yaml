@@ -1,0 +1,52 @@
+name: Test Google Cloud VM deploy and destroy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  gcp_vm_terraform_deploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Ensure netcat is installed
+        run: sudo apt-get update && sudo apt-get install -y netcat
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.10.5"
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+      - name: Initialize Terraform
+        run: terraform init
+        working-directory: tests/google-cloud/infra-only
+      - name: Run Terraform apply
+        run: terraform apply --auto-approve
+        working-directory: tests/google-cloud/infra-only
+      - name: Get public IP from Terraform output
+        id: ip
+        run: |
+          ip=$(terraform output -raw first_instance_public_ip)
+          echo "INSTANCE_IP=$ip" >> $GITHUB_ENV
+        working-directory: tests/google-cloud/infra-only
+      - name: Wait for SSH (port 22) to become available
+        run: |
+          echo "Waiting for port 22 on $INSTANCE_IP..."
+          for i in {1..30}; do
+            if nc -zv $INSTANCE_IP 22; then
+              echo "Port 22 is open."
+              exit 0
+            fi
+            echo "Attempt $i failed, retrying in 10s..."
+            sleep 10
+          done
+          echo "SSH not available after 30 attempts. Failing."
+          exit 1
+        env:
+          INSTANCE_IP: ${{ env.INSTANCE_IP }}
+      - name: Run Terraform Destroy
+        run: terraform destroy --auto-approve
+        working-directory: tests/google-cloud/infra-only
