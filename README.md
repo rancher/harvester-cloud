@@ -16,7 +16,7 @@ To make it easy for anyone to spin up a Harvester environment for labs, testing,
 │   └── ...
 ├── docs/
 │   └── ...
-└── # images/, LICENSE, etc.
+└── # images/, tests/, LICENSE, etc.
 ```
 
 The `modules/` directory contains templates for deploying VMs on different cloud providers (Google Cloud, Microsoft Azure, and DigitalOcean), along with all necessary scripts to configure Harvester.
