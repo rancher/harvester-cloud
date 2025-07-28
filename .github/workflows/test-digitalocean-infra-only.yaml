@@ -22,7 +22,7 @@ jobs:
       - name: Run Terraform apply
         env:
           DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
-        run: terraform apply --auto-approve -var "do_token=$DIGITALOCEAN_TOKEN"
+        run: terraform apply -var "do_token=$DIGITALOCEAN_TOKEN" -auto-approve
         working-directory: tests/digitalocean/infra-only
       - name: Get public IP from Terraform output
         id: ip
@@ -48,5 +48,5 @@ jobs:
       - name: Run Terraform Destroy
         env:
           DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
-        run: terraform destroy --auto-approve -var "do_token=$DIGITALOCEAN_TOKEN"
+        run: terraform destroy -var "do_token=$DIGITALOCEAN_TOKEN" -auto-approve
         working-directory: tests/digitalocean/infra-only
