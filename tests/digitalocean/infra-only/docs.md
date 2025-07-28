@@ -6,7 +6,9 @@
 
 ## Providers
 
-No providers.
+| Name | Version |
+|------|---------|
+| <a name="provider_local"></a> [local](#provider\_local) | n/a |
 
 ## Modules
 
@@ -16,7 +18,9 @@ No providers.
 
 ## Resources
 
-No resources.
+| Name | Type |
+|------|------|
+| [local_file.startup_script_file](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
 
 ## Inputs
 

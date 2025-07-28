@@ -5,6 +5,11 @@ locals {
   instance_type        = "g-16vcpu-64gb-intel"
 }
 
+resource "local_file" "startup_script_file" {
+  content  = "NULL"
+  filename = "${path.cwd}/generated-startup.sh"
+}
+
 module "harvester_node" {
   source               = "../../../modules/digitalocean/droplet"
   prefix               = var.prefix
@@ -12,4 +17,5 @@ module "harvester_node" {
   ssh_private_key_path = local.ssh_private_key_path
   ssh_public_key_path  = local.ssh_public_key_path
   instance_type        = local.instance_type
+  startup_script       = local_file.startup_script_file.filename
 }
