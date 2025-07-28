@@ -46,6 +46,7 @@ jobs:
         env:
           INSTANCE_IP: ${{ env.INSTANCE_IP }}
       - name: Run Terraform Destroy
+        if: always()
         env:
           DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
         run: terraform destroy -var "do_token=$DIGITALOCEAN_TOKEN" -auto-approve
