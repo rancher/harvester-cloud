@@ -24,7 +24,7 @@ jobs:
         run: terraform init
         working-directory: tests/google-cloud/infra-only
       - name: Run Terraform apply
-        run: terraform apply -auto-approve
+        run: terraform apply -var "subscription_id=${{ secrets.GCP_PROJECT_ID }}" -auto-approve
         working-directory: tests/google-cloud/infra-only
       - name: Get public IP from Terraform output
         id: ip
@@ -48,5 +48,5 @@ jobs:
         env:
           INSTANCE_IP: ${{ env.INSTANCE_IP }}
       - name: Run Terraform Destroy
-        run: terraform destroy -auto-approve
+        run: terraform destroy -var "subscription_id=${{ secrets.GCP_PROJECT_ID }}" -auto-approve
         working-directory: tests/google-cloud/infra-only

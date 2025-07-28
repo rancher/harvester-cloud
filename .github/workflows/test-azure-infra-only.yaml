@@ -48,5 +48,5 @@ jobs:
         env:
           INSTANCE_IP: ${{ env.INSTANCE_IP }}
       - name: Run Terraform Destroy
-        run: terraform destroy -auto-approve
+        run: terraform destroy -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" -auto-approve
         working-directory: tests/azure/infra-only
