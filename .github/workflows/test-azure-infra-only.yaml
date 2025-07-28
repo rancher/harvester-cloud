@@ -24,7 +24,9 @@ jobs:
         run: terraform init
         working-directory: tests/azure/infra-only
       - name: Run Terraform apply
-        run: terraform apply --auto-approve
+        env:
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        run: terraform apply -var "subscription_id=$AZURE_SUBSCRIPTION_ID" -auto-approve
         working-directory: tests/azure/infra-only
       - name: Get public IP from Terraform output
         id: ip
@@ -48,5 +50,8 @@ jobs:
         env:
           INSTANCE_IP: ${{ env.INSTANCE_IP }}
       - name: Run Terraform Destroy
-        run: terraform destroy --auto-approve
+        if: always()
+        env:
+          AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        run: terraform destroy -var "subscription_id=$AZURE_SUBSCRIPTION_ID" -auto-approve
         working-directory: tests/azure/infra-only
