@@ -6,7 +6,10 @@ locals {
 }
 
 resource "local_file" "startup_script_file" {
-  content  = "NULL"
+  content  = <<EOT
+#!/bin/bash
+exit 0
+EOT
   filename = "${path.cwd}/generated-startup.sh"
 }
 
