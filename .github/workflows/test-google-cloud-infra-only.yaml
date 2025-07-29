@@ -31,7 +31,7 @@ jobs:
       - name: Get public IP from Terraform output
         id: ip
         run: |
-          ip=$(terraform output -raw first_instance_public_ip)
+          ip=$(terraform output -json first_instance_public_ip | jq -r '.[0]')
           echo "INSTANCE_IP=$ip" >> $GITHUB_ENV
         working-directory: tests/google-cloud/infra-only
       - name: Wait for SSH (port 22) to become available
