@@ -137,12 +137,12 @@ rancher_insecure     = true
 
 ```console
 $ cat terraform.tfvars
-prefix               = "glovecchio"
-do_token             = "<DIGITALOCEAN_TOKEN>"
-os_image_id          = "openSUSE-Leap-15.6"
-region               = "fra1"
-harvester_node_count = 3
-data_disk_count      = 4
+prefix                 = "glovecchio"
+do_token               = "<DIGITALOCEAN_TOKEN>"
+os_image_name          = "openSUSE-Leap-15.6"
+region                 = "fra1"
+harvester_node_count   = 3
+data_disk_count        = 4
 ```
 
 **1 is the minimum accepted value, because it is the default disk needed for the Harvester host to function, so to have 3 more disks, the value will have to be 4.**
