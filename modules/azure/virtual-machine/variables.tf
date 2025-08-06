@@ -2,6 +2,10 @@ variable "prefix" {
   description = "Specifies the prefix added to the names of all resources. Default is 'azure-tf'."
   type        = string
   default     = "azure-tf"
+  validation {
+    condition     = can(regex("^[a-z0-9\\-.]+$", var.prefix))
+    error_message = "a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.'"
+  }
 }
 
 variable "region" {
