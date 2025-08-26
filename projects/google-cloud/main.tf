@@ -24,7 +24,7 @@ locals {
   vpc                                    = var.vpc == null ? module.harvester_node.vpc[0].name : var.vpc
   subnet                                 = var.subnet == null ? module.harvester_node.subnet[0].name : var.subnet
   create_firewall                        = var.create_firewall == true ? false : var.create_firewall
-  ssh_username                           = "sles"
+  ssh_username                           = "opensuse"
   kubeconfig_file                        = "${path.cwd}/${var.prefix}_kube_config.yml"
   instance_type = (
     var.harvester_node_count == 1 ? (local.harvester_cluster_size == "small" ? "n2-standard-16" : "n2-standard-32") :

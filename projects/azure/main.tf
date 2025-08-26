@@ -20,7 +20,7 @@ locals {
   create_ssh_key_pair                    = var.create_ssh_key_pair == true ? false : true
   ssh_private_key_path                   = var.ssh_private_key_path == null ? "${path.cwd}/${var.prefix}-ssh_private_key.pem" : var.ssh_private_key_path
   ssh_public_key_path                    = var.ssh_public_key_path == null ? "${path.cwd}/${var.prefix}-ssh_public_key.pem" : var.ssh_public_key_path
-  ssh_username                           = "sles"
+  ssh_username                           = "opensuse"
   kubeconfig_file                        = "${path.cwd}/${var.prefix}_kube_config.yml"
   instance_type = (
     var.harvester_node_count == 1 ? (local.harvester_cluster_size == "small" ? "Standard_D16s_v5" : "Standard_D32s_v5") :
