@@ -2,9 +2,9 @@ locals {
   private_ssh_key_path = var.ssh_private_key_path == null ? "${path.cwd}/${var.prefix}-ssh_private_key.pem" : var.ssh_private_key_path
   public_ssh_key_path  = var.ssh_public_key_path == null ? "${path.cwd}/${var.prefix}-ssh_public_key.pem" : var.ssh_public_key_path
   instance_count       = 1
-  instance_os_type     = "sles"
-  os_image_family      = "sles-15-sp6"
-  os_image_project     = "suse-cloud"
+  instance_os_type     = "opensuse"
+  os_image_family      = "opensuse-leap"
+  os_image_project     = "opensuse-cloud"
   ssh_username         = local.instance_os_type
 }
 

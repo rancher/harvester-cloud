@@ -47,7 +47,7 @@ export KUBECONFIG=<PREFIX>_kube_config.yaml
 #### Run the following command
 
 ```bash
-ssh -oStrictHostKeyChecking=no -i <PREFIX>-ssh_private_key.pem sles@<PUBLIC_IPV4>
+ssh -oStrictHostKeyChecking=no -i <PREFIX>-ssh_private_key.pem opensuse@<PUBLIC_IPV4>
 ```
 
 ## How to access Harvester Nested VMs
