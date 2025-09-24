@@ -12,7 +12,7 @@ export KUBECONFIG=<prefix>_kube_config.yaml
 #### Access Harvester UI to upload openSUSE Leap Image
 
 ```console
-URL: https://download.opensuse.org/distribution/leap/15.6/iso/openSUSE-Leap-15.6-NET-aarch64-Media.iso
+URL: https://download.opensuse.org/distribution/leap/15.6/iso/openSUSE-Leap-15.6-DVD-x86_64-Media.iso
 ```
 
 #### Access Harvester UI to upload Ubuntu Image
