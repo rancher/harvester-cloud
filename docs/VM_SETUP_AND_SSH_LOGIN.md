@@ -12,6 +12,8 @@ export KUBECONFIG=<prefix>_kube_config.yaml
 #### Access Harvester UI to upload openSUSE Leap Image
 
 ```console
+URL: https://download.opensuse.org/distribution/leap/15.6/appliances/openSUSE-Leap-15.6-Minimal-VM.x86_64-Cloud.qcow
+OR
 URL: https://download.opensuse.org/repositories/Cloud:/Images:/Leap_15.6/images/openSUSE-Leap-15.6.x86_64-1.0.2-NoCloud-Build1.38.qcow2
 ```
 
