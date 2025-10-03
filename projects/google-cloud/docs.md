@@ -5,7 +5,7 @@
 | <a name="requirement_google"></a> [google](#requirement\_google) | 6.43.0 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | 3.0.2 |
 | <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) | 2.37.1 |
-| <a name="requirement_rancher2"></a> [rancher2](#requirement\_rancher2) | 7.3.2 |
+| <a name="requirement_rancher2"></a> [rancher2](#requirement\_rancher2) | 8.2.1 |
 | <a name="requirement_ssh"></a> [ssh](#requirement\_ssh) | 2.7.0 |
 
 ## Providers
@@ -14,7 +14,7 @@
 |------|---------|
 | <a name="provider_local"></a> [local](#provider\_local) | n/a |
 | <a name="provider_null"></a> [null](#provider\_null) | n/a |
-| <a name="provider_rancher2"></a> [rancher2](#provider\_rancher2) | 7.3.2 |
+| <a name="provider_rancher2"></a> [rancher2](#provider\_rancher2) | 8.2.1 |
 | <a name="provider_ssh"></a> [ssh](#provider\_ssh) | 2.7.0 |
 
 ## Modules
@@ -36,7 +36,7 @@
 | [null_resource.copy_files_to_first_node](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [null_resource.harvester_iso_download_checking](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [null_resource.harvester_node_startup](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
-| [rancher2_cluster.rancher_cluster](https://registry.terraform.io/providers/rancher/rancher2/7.3.2/docs/resources/cluster) | resource |
+| [rancher2_cluster.rancher_cluster](https://registry.terraform.io/providers/rancher/rancher2/8.2.1/docs/resources/cluster) | resource |
 | [ssh_resource.retrieve_kubeconfig](https://registry.terraform.io/providers/loafoe/ssh/2.7.0/docs/resources/resource) | resource |
 | [local_file.sles_startup_script](https://registry.terraform.io/providers/hashicorp/local/latest/docs/data-sources/file) | data source |
 | [local_file.ssh_private_key](https://registry.terraform.io/providers/hashicorp/local/latest/docs/data-sources/file) | data source |
