@@ -1,4 +1,4 @@
-# How to Perform an Upgrade in an Air-Gapped Harvester Cluster Deployed Using the Harvester Cloud Project
+# How to perform an upgrade in an air-gapped Harvester Cluster deployed using the Harvester Cloud Project
 
 When deploying a Harvester cluster using the Harvester Cloud project, it is possible to restrict internet access to the Harvester nodes by setting the `harvester_airgapped` variable to `true`.
 
