@@ -32,7 +32,7 @@ The `projects/` directory combines modules to create different deployment recipe
 - [Performance analyses](https://github.com/rancher/harvester-cloud/blob/main/docs/PERFORMANCE.md)
 - [How to create a basic Harvester VM and access it via SSH from the local CLI](https://github.com/rancher/harvester-cloud/blob/main/docs/VM_SETUP_AND_SSH_LOGIN.md)
 - [How to create a downstream K8s cluster from Rancher using the Harvester Cloud Provider](https://github.com/rancher/harvester-cloud/blob/main/docs/CREATE_DOWNSTREAM_CLUSTER.md)
-- [How to perform an upgrade in an air-gapped Harvester cluster](https://github.com/rancher/harvester-cloud/main/docs/AIR_GAPPED_UPGRADE_PROCESS.md)
+- [How to perform an upgrade in an air-gapped Harvester cluster](https://github.com/rancher/harvester-cloud/blob/main/docs/AIR_GAPPED_UPGRADE_PROCESS.md)
 - [Microsoft Azure known issues](https://github.com/rancher/harvester-cloud/blob/main/docs/AZURE_KNOWN_ISSUES.md)
 
 ## How to get started with the various projects
