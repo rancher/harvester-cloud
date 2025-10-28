@@ -134,9 +134,15 @@ jobs:
             echo "No clusters found, Harvester integration may have failed."
             exit 1
           fi
-      - name: Terraform destroy (Harvester)
+      - name: Wait/Verify before destroy
+        timeout-minutes: 10
+        run: |
+          echo "Step will be forcibly stopped if it exceeds 10 minutes."
+      - name: Run Terraform Destroy (Harvester)
         if: always()
-        run: terraform destroy -auto-approve
+        env:
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        run: terraform destroy -var "project_id=$GCP_PROJECT_ID" -auto-approve
         working-directory: projects/google-cloud
       - name: Terraform destroy (Rancher)
         if: always()
