@@ -84,7 +84,7 @@ jobs:
           echo "RANCHER_CI_TOKEN_SECRET_KEY=$SECRET_KEY" >> $GITHUB_ENV
       - name: Initialize Terraform (Harvester)
         run: terraform init
-        working-directory: harvester-cloud/projects/google-cloud
+        working-directory: projects/google-cloud
       - name: Run Terraform apply (Harvester)
         env:
           GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
@@ -98,13 +98,13 @@ jobs:
             -var "rancher_access_key=$RANCHER_CI_TOKEN_ACCESS_KEY" \
             -var "rancher_secret_key=$RANCHER_CI_TOKEN_SECRET_KEY" \
             -var "rancher_insecure=true"
-        working-directory: harvester-cloud/projects/google-cloud
+        working-directory: projects/google-cloud
       - name: Get public IP from Terraform output
         id: ip
         run: |
           ip=$(terraform output -json first_instance_public_ip | jq -r '.[0]')
           echo "INSTANCE_IP=$ip" >> $GITHUB_ENV
-        working-directory: tests/google-cloud/infra-only
+        working-directory: projects/google-cloud
       - name: Wait for SSH (port 22) to become available
         run: |
           echo "Waiting for port 22 on $INSTANCE_IP..."
@@ -137,7 +137,7 @@ jobs:
       - name: Terraform destroy (Harvester)
         if: always()
         run: terraform destroy -auto-approve
-        working-directory: harvester-cloud/projects/google-cloud
+        working-directory: projects/google-cloud
       - name: Terraform destroy (Rancher)
         if: always()
         env:
