@@ -136,9 +136,8 @@ jobs:
             exit 1
           fi
       - name: Wait/Verify before destroy
-        timeout-minutes: 10
         run: |
-          echo "Step will be forcibly stopped if it exceeds 10 minutes."
+          sleep 600s
       - name: Run Terraform Destroy (Harvester)
         if: always()
         env:
