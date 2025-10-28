@@ -1,0 +1,151 @@
+name: Rancher integration testing on Google Cloud infrastructure
+
+on:
+  workflow_dispatch:
+
+jobs:
+  rancher_harvester_ci:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Clone tf-rancher-up project
+        run: git clone https://github.com/rancher/tf-rancher-up.git tf-rancher-up
+      - name: Install prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq curl
+          sudo apt-get install -y netcat-openbsd
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.10.5"
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+      - name: Initialize Terraform (Rancher - tf-rancher-up project)
+        run: terraform init
+        working-directory: tf-rancher-up/recipes/upstream/google-cloud/rke2
+      - name: Run Terraform apply (Rancher - tf-rancher-up project)
+        env:
+          PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          RANCHER_PASSWORD: ${{ secrets.RANCHER_PASSWORD }}
+        run: |
+          terraform apply -auto-approve \
+            -var "prefix=harv-cloud-rancher-ci" \
+            -var "project_id=$PROJECT_ID" \
+            -var "rancher_password=$RANCHER_PASSWORD"
+        working-directory: tf-rancher-up/recipes/upstream/google-cloud/rke2
+      - name: Get Rancher endpoint from Terraform output
+        id: rancher_out
+        run: |
+          url=$(terraform output -raw rancher_url)
+          echo "RANCHER_URL=$url" >> $GITHUB_ENV
+        working-directory: tf-rancher-up/recipes/upstream/google-cloud/rke2
+      - name: Wait for Rancher API
+        env:
+          RANCHER_URL: ${{ env.RANCHER_URL }}
+        run: |
+          echo "Waiting Rancher API..."
+          for i in {1..50}; do
+            if curl -k -sf "$RANCHER_URL/ping" > /dev/null; then
+              echo "Rancher ready!"
+              exit 0
+            fi
+            echo "Attempt $i failed, retrying in 10s..."
+            sleep 10
+          done
+          echo "Rancher not ready!"
+          exit 1
+      - name: Create Rancher API token
+        env:
+          RANCHER_URL: ${{ env.RANCHER_URL }}
+          RANCHER_PASSWORD: ${{ secrets.RANCHER_PASSWORD }}
+        run: |
+          TOKEN=$(curl -s -k "$RANCHER_URL/v3-public/localProviders/local?action=login" \
+            -H 'Content-Type: application/json' \
+            --data-raw "{\"username\":\"admin\",\"password\":\"$RANCHER_PASSWORD\"}" \
+            | jq -r '.token')
+          API_KEY=$(curl -s -k "$RANCHER_URL/v3/token" \
+            -H "Authorization: Bearer $TOKEN" \
+            -H 'Content-Type: application/json' \
+            --data '{"type":"apiKey","description":"ci token"}')
+          FULL_TOKEN=$(echo "$API_KEY" | jq -r '.token')
+          ACCESS_KEY=$(echo "$FULL_TOKEN" | cut -d':' -f1)
+          SECRET_KEY=$(echo "$FULL_TOKEN" | cut -d':' -f2)
+          echo "::add-mask::$TOKEN"
+          echo "::add-mask::$FULL_TOKEN"
+          echo "::add-mask::$ACCESS_KEY"
+          echo "::add-mask::$SECRET_KEY"
+          echo "RANCHER_CI_TOKEN_ACCESS_KEY=$ACCESS_KEY" >> $GITHUB_ENV
+          echo "RANCHER_CI_TOKEN_SECRET_KEY=$SECRET_KEY" >> $GITHUB_ENV
+      - name: Initialize Terraform (Harvester)
+        run: terraform init
+        working-directory: harvester-cloud/projects/google-cloud
+      - name: Run Terraform apply (Harvester)
+        env:
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          RANCHER_URL: ${{ env.RANCHER_URL }}
+          RANCHER_CI_TOKEN_ACCESS_KEY: ${{ env.RANCHER_CI_TOKEN_ACCESS_KEY }}
+          RANCHER_CI_TOKEN_SECRET_KEY: ${{ env.RANCHER_CI_TOKEN_SECRET_KEY }}
+        run: |
+          terraform apply -auto-approve \
+            -var "project_id=$GCP_PROJECT_ID" \
+            -var "rancher_api_url=$RANCHER_URL" \
+            -var "rancher_access_key=$RANCHER_CI_TOKEN_ACCESS_KEY" \
+            -var "rancher_secret_key=$RANCHER_CI_TOKEN_SECRET_KEY" \
+            -var "rancher_insecure=true"
+        working-directory: harvester-cloud/projects/google-cloud
+      - name: Get public IP from Terraform output
+        id: ip
+        run: |
+          ip=$(terraform output -json first_instance_public_ip | jq -r '.[0]')
+          echo "INSTANCE_IP=$ip" >> $GITHUB_ENV
+        working-directory: tests/google-cloud/infra-only
+      - name: Wait for SSH (port 22) to become available
+        run: |
+          echo "Waiting for port 22 on $INSTANCE_IP..."
+          for i in {1..30}; do
+            if nc -zv $INSTANCE_IP 22; then
+              echo "Port 22 is open."
+              exit 0
+            fi
+            echo "Attempt $i failed, retrying in 10s..."
+            sleep 10
+          done
+          echo "SSH not available after 30 attempts. Failing."
+          exit 1
+        env:
+          INSTANCE_IP: ${{ env.INSTANCE_IP }}
+      - name: Validate Harvester-Rancher integration
+        env:
+          RANCHER_URL: ${{ env.RANCHER_URL }}
+          RANCHER_CI_TOKEN_ACCESS_KEY: ${{ env.RANCHER_CI_TOKEN_ACCESS_KEY }}
+          RANCHER_CI_TOKEN_SECRET_KEY: ${{ env.RANCHER_CI_TOKEN_SECRET_KEY }}
+        run: |
+          echo "Checking Harvester integration with Rancher..."
+          RESPONSE=$(curl -s -k -u "$RANCHER_CI_TOKEN_ACCESS_KEY:$RANCHER_CI_TOKEN_SECRET_KEY" "$RANCHER_URL/v3/clusters")
+          if echo "$RESPONSE" | jq -e '.data | length > 0' > /dev/null; then
+            echo "Harvester successfully registered with Rancher."
+          else
+            echo "No clusters found, Harvester integration may have failed."
+            exit 1
+          fi
+      - name: Terraform destroy (Harvester)
+        if: always()
+        run: terraform destroy -auto-approve
+        working-directory: harvester-cloud/projects/google-cloud
+      - name: Terraform destroy (Rancher)
+        if: always()
+        env:
+          PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          RANCHER_PASSWORD: ${{ secrets.RANCHER_PASSWORD }}
+        run: |
+          terraform destroy -auto-approve \
+            -var "prefix=harv-cloud-rancher-ci" \
+            -var "project_id=$PROJECT_ID" \
+            -var "rancher_password=$RANCHER_PASSWORD"
+        working-directory: tf-rancher-up/recipes/upstream/google-cloud/rke2
