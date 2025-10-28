@@ -51,7 +51,7 @@
 | <a name="input_network_vlan_id"></a> [network\_vlan\_id](#input\_network\_vlan\_id) | Specifies the VLAN ID for the Harvester VM network. Default is '1'. | `number` | `1` | no |
 | <a name="input_private_ssh_key_file_name"></a> [private\_ssh\_key\_file\_name](#input\_private\_ssh\_key\_file\_name) | Specifies the name of the private SSH key file used for authentication. | `string` | n/a | yes |
 | <a name="input_private_ssh_key_file_path"></a> [private\_ssh\_key\_file\_path](#input\_private\_ssh\_key\_file\_path) | Specifies the full path where the private SSH key file is located. | `string` | n/a | yes |
-| <a name="input_ssh_username"></a> [ssh\_username](#input\_ssh\_username) | Specifies the username used for SSH authentication (Harvester nodes). Default is 'sles'. | `string` | `"sles"` | no |
+| <a name="input_ssh_username"></a> [ssh\_username](#input\_ssh\_username) | Specifies the username used for SSH authentication (Harvester nodes). Default is 'opensuse'. | `string` | `"opensuse"` | no |
 
 ## Outputs
 
