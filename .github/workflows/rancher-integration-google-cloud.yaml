@@ -35,7 +35,7 @@ jobs:
           RANCHER_PASSWORD: ${{ secrets.RANCHER_PASSWORD }}
         run: |
           terraform apply -auto-approve \
-            -var "prefix=harv-cloud-rancher-ci" \
+            -var "prefix=rancher-harv-integration-wf" \
             -var "project_id=$PROJECT_ID" \
             -var "rancher_password=$RANCHER_PASSWORD"
         working-directory: tf-rancher-up/recipes/upstream/google-cloud/rke2
@@ -93,6 +93,7 @@ jobs:
           RANCHER_CI_TOKEN_SECRET_KEY: ${{ env.RANCHER_CI_TOKEN_SECRET_KEY }}
         run: |
           terraform apply -auto-approve \
+            -var "prefix=harv-rancher-integration-wf" \
             -var "project_id=$GCP_PROJECT_ID" \
             -var "rancher_api_url=$RANCHER_URL" \
             -var "rancher_access_key=$RANCHER_CI_TOKEN_ACCESS_KEY" \
@@ -142,7 +143,14 @@ jobs:
         if: always()
         env:
           GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-        run: terraform destroy -var "project_id=$GCP_PROJECT_ID" -auto-approve
+        run: |
+          terraform destroy -auto-approve \
+            -var "prefix=harv-rancher-integration-wf" \
+            -var "project_id=$GCP_PROJECT_ID" \
+            -var "rancher_api_url=$RANCHER_URL" \
+            -var "rancher_access_key=$RANCHER_CI_TOKEN_ACCESS_KEY" \
+            -var "rancher_secret_key=$RANCHER_CI_TOKEN_SECRET_KEY" \
+            -var "rancher_insecure=true"
         working-directory: projects/google-cloud
       - name: Terraform destroy (Rancher)
         if: always()
@@ -151,7 +159,7 @@ jobs:
           RANCHER_PASSWORD: ${{ secrets.RANCHER_PASSWORD }}
         run: |
           terraform destroy -auto-approve \
-            -var "prefix=harv-cloud-rancher-ci" \
+            -var "prefix=rancher-harv-integration-wf" \
             -var "project_id=$PROJECT_ID" \
             -var "rancher_password=$RANCHER_PASSWORD"
         working-directory: tf-rancher-up/recipes/upstream/google-cloud/rke2
