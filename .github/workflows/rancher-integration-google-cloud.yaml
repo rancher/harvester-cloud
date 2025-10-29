@@ -140,7 +140,7 @@ jobs:
           fi
       - name: Wait/Verify before destroy
         run: |
-          sleep 600s
+          sleep 60s
       - name: Run Terraform Destroy (Harvester)
         if: always()
         env:
