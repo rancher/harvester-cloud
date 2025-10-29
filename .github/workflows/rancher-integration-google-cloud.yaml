@@ -129,8 +129,11 @@ jobs:
         run: |
           echo "Checking Harvester integration with Rancher..."
           RESPONSE=$(curl -s -k -u "$RANCHER_CI_TOKEN_ACCESS_KEY:$RANCHER_CI_TOKEN_SECRET_KEY" "$RANCHER_URL/v3/clusters")
-          if echo "$RESPONSE" | jq -e '.data | length > 0' > /dev/null; then
+          CLUSTER_COUNT=$(echo "$RESPONSE" | jq '.data | length')
+          if [ "$CLUSTER_COUNT" -gt 0 ]; then
             echo "Harvester successfully registered with Rancher."
+            echo "Found $CLUSTER_COUNT cluster(s):"
+            echo "$RESPONSE" | jq -r '.data[] | "- \(.name) (ID: \(.id))"'
           else
             echo "No clusters found, Harvester integration may have failed."
             exit 1
