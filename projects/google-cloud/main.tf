@@ -17,7 +17,6 @@ locals {
   harvester_cluster_size                 = var.harvester_node_count == 5 ? "small" : var.harvester_cluster_size
   harvester_cpu                          = local.harvester_cluster_size == "small" ? 8 : 16
   harvester_memory                       = local.harvester_cluster_size == "small" ? 32768 : 65536
-  create_ssh_key_pair                    = var.create_ssh_key_pair == true ? false : true
   ssh_private_key_path                   = var.ssh_private_key_path == null ? "${path.cwd}/${var.prefix}-ssh_private_key.pem" : var.ssh_private_key_path
   ssh_public_key_path                    = var.ssh_public_key_path == null ? "${path.cwd}/${var.prefix}-ssh_public_key.pem" : var.ssh_public_key_path
   create_vpc                             = var.create_vpc == true ? false : var.create_vpc
