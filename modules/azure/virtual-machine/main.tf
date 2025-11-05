@@ -143,7 +143,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
   eviction_policy = var.spot_instance ? "Deallocate" : null
   admin_ssh_key {
     username   = local.ssh_username
-    public_key = tls_private_key.ssh_private_key[0].public_key_openssh
+    public_key = var.create_ssh_key_pair ? tls_private_key.ssh_private_key[0].public_key_openssh : file(local.public_ssh_key_path)
   }
   os_disk {
     caching              = "ReadWrite"

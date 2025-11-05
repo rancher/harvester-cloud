@@ -134,7 +134,7 @@ resource "google_compute_instance" "default" {
   metadata = {
     serial-port-logging-enable = "TRUE"
     serial-port-enable         = "TRUE"
-    ssh-keys                   = var.create_ssh_key_pair ? "${local.ssh_username}:${tls_private_key.ssh_private_key[0].public_key_openssh}" : "${local.ssh_username}:${local.public_ssh_key_path}"
+    ssh-keys                   = var.create_ssh_key_pair ? "${local.ssh_username}:${tls_private_key.ssh_private_key[0].public_key_openssh}" : "${local.ssh_username}:${file(local.public_ssh_key_path)}"
     startup-script             = var.startup_script
   }
   lifecycle {
