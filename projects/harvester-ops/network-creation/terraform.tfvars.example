@@ -11,7 +11,7 @@ cluster_network_name = "cluster-vlan"
 cluster_network_vlanconfig_name = "cluster-vlan-all-nodes"
 
 ## -- Specifies the list of NICs used for the Harvester Cluster Network VLAN.
-cluster_network_vlan_nic = "virbr2"
+cluster_network_vlan_nics = "virbr2"
 
 ## -- Specifies the bond mode for the Harvester Cluster Network VLAN.
 cluster_network_vlan_bond_mode = "active-backup"
