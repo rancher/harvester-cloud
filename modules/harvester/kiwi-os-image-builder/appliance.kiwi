@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<image schemaversion="7.5" name="opensuse-leap-15-6-harv-cloud-image">
+    <description type="system">
+        <author>harvester-cloud maintainers</author>
+        <contact>none</contact>
+        <specification>openSUSE Leap 15.6 image certified for harvester-cloud</specification>
+    </description>
+    <preferences>
+        <version>1.15.3</version>
+        <packagemanager>zypper</packagemanager>
+        <locale>en_US</locale>
+        <keytable>us</keytable>
+        <timezone>UTC</timezone>
+        <rpm-excludedocs>true</rpm-excludedocs>
+        <rpm-check-signatures>false</rpm-check-signatures>
+        <type image="iso" firmware="efi" kernelcmdline="console=ttyS0">
+            <bootloader name="grub2" timeout="10"/>
+        </type>
+    </preferences>
+    <repository type="rpm-md">
+        <source path="obsrepositories:/"/>
+    </repository>
+    <packages type="image">
+        <!-- Base system / Boot -->
+        <package name="kernel-default"/>
+        <package name="dracut-kiwi-live"/>
+        <package name="grub2"/>
+        <package name="grub2-i386-pc"/>
+        <package name="grub2-x86_64-efi" arch="x86_64"/>
+        <package name="grub2-branding-openSUSE"/>
+        <package name="shim"/>
+        <package name="dosfstools"/>
+        <package name="systemd"/>
+        <package name="timezone"/>
+        <package name="udev"/>
+        <package name="procps"/>
+        <package name="filesystem"/>
+        <!-- System utilities -->
+        <package name="util-linux"/>
+        <package name="tar"/>
+        <package name="parted"/>
+        <package name="less"/>
+        <package name="bash-completion"/>
+        <package name="which"/>
+        <package name="iproute2"/>
+        <package name="iputils"/>
+        <package name="lvm2"/>
+        <!-- Networking / KVM / Cloud -->
+        <package name="libvirt"/>
+        <package name="qemu-kvm"/>
+        <package name="virt-install"/>
+        <package name="openssh"/>
+        <package name="cloud-init"/>
+        <package name="python3-websockify"/>
+        <package name="novnc"/>
+        <package name="socat"/>
+        <package name="sshpass"/>
+        <!-- Services / Daemons -->
+        <package name="nginx"/>
+        <package name="chrony"/>
+        <package name="cron"/>
+        <package name="bind-utils"/>
+        <!-- Extras / UI / Fonts -->
+        <package name="plymouth"/>
+        <package name="plymouth-theme-bgrt"/>
+        <package name="fontconfig"/>
+        <package name="fonts-config"/>
+        <package name="vim"/>
+        <package name="curl"/>
+        <package name="patterns-openSUSE-base"/>
+    </packages>
+    <packages type="bootstrap">
+        <package name="udev"/>
+        <package name="filesystem"/>
+        <package name="glibc-locale"/>
+        <package name="cracklib-dict-full"/>
+        <package name="ca-certificates"/>
+        <package name="ca-certificates-mozilla"/>
+        <package name="openSUSE-release"/>
+        <package name="zypper"/>
+    </packages>
+</image>
