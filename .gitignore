@@ -19,8 +19,8 @@ terraform.tfvars
 **/vlanx.xml
 projects/harvester-ops/network-creation/vlan*
 
-# Ignore build artifacts (e.g., ISO images) in outputs/ to keep repo size small
-modules/harvester/kiwi-os-image-builder/outputs/
+# Ignore generated ISO images to avoid committing large build artifacts
+**/*.iso
 
 # Temporary files
 **/*.swp
