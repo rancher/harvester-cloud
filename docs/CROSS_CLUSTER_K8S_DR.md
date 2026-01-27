@@ -1,6 +1,4 @@
-# rancher-harvester-k8s-dr
-
-Implement Cross-Cluster Kubernetes Disaster Recovery with Rancher using Harvester (harvester-cloud) as Cloud Provider.
+# Implement Cross-Cluster Kubernetes Disaster Recovery with Rancher using Harvester (harvester-cloud) as Cloud Provider.
 
 ## Architecture Overview
 
