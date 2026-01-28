@@ -19,8 +19,9 @@ terraform.tfvars
 **/vlanx.xml
 projects/harvester-ops/network-creation/vlan*
 
-# Ignore generated ISO images to avoid committing large build artifacts
+# Ignore generated ISO/QCOW2 images to avoid committing large build artifacts
 **/*.iso
+**/*.qcow2
 
 # Temporary files
 **/*.swp

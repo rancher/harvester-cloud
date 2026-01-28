@@ -668,6 +668,174 @@ $
 
 ## How to use the above created image in harvester-cloud projects?
 
-#### DO
+### DO
 
+#### Convert ISO to QCOW2
+
+```console
+$ ll
+total 907192
+drwxr-xr-x  3 glovecchio  staff         96 Jan 26 11:51 root
+-rw-r--r--  1 glovecchio  staff       3028 Jan 27 16:20 appliance.kiwi
+-rw-r--r--  1 glovecchio  staff        190 Jan 27 17:05 config.sh
+drwxr-xr-x  7 glovecchio  staff        224 Jan 27 18:35 ..
+-rw-r--r--  1 glovecchio  staff       8018 Jan 28 13:09 README.md
+drwxr-xr-x  7 glovecchio  staff        224 Jan 28 13:19 .
+-rw-r--r--  1 glovecchio  staff  464463872 Jan 28 13:19 opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.iso
+$ 
+```
+
+```bash
+docker run -it --rm --privileged --platform linux/amd64 -v $(pwd):/build opensuse/leap:15.6
+zypper in -y qemu-tools
+qemu-img convert -O qcow2 /build/opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.iso /build/opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.qcow2
+ls -l /build/
+```
+
+##### Example
+
+```console
+$ docker run -it --rm --privileged --platform linux/amd64 -v $(pwd):/build opensuse/leap:15.6
+:/ # zypper in -y qemu-tools
+Looking for gpg keys in repository Update repository of openSUSE Backports.
+  gpgkey=http://download.opensuse.org/update/leap/15.6/backports/repodata/repomd.xml.key
+Retrieving repository 'Update repository of openSUSE Backports' metadata ............................................................................[done]
+Building repository 'Update repository of openSUSE Backports' cache .................................................................................[done]
+Looking for gpg keys in repository Non-OSS Repository.
+  gpgkey=http://download.opensuse.org/distribution/leap/15.6/repo/non-oss/repodata/repomd.xml.key
+Retrieving repository 'Non-OSS Repository' metadata .................................................................................................[done]
+Building repository 'Non-OSS Repository' cache ......................................................................................................[done]
+Retrieving repository 'Open H.264 Codec (openSUSE Leap)' metadata ...................................................................................[done]
+Building repository 'Open H.264 Codec (openSUSE Leap)' cache ........................................................................................[done]
+Looking for gpg keys in repository Main Repository.
+  gpgkey=http://download.opensuse.org/distribution/leap/15.6/repo/oss/repodata/repomd.xml.key
+Retrieving repository 'Main Repository' metadata ....................................................................................................[done]
+Building repository 'Main Repository' cache .........................................................................................................[done]
+Looking for gpg keys in repository Update repository with updates from SUSE Linux Enterprise 15.
+  gpgkey=http://download.opensuse.org/update/leap/15.6/sle/repodata/repomd.xml.key
+Retrieving repository 'Update repository with updates from SUSE Linux Enterprise 15' metadata .......................................................[done]
+Building repository 'Update repository with updates from SUSE Linux Enterprise 15' cache ............................................................[done]
+Looking for gpg keys in repository Main Update Repository.
+  gpgkey=http://download.opensuse.org/update/leap/15.6/oss/repodata/repomd.xml.key
+Retrieving repository 'Main Update Repository' metadata .............................................................................................[done]
+Building repository 'Main Update Repository' cache ..................................................................................................[done]
+Looking for gpg keys in repository Update Repository (Non-Oss).
+  gpgkey=http://download.opensuse.org/update/leap/15.6/non-oss/repodata/repomd.xml.key
+Retrieving repository 'Update Repository (Non-Oss)' metadata ........................................................................................[done]
+Building repository 'Update Repository (Non-Oss)' cache .............................................................................................[done]
+Loading repository data...
+Reading installed packages...
+Resolving package dependencies...
+
+The following 23 NEW packages are going to be installed:
+  libaio1 libdevmapper1_03 libexpat1 libgmodule-2_0-0 libgnutls30 libhogweed6 libmpath0 libnettle8 libnuma1 libopenssl1_1 libpython3_6m1_0 libseccomp2
+  liburcu6 liburing2 libxkbcommon0 pkg-config python3-base qemu-img qemu-pr-helper qemu-tools system-group-kvm virtiofsd xkeyboard-config
+
+23 new packages to install.
+
+Package download size:    17.5 MiB
+
+Package install size change:
+              |      63.0 MiB  required by packages that will be installed
+    63.0 MiB  |  -      0 B    released by packages that will be removed
+
+Backend:  classic_rpmtrans
+Continue? [y/n/v/...? shows all options] (y): y
+Retrieving: libnuma1-2.0.14.20.g4ee5e0c-150400.1.24.x86_64 (Main Repository)                                                          (1/23),  31.8 KiB    
+Retrieving: libnuma1-2.0.14.20.g4ee5e0c-150400.1.24.x86_64.rpm .........................................................................[done (19.6 KiB/s)]
+Retrieving: libseccomp2-2.5.3-150400.2.4.x86_64 (Main Repository)                                                                     (2/23),  61.5 KiB    
+Retrieving: libseccomp2-2.5.3-150400.2.4.x86_64.rpm .................................................................................................[done]
+Retrieving: liburcu6-0.12.1-1.30.x86_64 (Main Repository)                                                                             (3/23),  97.2 KiB    
+Retrieving: liburcu6-0.12.1-1.30.x86_64.rpm .............................................................................................[done (1.1 KiB/s)]
+Retrieving: liburing2-2.1-150400.2.4.x86_64 (Main Repository)                                                                         (4/23),  36.4 KiB    
+Retrieving: liburing2-2.1-150400.2.4.x86_64.rpm .....................................................................................................[done]
+Retrieving: system-group-kvm-20170617-150400.24.2.1.noarch (Main Repository)                                                          (5/23),  11.8 KiB    
+Retrieving: system-group-kvm-20170617-150400.24.2.1.noarch.rpm ......................................................................................[done]
+Retrieving: libaio1-0.3.113-150600.15.3.1.x86_64 (Update repository with updates from SUSE Linux Enterprise 15)                       (6/23),  21.3 KiB    
+Retrieving: libaio1-0.3.113-150600.15.3.1.x86_64.rpm ................................................................................................[done]
+Retrieving: libdevmapper1_03-2.03.22_1.02.196-150600.3.9.3.x86_64 (Update repository with updates from SUSE Linux Enterprise 15)      (7/23), 190.5 KiB    
+Retrieving: libdevmapper1_03-2.03.22_1.02.196-150600.3.9.3.x86_64.rpm ...............................................................................[done]
+Retrieving: libexpat1-2.7.1-150400.3.31.1.x86_64 (Update repository with updates from SUSE Linux Enterprise 15)                       (8/23), 101.7 KiB    
+Retrieving: libexpat1-2.7.1-150400.3.31.1.x86_64.rpm ................................................................................................[done]
+Retrieving: libgmodule-2_0-0-2.78.6-150600.4.28.1.x86_64 (Update repository with updates from SUSE Linux Enterprise 15)               (9/23), 147.9 KiB    
+Retrieving: libgmodule-2_0-0-2.78.6-150600.4.28.1.x86_64.rpm ........................................................................................[done]
+Retrieving: libnettle8-3.9.1-150600.3.2.1.x86_64 (Update repository with updates from SUSE Linux Enterprise 15)                      (10/23), 171.1 KiB    
+Retrieving: libnettle8-3.9.1-150600.3.2.1.x86_64.rpm ................................................................................................[done]
+Retrieving: libopenssl1_1-1.1.1w-150600.5.18.1.x86_64 (Update repository with updates from SUSE Linux Enterprise 15)                 (11/23),   1.4 MiB    
+Retrieving: libopenssl1_1-1.1.1w-150600.5.18.1.x86_64.rpm ...............................................................................[done (1.3 MiB/s)]
+Retrieving: pkg-config-0.29.2-150600.15.6.3.x86_64 (Update repository with updates from SUSE Linux Enterprise 15)                    (12/23),  73.3 KiB    
+Retrieving: pkg-config-0.29.2-150600.15.6.3.x86_64.rpm ..............................................................................................[done]
+Retrieving: virtiofsd-1.10.1-150600.4.3.1.x86_64 (Update repository with updates from SUSE Linux Enterprise 15)                      (13/23), 880.5 KiB    
+Retrieving: virtiofsd-1.10.1-150600.4.3.1.x86_64.rpm ...................................................................................[done (49.3 KiB/s)]
+Retrieving: libmpath0-0.9.8+247+suse.863ae86f-150600.3.6.1.x86_64 (Update repository with updates from SUSE Linux Enterprise 15)     (14/23), 313.0 KiB    
+Retrieving: libmpath0-0.9.8+247+suse.863ae86f-150600.3.6.1.x86_64.rpm ...............................................................................[done]
+Retrieving: libhogweed6-3.9.1-150600.3.2.1.x86_64 (Update repository with updates from SUSE Linux Enterprise 15)                     (15/23), 226.0 KiB    
+Retrieving: libhogweed6-3.9.1-150600.3.2.1.x86_64.rpm ...............................................................................................[done]
+Retrieving: libpython3_6m1_0-3.6.15-150300.10.103.1.x86_64 (Update repository with updates from SUSE Linux Enterprise 15)            (16/23),   1.2 MiB    
+Retrieving: libpython3_6m1_0-3.6.15-150300.10.103.1.x86_64.rpm ......................................................................................[done]
+Retrieving: python3-base-3.6.15-150300.10.103.1.x86_64 (Update repository with updates from SUSE Linux Enterprise 15)                (17/23),   7.8 MiB    
+Retrieving: python3-base-3.6.15-150300.10.103.1.x86_64.rpm ..............................................................................[done (5.5 MiB/s)]
+Retrieving: libgnutls30-3.8.3-150600.4.12.1.x86_64 (Update repository with updates from SUSE Linux Enterprise 15)                    (18/23), 912.7 KiB    
+Retrieving: libgnutls30-3.8.3-150600.4.12.1.x86_64.rpm ..............................................................................................[done]
+Retrieving: qemu-pr-helper-8.2.10-150600.3.43.1.x86_64 (Update repository with updates from SUSE Linux Enterprise 15)                (19/23), 605.0 KiB    
+Retrieving: qemu-pr-helper-8.2.10-150600.3.43.1.x86_64.rpm ............................................................................[done (456.3 KiB/s)]
+Retrieving: qemu-img-8.2.10-150600.3.43.1.x86_64 (Update repository with updates from SUSE Linux Enterprise 15)                      (20/23),   2.1 MiB    
+Retrieving: qemu-img-8.2.10-150600.3.43.1.x86_64.rpm ..................................................................................[done (467.8 KiB/s)]
+Retrieving: xkeyboard-config-2.40-150600.1.2.noarch (Main Repository)                                                                (21/23), 430.9 KiB    
+Retrieving: xkeyboard-config-2.40-150600.1.2.noarch.rpm .............................................................................................[done]
+Retrieving: libxkbcommon0-1.5.0-150600.3.3.1.x86_64 (Update repository with updates from SUSE Linux Enterprise 15)                   (22/23), 119.2 KiB    
+Retrieving: libxkbcommon0-1.5.0-150600.3.3.1.x86_64.rpm .............................................................................................[done]
+Retrieving: qemu-tools-8.2.10-150600.3.43.1.x86_64 (Update repository with updates from SUSE Linux Enterprise 15)                    (23/23), 714.0 KiB    
+Retrieving: qemu-tools-8.2.10-150600.3.43.1.x86_64.rpm ..............................................................................................[done]
+
+Checking for file conflicts: ........................................................................................................................[done]
+( 1/23) Installing: libnuma1-2.0.14.20.g4ee5e0c-150400.1.24.x86_64 ..................................................................................[done]
+( 2/23) Installing: libseccomp2-2.5.3-150400.2.4.x86_64 .............................................................................................[done]
+( 3/23) Installing: liburcu6-0.12.1-1.30.x86_64 .....................................................................................................[done]
+( 4/23) Installing: liburing2-2.1-150400.2.4.x86_64 .................................................................................................[done]
+/usr/sbin/groupadd -r -g 36 kvm
+( 5/23) Installing: system-group-kvm-20170617-150400.24.2.1.noarch ..................................................................................[done]
+( 6/23) Installing: libaio1-0.3.113-150600.15.3.1.x86_64 ............................................................................................[done]
+( 7/23) Installing: libdevmapper1_03-2.03.22_1.02.196-150600.3.9.3.x86_64 ...........................................................................[done]
+( 8/23) Installing: libexpat1-2.7.1-150400.3.31.1.x86_64 ............................................................................................[done]
+( 9/23) Installing: libgmodule-2_0-0-2.78.6-150600.4.28.1.x86_64 ....................................................................................[done]
+(10/23) Installing: libnettle8-3.9.1-150600.3.2.1.x86_64 ............................................................................................[done]
+(11/23) Installing: libopenssl1_1-1.1.1w-150600.5.18.1.x86_64 .......................................................................................[done]
+(12/23) Installing: pkg-config-0.29.2-150600.15.6.3.x86_64 ..........................................................................................[done]
+(13/23) Installing: virtiofsd-1.10.1-150600.4.3.1.x86_64 ............................................................................................[done]
+(14/23) Installing: libmpath0-0.9.8+247+suse.863ae86f-150600.3.6.1.x86_64 ...........................................................................[done]
+(15/23) Installing: libhogweed6-3.9.1-150600.3.2.1.x86_64 ...........................................................................................[done]
+(16/23) Installing: libpython3_6m1_0-3.6.15-150300.10.103.1.x86_64 ..................................................................................[done]
+(17/23) Installing: python3-base-3.6.15-150300.10.103.1.x86_64 ......................................................................................[done]
+(18/23) Installing: libgnutls30-3.8.3-150600.4.12.1.x86_64 ..........................................................................................[done]
+(19/23) Installing: qemu-pr-helper-8.2.10-150600.3.43.1.x86_64 ......................................................................................[done]
+(20/23) Installing: qemu-img-8.2.10-150600.3.43.1.x86_64 ............................................................................................[done]
+(21/23) Installing: xkeyboard-config-2.40-150600.1.2.noarch .........................................................................................[done]
+(22/23) Installing: libxkbcommon0-1.5.0-150600.3.3.1.x86_64 .........................................................................................[done]
+(23/23) Installing: qemu-tools-8.2.10-150600.3.43.1.x86_64 ..........................................................................................[done]
+:/ # qemu-img convert -O qcow2 /build/opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.iso /build/opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.qcow2
+:/ # ls -l /build/
+total 889248
+-rw-r--r-- 1 root root     61064 Jan 28 12:41 README.md
+-rw-r--r-- 1 root root      3028 Jan 27 15:20 appliance.kiwi
+-rw-r--r-- 1 root root       190 Jan 27 16:05 config.sh
+-rw-r--r-- 1 root root 464463872 Jan 28 12:19 opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.iso
+-rw-r--r-- 1 root root 446103552 Jan 28 12:51 opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.qcow2
+drwxr-xr-x 1 root root        96 Jan 26 10:51 root
+:/ # exit
+exit
+$ ll
+total 1778504
+drwxr-xr-x  3 glovecchio  staff         96 Jan 26 11:51 root
+-rw-r--r--  1 glovecchio  staff       3028 Jan 27 16:20 appliance.kiwi
+-rw-r--r--  1 glovecchio  staff        190 Jan 27 17:05 config.sh
+drwxr-xr-x  7 glovecchio  staff        224 Jan 27 18:35 ..
+-rw-r--r--  1 glovecchio  staff  464463872 Jan 28 13:19 opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.iso
+-rw-r--r--  1 glovecchio  staff  446103552 Jan 28 13:51 opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.qcow2
+-rw-r--r--  1 glovecchio  staff      61619 Jan 28 13:52 README.md
+drwxr-xr-x  8 glovecchio  staff        256 Jan 28 13:52 .
+$
+```
+
+#### Run the Terraform code with the following `terraform.tfvars` file
 
