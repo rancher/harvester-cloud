@@ -667,7 +667,7 @@ $ du -hsx opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.iso
 $
 ```
 
-**Convert ISO to RAW (.img).**
+**Convert ISO to RAW (.img)**
 
 ```console
 $ ll
