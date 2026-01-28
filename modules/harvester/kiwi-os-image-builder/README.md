@@ -162,7 +162,7 @@ systemctl enable cloud-final
 - `systemctl enable cloud-config`: Applies user and system configuration provided via cloud-init.
 - `systemctl enable cloud-final`: Executes final cloud-init tasks once the system is fully up.
 
-## How to create the image locally
+## How to create the image locally - for educational purposes only, as it is not possible to upload the image from here
 
 ```console
 $ pwd
@@ -667,11 +667,7 @@ $ du -hsx opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.iso
 $
 ```
 
-## How to use the above created image in harvester-cloud projects?
-
-### DO
-
-#### Convert ISO to QCOW2
+**Convert ISO to RAW (.img).**
 
 ```console
 $ ll
@@ -689,7 +685,7 @@ $
 ```bash
 docker run -it --rm --privileged --platform linux/amd64 -v $(pwd):/build opensuse/leap:15.6
 zypper in -y qemu-tools
-qemu-img convert -O qcow2 /build/opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.iso /build/opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.qcow2
+qemu-img convert -O raw /build/opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.iso /build/opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.img
 ls -l /build/
 ```
 
@@ -814,14 +810,14 @@ Checking for file conflicts: ...................................................
 (21/23) Installing: xkeyboard-config-2.40-150600.1.2.noarch .........................................................................................[done]
 (22/23) Installing: libxkbcommon0-1.5.0-150600.3.3.1.x86_64 .........................................................................................[done]
 (23/23) Installing: qemu-tools-8.2.10-150600.3.43.1.x86_64 ..........................................................................................[done]
-:/ # qemu-img convert -O qcow2 /build/opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.iso /build/opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.qcow2
+:/ # qemu-img convert -O raw /build/opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.iso /build/opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.img
 :/ # ls -l /build/
 total 889248
 -rw-r--r-- 1 root root     61064 Jan 28 12:41 README.md
 -rw-r--r-- 1 root root      3028 Jan 27 15:20 appliance.kiwi
 -rw-r--r-- 1 root root       190 Jan 27 16:05 config.sh
 -rw-r--r-- 1 root root 464463872 Jan 28 12:19 opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.iso
--rw-r--r-- 1 root root 446103552 Jan 28 12:51 opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.qcow2
+-rw-r--r-- 1 root root 464463872 Jan 28 12:51 opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.img
 drwxr-xr-x 1 root root        96 Jan 26 10:51 root
 :/ # exit
 exit
@@ -832,11 +828,8 @@ drwxr-xr-x  3 glovecchio  staff         96 Jan 26 11:51 root
 -rw-r--r--  1 glovecchio  staff        190 Jan 27 17:05 config.sh
 drwxr-xr-x  7 glovecchio  staff        224 Jan 27 18:35 ..
 -rw-r--r--  1 glovecchio  staff  464463872 Jan 28 13:19 opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.iso
--rw-r--r--  1 glovecchio  staff  446103552 Jan 28 13:51 opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.qcow2
+-rw-r--r--  1 glovecchio  staff  464463872 Jan 28 13:51 opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.img
 -rw-r--r--  1 glovecchio  staff      61619 Jan 28 13:52 README.md
 drwxr-xr-x  8 glovecchio  staff        256 Jan 28 13:52 .
 $
 ```
-
-#### Run the Terraform code with the following `terraform.tfvars` file
-
