@@ -167,6 +167,7 @@ systemctl enable cloud-final
 ```console
 $ pwd
 ~/harvester-cloud/modules/harvester/kiwi-os-image-builder
+$
 ```
 
 ```bash
