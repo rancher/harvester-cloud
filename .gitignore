@@ -21,6 +21,7 @@ projects/harvester-ops/network-creation/vlan*
 
 # Ignore generated ISO/QCOW2 images to avoid committing large build artifacts
 **/*.iso
+**/*.img
 **/*.qcow2
 
 # Temporary files
