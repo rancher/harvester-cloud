@@ -1,11 +1,14 @@
-# How to configure an ISCSI Disk in a Harvester cluster 
+# How to Configure an iSCSI Disk in a Harvester Cluster
 
-The following documentation will explain the use-case of how to expose an ISCSI disk and how to mount in a Harvester cluster deployed by using the harvester-cloud project.
-All the scenario and testing will be performed in a Harvester cluster deployed on DigitalOcean but with small changes it will work on a Harvester cluster deployed on any cloud-provider since only the creation of the additional disk will be different on each cloud provider.
+This documentation explains the use case for exposing an iSCSI disk and mounting it in a Harvester cluster deployed using the `harvester-cloud` project.
 
-## PRE-REQUISITES:
+All scenarios and tests are performed on a Harvester cluster deployed on DigitalOcean. With minor changes, the same procedure can be applied to Harvester clusters deployed on other cloud providers, as only the creation of the additional disk differs between providers.
 
-* First of all, We need a Harvester cluster up and running deployed on any cloud provider. The examples provided have been tested by creating a Harvester cluster on DigitalOcean by using the following variables.
+## PREREQUISITES:
+
+* A Harvester cluster must be up and running on any cloud provider.
+The examples in this guide were tested on a Harvester cluster deployed on DigitalOcean using the variables below.
+
 ```console
 cat harvester-cloud/projects/digitalocean/terraform.tfvars
 
@@ -15,7 +18,10 @@ region = "ams3"
 harvester_node_count = 1
 prefix = "jlagos"
 ```
-* Extra disk created on the cloud and attached to the cloud instance. On DigitalOcean it is possible to do this by using doctl locally or on the DigitalOcean portal. https://docs.digitalocean.com/reference/doctl/how-to/install/
+
+* An additional disk provisioned by the cloud provider and attached to the instance running Harvester.
+On DigitalOcean, the disk can be created and attached using doctl or via the DigitalOcean control panel.
+Refer to the [official documentation](https://docs.digitalocean.com/reference/doctl/how-to/install/) for more details.
 
 ```console
 1 - Create DigitalOcean Volume by selecting the same region where the cluster has been deployed
@@ -35,11 +41,12 @@ Disk model: Volume
 Units: sectors of 1 * 512 = 512 bytes
 Sector size (logical/physical): 512 bytes / 512 bytes
 I/O size (minimum/optimal): 512 bytes / 512 bytes
-
 ```
-* We can separate the ISCSI network from the Harvester management subnet (192.168.122.0/24) by adding a new interface to the harvester nodes using [network-creation](https://github.com/rancher/harvester-cloud/tree/main/projects/harvester-ops/network-creation) project
 
-In the document a new interface will be created to the Harvester node. Here are the variables used to execute network-creation terraform script
+* Optionally, the iSCSI network can be separated from the Harvester management subnet (192.168.122.0/24) by adding a new network interface to the Harvester nodes using the [network-creation](https://github.com/rancher/harvester-cloud/tree/main/projects/harvester-ops/network-creation) project.
+
+In this document, a new network interface will be created for the Harvester nodes.
+The following variables are used to execute the network-creation Terraform script.
 
 ```console
 cat harvester-cloud/projects/harvester-ops/network-creation/terraform.tfvars
@@ -53,9 +60,10 @@ ssh_username              = "opensuse"
 cluster_network_count = 1 # ens7 interface will be added to Local Harvester node which is connected to 192.168.123.0/24 subnet
 ```
 
-### Expose ISCSI disk on the cloud instance.
+### Expose iSCSI disk on the cloud instance.
 
 1. Identifying the additional disk mounted on the cloud instance.
+
 ```console
 1 - SSH into the node. terraform output to get the public IP of the cloud instance where Harvester nodes are running.
 
@@ -65,7 +73,6 @@ first_instance_public_ip = [
 ]
 harvester_url = "https://<prefix>.<public-ip>.sslip.io"
 longhorn_url = "https://<prefix>.<public-ip>.sslip.io/dashboard/c/local/longhorn"
-
 
 2 - ssh -i <prefix>-ssh_private_key.pem root@<public-ip>
 
@@ -135,10 +142,10 @@ Sector size (logical/physical): 512 bytes / 512 bytes
 I/O size (minimum/optimal): 512 bytes / 512 bytes
 
 /dev/sdb is the new additional disk added
-
 ```
 
 2. Installing pip and targetcli on the cloud machine.
+
 ```console
 1 - zypper in python3-pip
 2 - pip3 install targetcli-fb configshell_fb rtslib_fb 
@@ -175,7 +182,6 @@ sudo targetcli /iscsi/$IQN/tpg1/acls create $HARVESTER_IQN
 
 echo "[INFO] saving config..."
 sudo targetcli saveconfig
-
 ```
 
 ```console
@@ -223,21 +229,20 @@ o- / ...........................................................................
   o- loopback ......................................................................................................... [Targets: 0]
   o- vhost ............................................................................................................ [Targets: 0]
   o- xen-pvscsi ....................................................................................................... [Targets: 0]
-
 ```
 
-### Mount ISCSI disk on Harvester node
+### Mount iSCSI disk on Harvester node
 
 1. Access Harvester node through SSH and add an IP from 192.168.123.0/24 subnet to ens7 interface
 
 ```console
 1 - ssh rancher@192.168.122.120 # Password can be obtained from join/Create yaml file located on the cloud directory (DigitalOcean,Google-cloud & Azure)
 
-1 - ip link show ens7
+2 - ip link show ens7
 ens7: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP mode DEFAULT group default qlen 1000
     link/ether 52:54:00:cf:fe:0d brd ff:ff:ff:ff:ff:ff
     altname enp0s7
-2 - ip addr add 192.168.123.36/24 dev ens7
+3 - ip addr add 192.168.123.36/24 dev ens7
 ```
 
 2. Apply iscsiadm commands
@@ -256,8 +261,8 @@ Disk model: disk1
 Units: sectors of 1 * 512 = 512 bytes
 Sector size (logical/physical): 512 bytes / 512 bytes
 I/O size (minimum/optimal): 512 bytes / 33550336 bytes
-
 ```
+
 4. Check on Harvester UI/CLI that the new disk can be added.
 
 ```console
@@ -266,11 +271,11 @@ NAMESPACE         NAME                               TYPE   DEVPATH    MOUNTPOIN
 longhorn-system   74f562c07bd2cffad33d4fe2effdcd1a   disk   /dev/sda                jlagos-1   Unprovisioned    77s
 ```
 
-![ISCSI_HARVESTER_DISK_1.png](../images/ISCSI_HARVESTER_DISK_1.png)
+![ISCS_DISK_SETUP_1.png](../images/ISCS_DISK_SETUP_1.png)
 
 5. Add the disk. It is also possible to confirm new disk on Longhorn UI.
 
-![ISCSI_HARVESTER_DISK_2.png](../images/ISCSI_HARVESTER_DISK_2.png)
+![ISCS_DISK_SETUP_2.png](../images/ISCS_DISK_SETUP_2.png)
 
 6. The previous configuration is not persistent which means that it will be removed after a node reboot. In case the configuration needs to be persistent after a reboot the following command must be executed.
 

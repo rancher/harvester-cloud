@@ -35,6 +35,7 @@ The `projects/` directory combines modules to create different deployment recipe
 - [How to create a downstream K8s cluster from Rancher using the Harvester Cloud Provider](https://github.com/rancher/harvester-cloud/blob/main/docs/CREATE_DOWNSTREAM_CLUSTER.md)
 - [How to perform an upgrade in an air-gapped Harvester cluster](https://github.com/rancher/harvester-cloud/blob/main/docs/AIR_GAPPED_UPGRADE_PROCESS.md)
 - [Implement Cross-Cluster Kubernetes Disaster Recovery with Rancher using Harvester (harvester-cloud) as Cloud Provider](https://github.com/rancher/harvester-cloud/blob/main/docs/CROSS_CLUSTER_K8S_DR.md)
+- [How to Configure an iSCSI Disk in a Harvester Cluster](https://github.com/rancher/harvester-cloud/blob/main/docs/ISCS_DISK_SETUP.md)
 
 ## How to get started with the various projects
 
