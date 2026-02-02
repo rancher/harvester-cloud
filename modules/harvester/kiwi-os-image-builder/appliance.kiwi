@@ -6,7 +6,7 @@
         <specification>openSUSE Leap 15.6 image certified for harvester-cloud</specification>
     </description>
     <preferences>
-        <version>1.15.3</version>
+        <version>1.0.0</version>
         <packagemanager>zypper</packagemanager>
         <locale>en_US</locale>
         <keytable>us</keytable>

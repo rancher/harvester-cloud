@@ -4,6 +4,7 @@ locals {
   instance_count       = 1
   instance_os_type     = "opensuse"
   ssh_username         = local.instance_os_type
+  certified_image_url  = var.certified_os_image ? "https://github.com/rancher/harvester-cloud/releases/download/${var.certified_os_image_tag}/opensuse-leap-15-6-harv-cloud-image.x86_64.qcow2.bz2" : null
 }
 
 resource "tls_private_key" "ssh_private_key" {
@@ -43,14 +44,22 @@ resource "digitalocean_volume_attachment" "data_disk_attachment" {
   droplet_id = digitalocean_droplet.nodes[0].id
 }
 
+resource "digitalocean_custom_image" "upload_certified_image" {
+  count   = var.certified_os_image ? 1 : 0
+  name    = "${var.prefix}-opensuse-certified-img"
+  url     = local.certified_image_url
+  regions = ["nyc3", "${var.region}"]
+}
+
 resource "digitalocean_droplet" "nodes" {
-  count    = local.instance_count
-  name     = "node-${var.prefix}-${count.index + 1}"
-  tags     = ["user:${var.prefix}"]
-  region   = var.region
-  size     = var.instance_type
-  image    = data.digitalocean_image.opensuse.id
-  ssh_keys = [digitalocean_ssh_key.do_pub_created_ssh.id]
+  count      = local.instance_count
+  depends_on = [digitalocean_custom_image.upload_certified_image]
+  name       = "node-${var.prefix}-${count.index + 1}"
+  tags       = ["user:${var.prefix}"]
+  region     = var.region
+  size       = var.instance_type
+  image      = var.certified_os_image ? digitalocean_custom_image.upload_certified_image[0].id : data.digitalocean_image.opensuse.id
+  ssh_keys   = [digitalocean_ssh_key.do_pub_created_ssh.id]
 }
 
 resource "digitalocean_firewall" "example_firewall" {

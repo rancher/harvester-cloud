@@ -17,7 +17,7 @@ KIWI is an openSUSE tool for building Linux system images like ISO or QCOW2. It 
         <specification>openSUSE Leap 15.6 image certified for harvester-cloud</specification>
     </description>
     <preferences>
-        <version>1.15.3</version>
+        <version>1.0.0</version>
         <packagemanager>zypper</packagemanager>
         <locale>en_US</locale>
         <keytable>us</keytable>
@@ -106,7 +106,7 @@ Provides metadata about the image:
   - `<specification>`: Short description of the image (`openSUSE Leap 15.6 image certified for harvester-cloud`).
 - `<preferences> … </preferences>`
 Defines general build preferences and configuration:
-  - `<version>`: KIWI version used (1.15.3).
+  - `<version>`: KIWI version used (1.0.0).
   - `<packagemanager>`: Package manager to use (`zypper`).
   - `<locale>` and `<keytable>`: Language and keyboard settings (`en_US, us`).
   - `<timezone>`: System timezone (UTC).
@@ -647,10 +647,10 @@ Running post-transaction scripts ...............................................
 [ INFO    ]: 12:19:08 | Export rpm packages changelog metadata
 [ INFO    ]: 12:19:09 | Export rpm verification metadata
 [ INFO    ]: 12:19:27 | Result files:
-[ INFO    ]: 12:19:27 | --> image_changes: /tmp/kiwi-outputs/opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.changes
-[ INFO    ]: 12:19:27 | --> image_packages: /tmp/kiwi-outputs/opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.packages
-[ INFO    ]: 12:19:27 | --> image_verified: /tmp/kiwi-outputs/opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.verified
-[ INFO    ]: 12:19:27 | --> live_image: /tmp/kiwi-outputs/opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.iso
+[ INFO    ]: 12:19:27 | --> image_changes: /tmp/kiwi-outputs/opensuse-leap-15-6-harv-cloud-image.x86_64-1.0.0.changes
+[ INFO    ]: 12:19:27 | --> image_packages: /tmp/kiwi-outputs/opensuse-leap-15-6-harv-cloud-image.x86_64-1.0.0.packages
+[ INFO    ]: 12:19:27 | --> image_verified: /tmp/kiwi-outputs/opensuse-leap-15-6-harv-cloud-image.x86_64-1.0.0.verified
+[ INFO    ]: 12:19:27 | --> live_image: /tmp/kiwi-outputs/opensuse-leap-15-6-harv-cloud-image.x86_64-1.0.0.iso
 :/ # exit
 exit
 $ ll
@@ -661,9 +661,9 @@ drwxr-xr-x  3 glovecchio  staff         96 Jan 26 11:51 root
 drwxr-xr-x  7 glovecchio  staff        224 Jan 27 18:35 ..
 -rw-r--r--  1 glovecchio  staff       8018 Jan 28 13:09 README.md
 drwxr-xr-x  7 glovecchio  staff        224 Jan 28 13:19 .
--rw-r--r--  1 glovecchio  staff  464463872 Jan 28 13:19 opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.iso
-$ du -hsx opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.iso
-443M	opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.iso
+-rw-r--r--  1 glovecchio  staff  464463872 Jan 28 13:19 opensuse-leap-15-6-harv-cloud-image.x86_64-1.0.0.iso
+$ du -hsx opensuse-leap-15-6-harv-cloud-image.x86_64-1.0.0.iso
+443M	opensuse-leap-15-6-harv-cloud-image.x86_64-1.0.0.iso
 $
 ```
 
@@ -678,14 +678,14 @@ drwxr-xr-x  3 glovecchio  staff         96 Jan 26 11:51 root
 drwxr-xr-x  7 glovecchio  staff        224 Jan 27 18:35 ..
 -rw-r--r--  1 glovecchio  staff       8018 Jan 28 13:09 README.md
 drwxr-xr-x  7 glovecchio  staff        224 Jan 28 13:19 .
--rw-r--r--  1 glovecchio  staff  464463872 Jan 28 13:19 opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.iso
+-rw-r--r--  1 glovecchio  staff  464463872 Jan 28 13:19 opensuse-leap-15-6-harv-cloud-image.x86_64-1.0.0.iso
 $ 
 ```
 
 ```bash
 docker run -it --rm --privileged --platform linux/amd64 -v $(pwd):/build opensuse/leap:15.6
 zypper in -y qemu-tools
-qemu-img convert -O raw /build/opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.iso /build/opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.img
+qemu-img convert -O raw /build/opensuse-leap-15-6-harv-cloud-image.x86_64-1.0.0.iso /build/opensuse-leap-15-6-harv-cloud-image.x86_64-1.0.0.img
 ls -l /build/
 ```
 
@@ -810,14 +810,14 @@ Checking for file conflicts: ...................................................
 (21/23) Installing: xkeyboard-config-2.40-150600.1.2.noarch .........................................................................................[done]
 (22/23) Installing: libxkbcommon0-1.5.0-150600.3.3.1.x86_64 .........................................................................................[done]
 (23/23) Installing: qemu-tools-8.2.10-150600.3.43.1.x86_64 ..........................................................................................[done]
-:/ # qemu-img convert -O raw /build/opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.iso /build/opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.img
+:/ # qemu-img convert -O raw /build/opensuse-leap-15-6-harv-cloud-image.x86_64-1.0.0.iso /build/opensuse-leap-15-6-harv-cloud-image.x86_64-1.0.0.img
 :/ # ls -l /build/
 total 889248
 -rw-r--r-- 1 root root     61064 Jan 28 12:41 README.md
 -rw-r--r-- 1 root root      3028 Jan 27 15:20 appliance.kiwi
 -rw-r--r-- 1 root root       190 Jan 27 16:05 config.sh
--rw-r--r-- 1 root root 464463872 Jan 28 12:19 opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.iso
--rw-r--r-- 1 root root 464463872 Jan 28 12:51 opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.img
+-rw-r--r-- 1 root root 464463872 Jan 28 12:19 opensuse-leap-15-6-harv-cloud-image.x86_64-1.0.0.iso
+-rw-r--r-- 1 root root 464463872 Jan 28 12:51 opensuse-leap-15-6-harv-cloud-image.x86_64-1.0.0.img
 drwxr-xr-x 1 root root        96 Jan 26 10:51 root
 :/ # exit
 exit
@@ -827,8 +827,8 @@ drwxr-xr-x  3 glovecchio  staff         96 Jan 26 11:51 root
 -rw-r--r--  1 glovecchio  staff       3028 Jan 27 16:20 appliance.kiwi
 -rw-r--r--  1 glovecchio  staff        190 Jan 27 17:05 config.sh
 drwxr-xr-x  7 glovecchio  staff        224 Jan 27 18:35 ..
--rw-r--r--  1 glovecchio  staff  464463872 Jan 28 13:19 opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.iso
--rw-r--r--  1 glovecchio  staff  464463872 Jan 28 13:51 opensuse-leap-15-6-harv-cloud-image.x86_64-1.15.3.img
+-rw-r--r--  1 glovecchio  staff  464463872 Jan 28 13:19 opensuse-leap-15-6-harv-cloud-image.x86_64-1.0.0.iso
+-rw-r--r--  1 glovecchio  staff  464463872 Jan 28 13:51 opensuse-leap-15-6-harv-cloud-image.x86_64-1.0.0.img
 -rw-r--r--  1 glovecchio  staff      61619 Jan 28 13:52 README.md
 drwxr-xr-x  8 glovecchio  staff        256 Jan 28 13:52 .
 $
