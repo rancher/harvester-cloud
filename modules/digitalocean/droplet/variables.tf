@@ -4,6 +4,22 @@ variable "prefix" {
   default     = "do-tf"
 }
 
+variable "certified_os_image" {
+  description = "Specifies whether to use the Harvester OS image released in the GitHub repository. If set to false, the default OpenSUSE image provided by the cloud provider will be used. Default is 'false'."
+  type        = bool
+  default     = false
+}
+
+variable "certified_os_image_tag" {
+  description = "Specifies which GitHub release to use for the Harvester OpenSUSE image. Default is 'build-1'."
+  type        = string
+  default     = "build-1"
+  validation {
+    condition     = can(regex("^build-[0-9]+$", var.certified_os_image_tag))
+    error_message = "Invalid value for certified_os_image_tag. Allowed values must match the format 'build-<number>'."
+  }
+}
+
 variable "os_image_name" {
   description = "Specifies the name of the OpenSUSE image uploaded to the DigitalOcean account. Default is 'openSUSE-Leap-15.6'."
   type        = string
