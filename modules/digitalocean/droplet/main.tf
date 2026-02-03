@@ -116,7 +116,7 @@ resource "null_resource" "kernel_configuration" {
 }
 
 resource "null_resource" "startup_configuration" {
-  count = var.startup_script == null ? 0 : 1
+  count      = var.startup_script == null ? 0 : 1
   depends_on = [null_resource.kernel_configuration]
   connection {
     type        = "ssh"
