@@ -97,8 +97,8 @@ resource "digitalocean_firewall" "example_firewall" {
   }
 }
 
-resource "null_resource" "startup_configuration" {
-  count = var.startup_script == null ? 0 : 1
+resource "null_resource" "kernel_configuration" {
+  count = var.certified_os_image ? 0 : 1
   connection {
     type        = "ssh"
     host        = digitalocean_droplet.nodes[0].ipv4_address
@@ -112,6 +112,16 @@ resource "null_resource" "startup_configuration" {
       "sudo zypper --non-interactive install kernel-default cron > /dev/null 2>&1",
       "sudo reboot > /dev/null 2>&1"
     ]
+  }
+}
+
+resource "null_resource" "startup_configuration" {
+  count = var.startup_script == null ? 0 : 1
+  connection {
+    type        = "ssh"
+    host        = digitalocean_droplet.nodes[0].ipv4_address
+    user        = local.ssh_username
+    private_key = var.create_ssh_key_pair ? tls_private_key.ssh_private_key[0].private_key_openssh : file(local.private_ssh_key_path)
   }
   provisioner "file" {
     source      = var.startup_script

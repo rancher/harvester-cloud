@@ -4,6 +4,12 @@ prefix = "do-tf"
 ## -- DigitalOcean API token used to deploy the infrastructure.
 do_token = null
 
+## Specifies whether to use the Harvester OS image released in the GitHub repository. If set to false, the default OpenSUSE image provided by the cloud provider will be used. Default is 'false'.
+certified_os_image = false
+
+## Specifies which GitHub release to use for the Harvester OpenSUSE image. Default is 'build-1'.
+certified_os_image_tag = "build-1"
+
 ## -- Specifies the name of the openSUSE image uploaded to the DigitalOcean account.
 os_image_name = "openSUSE-Leap-15.6"
 
