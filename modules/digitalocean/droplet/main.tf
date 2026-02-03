@@ -117,10 +117,12 @@ resource "null_resource" "kernel_configuration" {
 
 resource "null_resource" "startup_configuration" {
   count = var.startup_script == null ? 0 : 1
+  depends_on = [null_resource.kernel_configuration]
   connection {
     type        = "ssh"
     host        = digitalocean_droplet.nodes[0].ipv4_address
     user        = local.ssh_username
+    timeout     = "5m"
     private_key = var.create_ssh_key_pair ? tls_private_key.ssh_private_key[0].private_key_openssh : file(local.private_ssh_key_path)
   }
   provisioner "file" {
