@@ -8,6 +8,12 @@ variable "prefix" {
   }
 }
 
+variable "subscription_id" {
+  description = "Specifies the Azure Subscription ID that will contain all created resources. Default is 'azure-tf'."
+  type        = string
+  default     = "azure-tf"
+}
+
 variable "certified_os_image" {
   description = "Specifies whether to use the Harvester OS image released in the GitHub repository. If set to false, the default OpenSUSE image provided by the cloud provider will be used. Default is 'false'."
   type        = bool
@@ -22,12 +28,6 @@ variable "certified_os_image_tag" {
     condition     = can(regex("^build-[0-9]+$", var.certified_os_image_tag))
     error_message = "Invalid value for certified_os_image_tag. Allowed values must match the format 'build-<number>'."
   }
-}
-
-variable "subscription_id" {
-  description = "Specifies the Azure Subscription ID that will contain all created resources. Default is 'azure-tf'."
-  type        = string
-  default     = "azure-tf"
 }
 
 variable "region" {

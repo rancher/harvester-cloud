@@ -4,14 +4,14 @@ prefix = "azure-tf"
 ## -- Specifies the Azure Subscription ID that will contain all created resources.
 subscription_id = "azure-tf"
 
-## -- Specifies the Azure region used for all resources.
-region = "westeurope"
-
-## Specifies whether to use the Harvester OS image released in the GitHub repository. If set to false, the default OpenSUSE image provided by the cloud provider will be used. Default is 'false'.
+## Specifies whether to use the Harvester OS image released in the GitHub repository. If set to false, the default OpenSUSE image provided by the cloud provider will be used.
 certified_os_image = false
 
-## Specifies which GitHub release to use for the Harvester OpenSUSE image. Default is 'build-1'.
+## Specifies which GitHub release to use for the Harvester OpenSUSE image.
 certified_os_image_tag = "build-1"
+
+## -- Specifies the Azure region used for all resources.
+region = "westeurope"
 
 ## -- Specifies whether a new SSH key pair needs to be created for the instances.
 create_ssh_key_pair = true
