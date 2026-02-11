@@ -1,3 +1,4 @@
 data "digitalocean_image" "opensuse" {
-  name = var.os_image_name
+  count = var.certified_os_image ? 0 : 1
+  name  = var.os_image_name
 }
