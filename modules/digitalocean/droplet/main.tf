@@ -58,7 +58,7 @@ resource "digitalocean_droplet" "nodes" {
   tags       = ["user:${var.prefix}"]
   region     = var.region
   size       = var.instance_type
-  image      = var.certified_os_image ? digitalocean_custom_image.upload_certified_image[0].id : data.digitalocean_image.opensuse.id
+  image      = var.certified_os_image ? digitalocean_custom_image.upload_certified_image[0].id : data.digitalocean_image.opensuse[0].id
   ssh_keys   = [digitalocean_ssh_key.do_pub_created_ssh.id]
 }
 
