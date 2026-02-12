@@ -37,7 +37,7 @@ The `projects/` directory combines modules to create different deployment recipe
 - [Implement Cross-Cluster Kubernetes Disaster Recovery with Rancher using Harvester (harvester-cloud) as Cloud Provider](https://github.com/rancher/harvester-cloud/blob/main/docs/CROSS_CLUSTER_K8S_DR.md)
 - [How to Configure an iSCSI Disk in a Harvester Cluster](https://github.com/rancher/harvester-cloud/blob/main/docs/ISCS_DISK_SETUP.md)
 - [How to use the certified openSUSE Leap 15.6 image for harvester-cloud](https://github.com/rancher/harvester-cloud/blob/main/docs/KIWI_OS_IMAGE_BUILDER.md)
-
+- [How to access Harvester nodes serial console](docs/HARVESTER_NODES_SERIAL_CONSOLE.md)
 ## How to get started with the various projects
 
 - [Google](https://github.com/rancher/harvester-cloud/blob/main/projects/google-cloud/README.md)
