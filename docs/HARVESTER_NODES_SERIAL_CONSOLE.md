@@ -1,11 +1,11 @@
 # How to access Harvester nodes serial console
 
-This documentation explains the steps to access Harvester nodes serial console through browser. 
+This documentation explains the steps to access the Harvester nodes’ serial console through a browser.
 
 ## PREREQUISITES:
 
-* A Harvester cluster must be up and running on any cloud provider. The steps will be the same on all the cloud providers.
-The example and steps followed on the documentation has been tested in a Harvester cluster deployed on DigitalOcean using the variables below.
+* A Harvester cluster must be up and running on any cloud provider. The steps are the same for all cloud providers.
+The example and steps in this documentation have been tested on a Harvester cluster deployed on DigitalOcean using the variables below.
 
 ```console
 cat harvester-cloud/projects/digitalocean/terraform.tfvars
@@ -19,7 +19,7 @@ prefix = "jlagos"
 
 ### PROCEDURE
 
-1. Take a look at the terraform output and save public IP of cloud instance.
+1. Review the Terraform output and save the public IP of the cloud instance.
 
 ```console
 terraform output
@@ -30,7 +30,7 @@ harvester_url = "https://jlagos.209.38.100.44.sslip.io"
 longhorn_url = "https://jlagos.209.38.100.44.sslip.io/dashboard/c/local/longhorn"
 ```
 
-2. Access cloud instance public IP through SSH by using the SSH key files generated on the same directory.
+2. Access the cloud instance’s public IP via SSH using the SSH key files located in the same directory.
 
 ```console
 ls -lrth *ssh*
@@ -49,7 +49,7 @@ Have a lot of fun...
 node-jlagos-1:~ # 
 ```
 
-3. Identify Harvester nodes virtual machines.
+3. Identify Harvester node virtual machines.
 
 ```console
 node-jlagos-1:~ # virsh list
@@ -61,8 +61,8 @@ setlocale: No such file or directory
  6    harvester-node-3   running
 ```
 
-4. Execute websockify proxy command to be able to access Harvester node through browser.
-Here are the commands that are required to access Harvester nodes through browser.
+4. Execute the Websockify proxy command to enable access to the Harvester node through a browser.
+The following commands are required to access Harvester nodes via a browser.
 
 ```console
 websockify --web /usr/share/novnc/ --wrap-mode=ignore 6080 localhost:5901 -> To access Node harvester-node-1
@@ -72,7 +72,7 @@ websockify --web /usr/share/novnc/ --wrap-mode=ignore 6080 localhost:5904 -> To 
 websockify --web /usr/share/novnc/ --wrap-mode=ignore 6080 localhost:5905 -> To access node harvester node-5
 ```
 
-In the example, node harvester-node-1 will be exposed to the internet on browser.
+In this example, the node harvester-node-1 will be accessible through a browser on the Internet.
 
 ```console
 node-jlagos-1:~ # websockify --web /usr/share/novnc/ --wrap-mode=ignore 6080 localhost:5901
@@ -84,10 +84,10 @@ WebSocket server settings:
   - proxying from :6080 to localhost:5901
 ```
 
-5. Access public IP from browser on port 6080.
+5. Access the public IP via a browser on port 6080.
 
 ![HARVESTER_NODES_SERIAL_CONSOLE_1](../images/HARVESTER_NODES_SERIAL_CONSOLE_1.png)
 
-Once connected password must be typed. Password is `yourpass`.
+Once connected, you must enter the password. The password is `yourpass`.
 
 ![HARVESTER_NODES_SERIAL_CONSOLE_2](../images/HARVESTER_NODES_SERIAL_CONSOLE_2.png)
