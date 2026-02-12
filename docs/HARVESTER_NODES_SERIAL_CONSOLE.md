@@ -2,8 +2,8 @@
 
 ## PREREQUISITES:
 
-* A Harvester cluster must be up and running on any cloud provider. The steps are the same for all cloud providers.
-The example and steps in this documentation have been tested on a Harvester cluster deployed on DigitalOcean using the variables below.
+**A Harvester cluster must be up and running on any cloud provider. The steps are the same for all cloud providers.
+The example and steps in this documentation have been tested on a Harvester cluster deployed on DigitalOcean using the variables below.**
 
 ```console
 cat harvester-cloud/projects/digitalocean/terraform.tfvars
