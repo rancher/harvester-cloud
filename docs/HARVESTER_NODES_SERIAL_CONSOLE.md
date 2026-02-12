@@ -1,7 +1,5 @@
 # How to access the Harvester nodes’ serial console through a browser
 
-This documentation explains the steps to access the Harvester nodes’ serial console through a browser.
-
 ## PREREQUISITES:
 
 * A Harvester cluster must be up and running on any cloud provider. The steps are the same for all cloud providers.
