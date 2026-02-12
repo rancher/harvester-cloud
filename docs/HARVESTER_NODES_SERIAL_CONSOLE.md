@@ -1,4 +1,4 @@
-# How to access Harvester nodes serial console
+# How to access the Harvester nodes’ serial console through a browser
 
 This documentation explains the steps to access the Harvester nodes’ serial console through a browser.
 
