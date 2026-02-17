@@ -4,7 +4,7 @@
 sudo zypper --non-interactive addrepo https://download.opensuse.org/repositories/network/SLE_15/network.repo
 sudo zypper --non-interactive addrepo https://download.opensuse.org/repositories/openSUSE:Leap:15.0/standard/openSUSE:Leap:15.0.repo
 sudo zypper --non-interactive --gpg-auto-import-keys refresh
-sudo zypper --non-interactive install parted util-linux virt-install libvirt qemu-kvm python3-websockify novnc socat nginx sshpass chrony
+sudo zypper --non-interactive install parted util-linux virt-install libvirt qemu-kvm python3-websockify novnc socat nginx sshpass chrony cron
 sudo systemctl enable --now libvirtd
 sudo mkdir -p /srv/www/harvester
 
