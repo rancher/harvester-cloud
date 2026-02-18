@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Set SELinux to permissive permanently
+sudo setenforce 0 2>/dev/null || true && sudo sed -i 's/^SELINUX=.*/SELINUX=permissive/' /etc/selinux/config
+
 # Installation of pre-requisite packages
 sudo zypper --non-interactive addrepo https://download.opensuse.org/repositories/network/SLE_15/network.repo
 sudo zypper --non-interactive addrepo https://download.opensuse.org/repositories/openSUSE:Leap:15.0/standard/openSUSE:Leap:15.0.repo
