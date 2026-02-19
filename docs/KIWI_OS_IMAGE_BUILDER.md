@@ -79,6 +79,9 @@ KIWI is an openSUSE tool for building Linux system images like ISO or QCOW2. It 
         <package name="vim"/>
         <package name="curl"/>
         <package name="patterns-openSUSE-base"/>
+        <!-- Google Agents -->
+        <package name="google-guest-agent"/>
+        <package name="google-osconfig-agent"/>
     </packages>
     <packages type="bootstrap">
         <package name="udev"/>
@@ -132,6 +135,8 @@ List of all packages installed in the ISO image:
     - `nginx`, `chrony`, `cron`, `bind-utils`.
   - Extras / UI / Fonts:
     - `plymouth`, `plymouth-theme-bgrt`, `fontconfig`, `fonts-config`, `vim`, `curl`, `patterns-openSUSE-base`.
+  - Google Agents:
+    - `google-guest-agent`, `google-osconfig-agent`.
 - `<packages type="bootstrap"> … </packages>`
 Packages required for bootstrapping the build environment (minimal dependencies):
   - `udev`, `filesystem`, `glibc-locale`, `cracklib-dict-full`, `ca-certificates`, `ca-certificates-mozilla`, `openSUSE-release`, `zypper`.
@@ -150,6 +155,9 @@ systemctl enable cloud-init
 systemctl enable cloud-init-local
 systemctl enable cloud-config
 systemctl enable cloud-final
+systemctl enable google-guest-agent
+systemctl enable google-osconfig-agent
+systemctl enable google-startup-scripts.service
 ```
 
 - `#!/bin/bash`: Executes the script using Bash.
@@ -161,6 +169,9 @@ systemctl enable cloud-final
 - `systemctl enable cloud-init`: Main cloud-init service responsible for instance initialization.
 - `systemctl enable cloud-config`: Applies user and system configuration provided via cloud-init.
 - `systemctl enable cloud-final`: Executes final cloud-init tasks once the system is fully up.
+- `systemctl enable google-guest-agent`: Enables the Google Compute Engine guest agent, which is responsible for integrating the VM with the cloud platform (user account provisioning, SSH keys injection, metadata access, hostname setup, and general instance lifecycle management on Google Cloud).
+- `systemctl enable google-osconfig-agent`: Enables the OS Config agent, which allows remote configuration management, patching, and execution of management tasks triggered from Google Cloud (for example OS policies, package updates, and configuration enforcement).
+- `systemctl enable google-startup-scripts.service`: Enables execution of startup scripts provided via instance metadata on Google Cloud. This service is required for `startup-script` metadata to be executed automatically at first boot (and on subsequent boots, depending on configuration). Without this service enabled, startup scripts are present in metadata but never executed.
 
 ## How to create the image locally - for educational purposes only, as it is not possible to upload the image from here
 

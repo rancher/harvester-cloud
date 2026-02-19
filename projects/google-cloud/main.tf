@@ -102,26 +102,28 @@ resource "local_file" "harvester_startup_script" {
 }
 
 module "harvester_node" {
-  depends_on           = [local_file.sles_startup_script_config]
-  source               = "../../modules/google-cloud/compute-engine"
-  prefix               = var.prefix
-  region               = var.region
-  create_ssh_key_pair  = var.create_ssh_key_pair
-  ssh_private_key_path = local.ssh_private_key_path
-  ssh_public_key_path  = local.ssh_public_key_path
-  ip_cidr_range        = var.ip_cidr_range
-  create_vpc           = var.create_vpc
-  vpc                  = var.vpc
-  subnet               = var.subnet
-  create_firewall      = var.create_firewall
-  spot_instance        = var.spot_instance
-  os_disk_type         = var.os_disk_type
-  os_disk_size         = var.os_disk_size
-  instance_type        = local.instance_type
-  data_disk_count      = var.harvester_node_count * var.data_disk_count
-  data_disk_type       = var.data_disk_type
-  data_disk_size       = var.data_disk_size
-  startup_script       = data.local_file.sles_startup_script.content
+  depends_on             = [local_file.sles_startup_script_config]
+  source                 = "../../modules/google-cloud/compute-engine"
+  prefix                 = var.prefix
+  region                 = var.region
+  create_ssh_key_pair    = var.create_ssh_key_pair
+  ssh_private_key_path   = local.ssh_private_key_path
+  ssh_public_key_path    = local.ssh_public_key_path
+  ip_cidr_range          = var.ip_cidr_range
+  create_vpc             = var.create_vpc
+  vpc                    = var.vpc
+  subnet                 = var.subnet
+  create_firewall        = var.create_firewall
+  spot_instance          = var.spot_instance
+  os_disk_type           = var.os_disk_type
+  os_disk_size           = var.os_disk_size
+  instance_type          = local.instance_type
+  data_disk_count        = var.harvester_node_count * var.data_disk_count
+  data_disk_type         = var.data_disk_type
+  data_disk_size         = var.data_disk_size
+  startup_script         = data.local_file.sles_startup_script.content
+  certified_os_image     = var.certified_os_image
+  certified_os_image_tag = var.certified_os_image_tag
 }
 
 data "local_file" "ssh_private_key" {

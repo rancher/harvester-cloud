@@ -4,6 +4,12 @@ prefix = "gcp-tf"
 ## -- Specifies the Google Project ID that will contain all created resources.
 project_id = "gcp-tf"
 
+## Specifies whether to use the Harvester OS image released in the GitHub repository. If set to false, the default OpenSUSE image provided by the cloud provider will be used. Default is 'false'.
+certified_os_image = false
+
+## Specifies which GitHub release to use for the Harvester OpenSUSE image. Default is 'build-1'.
+certified_os_image_tag = "build-1"
+
 ## -- Specifies the Google region used for all resources.
 region = "us-west2"
 
@@ -53,7 +59,7 @@ data_disk_size = 350
 startup_script = null
 
 ## -- Specifies the Harvester version.
-harvester_version = "v1.7.0"
+harvester_version = "v1.6.1"
 
 ## -- Specifies the number of Harvester nodes to create (1, 3, or 5).
 harvester_node_count = 1
