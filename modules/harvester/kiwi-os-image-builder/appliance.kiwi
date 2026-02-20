@@ -68,6 +68,9 @@
         <package name="vim"/>
         <package name="curl"/>
         <package name="patterns-openSUSE-base"/>
+        <!-- Google Agents -->
+        <package name="google-guest-agent"/>
+        <package name="google-osconfig-agent"/>
     </packages>
     <packages type="bootstrap">
         <package name="udev"/>
