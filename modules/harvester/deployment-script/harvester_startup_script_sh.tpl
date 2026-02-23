@@ -40,8 +40,18 @@ sudo systemctl enable --now socat-proxy.service
 
 # Restrict internet access to Harvester nodes when harvester_airgapped variable is true
 if [ ${harvester_airgapped} == true ]; then
-  sudo iptables -D LIBVIRT_FWO -s 192.168.122.0/24 -i virbr1 -j ACCEPT
-  sudo iptables -I LIBVIRT_FWO 1 -s 192.168.122.0/16 -d 192.168.122.0/16 -j ACCEPT
+  sudo bash -c 'cat << "EOF" >> /etc/nftables.conf
+table inet filter {
+  chain forward {
+    type filter hook forward priority 0;
+
+    # Consenti solo traffico interno↔interno (equivalente della -I LIBVIRT_FWO 1 ...)
+    ip saddr 192.168.122.0/16 ip daddr 192.168.122.0/16 accept
+  }
+}
+EOF'
+
+  sudo nft -f /etc/nftables.conf || true
 fi
 
 # Wait for the Harvester services to start
