@@ -45,7 +45,6 @@ table inet filter {
   chain forward {
     type filter hook forward priority 0;
 
-    # Consenti solo traffico interno↔interno (equivalente della -I LIBVIRT_FWO 1 ...)
     ip saddr 192.168.122.0/16 ip daddr 192.168.122.0/16 accept
   }
 }

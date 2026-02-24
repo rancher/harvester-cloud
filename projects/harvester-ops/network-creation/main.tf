@@ -46,11 +46,21 @@ resource "ssh_resource" "create_vlanx" {
   host        = local.harvester_public_ip
   user        = var.ssh_username
   private_key = file("${var.private_ssh_key_file_path}/${var.private_ssh_key_file_name}")
-  commands = [
-    "sudo virsh net-define /tmp/${basename(local_file.qemu_vlanx_config[each.key].filename)} || true",
-    "sudo virsh net-start ${local.vlan_base}${each.key + 1} || true",
-    "sudo virsh net-autostart ${local.vlan_base}${each.key + 1} || true",
-    "sudo iptables -I LIBVIRT_FWI 1 -d 192.168.0.0/16 -j ACCEPT",
+  commands = [<<EOT
+sudo virsh net-define /tmp/${basename(local_file.qemu_vlanx_config[each.key].filename)} || true
+sudo virsh net-start ${local.vlan_base}${each.key + 1} || true
+sudo virsh net-autostart ${local.vlan_base}${each.key + 1} || true
+sudo bash -c 'cat << "EOF" >> /etc/nftables.conf
+table inet filter {
+  chain forward {
+    type filter hook forward priority 0;
+
+    ip daddr 192.168.0.0/16 accept
+  }
+}
+EOF'
+sudo nft -f /etc/nftables.conf || true
+EOT
   ]
 }
 
@@ -60,8 +70,12 @@ resource "ssh_resource" "harvester_airgapped" {
   host        = local.harvester_public_ip
   user        = var.ssh_username
   private_key = file("${var.private_ssh_key_file_path}/${var.private_ssh_key_file_name}")
-  commands = [
-    "sudo iptables -D LIBVIRT_FWO -s ${each.value.ip_base}/24 -i ${each.value.nic} -j ACCEPT"
+  commands = [<<EOT
+sudo bash -c 'cat << "EOF" >> /etc/nftables.conf
+delete rule inet filter forward iifname "${each.value.nic}" ip saddr ${each.value.ip_base}/24 accept
+EOF'
+sudo nft -f /etc/nftables.conf || true
+EOT
   ]
 }
 
