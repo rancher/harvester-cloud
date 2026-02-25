@@ -38,21 +38,6 @@ sudo chmod 755 /etc/systemd/system/socat-proxy.service
 sudo systemctl daemon-reload
 sudo systemctl enable --now socat-proxy.service
 
-# Restrict internet access to Harvester nodes when harvester_airgapped variable is true
-if [ ${harvester_airgapped} == true ]; then
-  sudo bash -c 'cat << "EOF" >> /etc/nftables.conf
-table inet filter {
-  chain forward {
-    type filter hook forward priority 0;
-
-    ip saddr 192.168.122.0/16 ip daddr 192.168.122.0/16 accept
-  }
-}
-EOF'
-
-  sudo nft -f /etc/nftables.conf || true
-fi
-
 # Wait for the Harvester services to start
 attempts=0
 while [ "$attempts" -lt 15 ]; do
@@ -101,4 +86,36 @@ EOF
       disk_index=$((disk_index + 1))
     done
   done
+fi
+
+# Restrict internet access to Harvester nodes when harvester_airgapped variable is true
+if [ ${harvester_airgapped} == true ]; then
+  sudo bash -c 'cat << "EOF" > /etc/nftables.conf
+table inet filter {
+    # INPUT chain: controls incoming traffic to the VM itself
+    chain input {
+        type filter hook input priority filter; policy drop;  # Default drop all incoming packets
+        iif lo accept                                         # Allow all traffic on the loopback interface
+        tcp dport 22 accept                                   # Allow SSH connections
+        ct state established,related accept                   # Allow established and related connections
+        ip saddr 192.168.0.0/16 accept                        # Allow traffic from the local network
+    }
+    # OUTPUT chain: controls outgoing traffic from the VM
+    chain output {
+        type filter hook output priority filter; policy drop; # Default drop all outgoing packets
+        ip daddr 127.0.0.0/8 accept                           # Allow traffic to loopback
+        ip daddr 192.168.0.0/16 accept                        # Allow traffic to local network
+        ct state established,related accept                   # Allow established and related connections
+        tcp dport 80 accept                                   # Allow HTTP traffic
+        udp dport 53 accept                                   # Allow DNS queries over UDP
+        tcp dport 53 accept                                   # Allow DNS queries over TCP
+    }
+    # FORWARD chain: controls traffic passing through the VM (routing)
+    chain forward {
+        type filter hook forward priority filter; policy drop; # Default drop all forwarded packets
+        ip saddr 192.168.0.0/16 ip daddr 192.168.0.0/16 accept # Allow forwarding within the local network
+    }
+}
+EOF'
+  sudo nft -f /etc/nftables.conf || true
 fi
