@@ -107,6 +107,7 @@ table inet filter {
         ip daddr 192.168.0.0/16 accept                        # Allow traffic to local network
         ct state established,related accept                   # Allow established and related connections
         tcp dport 80 accept                                   # Allow HTTP traffic
+        tcp dport 443 accept                                  # Allow HTTPS traffic
         udp dport 53 accept                                   # Allow DNS queries over UDP
         tcp dport 53 accept                                   # Allow DNS queries over TCP
     }
