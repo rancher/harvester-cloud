@@ -1,7 +1,7 @@
 variable "vm_prefix" {
-  description = "Specifies the prefix added to the names of all VMs. Default is 'demo-tf'."
+  description = "Specifies the prefix added to the names of all VMs. Default is 's3-server'."
   type        = string
-  default     = "demo-tf"
+  default     = "s3-server"
 }
 
 variable "vm_count" {
@@ -29,19 +29,19 @@ variable "ssh_password" {
 }
 
 variable "cpu" {
-  description = "Specifies the number of CPU cores allocated to each VM. Default is '2'."
-  type        = number
-  default     = 2
-}
-
-variable "memory" {
-  description = "Specifies the amount of memory allocated to each VM, in GB. Default is '4'."
+  description = "Specifies the number of CPU cores allocated to each VM. Default is '4'."
   type        = number
   default     = 4
 }
 
+variable "memory" {
+  description = "Specifies the amount of memory allocated to each VM, in GB. Default is '6'."
+  type        = number
+  default     = 6
+}
+
 variable "network_name" {
-  description = "Specifies the name of the Harvester VM network that was created. Default is an empty string ('')." # management network by default
+  description = "Specifies the name of the Harvester VM network that was created. Default is an empty string ('')."
   type        = string
   default     = ""
 }
@@ -65,44 +65,32 @@ variable "os_disk_size" {
 }
 
 variable "data_disk_size" {
-  description = "Specifies the size of the data disk attached to each VM, in GB. Default is '25'."
+  description = "Specifies the size of the data disk attached to each VM, in GB. Default is '100'."
   type        = number
-  default     = 25
-}
-
-variable "startup_script" {
-  description = "Specifies a custom startup script to be executed when the VM is initialized. Default is 'null'."
-  type        = string
-  default     = null
-}
-
-## -- Workload installation flags
-
-variable "s3_server_install" {
-  description = "Enables the automated installation of an S3-compatible server (Garage) on the VM during startup. Default is 'false'."
-  type        = bool
-  default     = false
+  default     = 100
 }
 
 ## -- S3 Server (Garage) configuration
 
 variable "s3_bucket_name" {
-  description = "Specifies the name of the S3 bucket to create. Only used when 's3_server_install' is true. Default is 'bucket1'."
+  description = "Specifies the name of the S3 bucket to create. Default is 'bucket1'."
   type        = string
   default     = "bucket1"
 }
 
 variable "s3_bucket_region" {
-  description = "Specifies the S3 bucket region name. Only used when 's3_server_install' is true. Default is 'region1'."
+  description = "Specifies the S3 bucket region name. Default is 'region1'."
   type        = string
   default     = "region1"
 }
 
 variable "s3_garage_version" {
-  description = "Specifies the URL to the Garage binary version to install. Only used when 's3_server_install' is true."
+  description = "Specifies the URL to the Garage binary version to install."
   type        = string
   default     = "https://garagehq.deuxfleurs.fr/_releases/v1.1.0/x86_64-unknown-linux-musl/garage"
 }
+
+## -- Harvester connection
 
 variable "harvester_url" {
   description = "Specifies the URL of the Harvester cluster API."
