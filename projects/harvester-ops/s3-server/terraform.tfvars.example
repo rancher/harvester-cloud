@@ -1,5 +1,5 @@
 ## -- Specifies the prefix added to the names of all VMs.
-vm_prefix = "demo-tf"
+vm_prefix = "s3-server"
 
 ## -- Specifies the number of VM instances to be created.
 vm_count = 1
@@ -14,10 +14,10 @@ ssh_username = "opensuse"
 ssh_password = "SecretPassword.123"
 
 ## -- Specifies the number of CPU cores allocated to each VM.
-cpu = 2
+cpu = 4
 
 ## -- Specifies the amount of memory allocated to each VM, in GB.
-memory = 4
+memory = 6
 
 ## -- Specifies the name of the Harvester VM network that was created.
 network_name = ""
@@ -32,17 +32,9 @@ image_name = "opensuse-leap-15-6"
 os_disk_size = 25
 
 ## -- Specifies the size of the data disk attached to each VM, in GB.
-data_disk_size = 25
+data_disk_size = 100
 
-## -- Specifies a custom startup script to be executed when the VM is initialized.
-startup_script = null
-
-## -- Workload installation flags
-
-## -- Enables the automated installation of an S3-compatible server (Garage) on the VM during startup.
-s3_server_install = false
-
-## -- S3 Server (Garage) configuration (only used when s3_server_install is true)
+## -- S3 Server (Garage) configuration
 
 ## -- Specifies the name of the S3 bucket to create.
 s3_bucket_name = "bucket1"
