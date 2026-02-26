@@ -109,6 +109,7 @@ table inet filter {
         ct state established,related accept                   # Allow established and related connections
         tcp dport 80 accept                                   # Allow HTTP traffic
         tcp dport 443 accept                                  # Allow HTTPS traffic
+        tcp dport 6443 accept                                 # Allow Kubernetes API server access
         udp dport 53 accept                                   # Allow DNS queries over UDP
         tcp dport 53 accept                                   # Allow DNS queries over TCP
     }
