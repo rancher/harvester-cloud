@@ -97,6 +97,7 @@ table inet filter {
         type filter hook input priority filter; policy drop;  # Default drop all incoming packets
         iif lo accept                                         # Allow all traffic on the loopback interface
         tcp dport 22 accept                                   # Allow SSH connections
+        tcp dport 443 accept                                  # Allow HTTPS access to Harvester UI
         ct state established,related accept                   # Allow established and related connections
         ip saddr 192.168.0.0/16 accept                        # Allow traffic from the local network
     }
