@@ -50,34 +50,21 @@ resource "ssh_resource" "create_vlanx" {
 sudo virsh net-define /tmp/${basename(local_file.qemu_vlanx_config[each.key].filename)} || true
 sudo virsh net-start ${local.vlan_base}${each.key + 1} || true
 sudo virsh net-autostart ${local.vlan_base}${each.key + 1} || true
-sudo bash -c 'cat << "EOF" >> /etc/nftables.conf
-table inet filter {
-  chain forward {
-    type filter hook forward priority 0;
-
-    ip daddr 192.168.0.0/16 accept
-  }
-}
-EOF'
-sudo nft -f /etc/nftables.conf || true
 EOT
   ]
 }
 
-resource "ssh_resource" "harvester_airgapped" {
-  for_each    = var.harvester_airgapped ? local.vlanx_network_map : {}
-  depends_on  = [ssh_resource.create_vlanx]
-  host        = local.harvester_public_ip
-  user        = var.ssh_username
-  private_key = file("${var.private_ssh_key_file_path}/${var.private_ssh_key_file_name}")
-  commands = [<<EOT
-sudo bash -c 'cat << "EOF" >> /etc/nftables.conf
-delete rule inet filter forward iifname "${each.value.nic}" ip saddr ${each.value.ip_base}/24 accept
-EOF'
-sudo nft -f /etc/nftables.conf || true
-EOT
-  ]
-}
+#resource "ssh_resource" "harvester_airgapped" {
+#  for_each    = var.harvester_airgapped ? local.vlanx_network_map : {}
+#  depends_on  = [ssh_resource.create_vlanx]
+#  host        = local.harvester_public_ip
+#  user        = var.ssh_username
+#  private_key = file("${var.private_ssh_key_file_path}/${var.private_ssh_key_file_name}")
+#  commands = [<<EOT
+#sudo nft delete rule inet filter forward iifname "${each.value.nic}" ip saddr ${each.value.ip_base}/16 accept || true
+#EOT
+#  ]
+#}
 
 resource "ssh_resource" "attach_network_interface" {
   depends_on  = [ssh_resource.create_vlanx, ssh_resource.harvester_airgapped]
