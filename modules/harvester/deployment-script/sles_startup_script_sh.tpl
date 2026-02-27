@@ -40,17 +40,43 @@ sudo curl -L -o /srv/www/harvester/harvester-${version}-amd64.iso \
 
 # Disk partitioning
 for i in $(seq 1 "${count}"); do
-  if [ -b "${disk_name}$(printf "\x$(printf %x $((${disk_structure} + i)))")" ]; then
-    echo "Partitioning and mounting disk ${disk_name}$(printf "\x$(printf %x $((${disk_structure} + i)))") on ${mount_point}$i..."
-    sudo parted --script "${disk_name}$(printf "\x$(printf %x $((${disk_structure} + i)))")" mklabel gpt
-    sudo parted --script "${disk_name}$(printf "\x$(printf %x $((${disk_structure} + i)))")" mkpart primary ext4 0% 100%
-    sudo mkfs.ext4 "${disk_name}$(printf "\x$(printf %x $((${disk_structure} + i)))")1"
-    sudo mkdir -p "${mount_point}$i"
-    sudo mount "${disk_name}$(printf "\x$(printf %x $((${disk_structure} + i)))")1" "${mount_point}$i"
-    echo "${disk_name}$(printf "\x$(printf %x $((${disk_structure} + i)))")1 ${mount_point}$i ext4 defaults 0 0" | sudo tee -a /etc/fstab
+  if [[ "${disk_name}" == /dev/sd ]]; then
+    disk="${disk_name}$(printf "\x$(printf %x $((${disk_structure} + i)))")"
+    part="$${disk}1"
+  elif [[ "${disk_name}" == /dev/nvme ]]; then
+    disk="${disk_name}$${i}n1"
+    part="$${disk}p1"
   else
-    echo "Error: disk ${disk_name}$(printf "\x$(printf %x $((${disk_structure} + i)))") does not exist."
+    echo "Error: unsupported disk type $disk_name"
+    exit 1
+  fi
+  if [ -b "$${disk}" ]; then
+    echo "Partitioning and mounting disk $${disk} on /mnt/datadisk$i..."
+    sudo parted --script "$${disk}" mklabel gpt
+    sudo parted --script "$${disk}" mkpart primary ext4 0% 100%
+    sudo mkfs.ext4 "$${part}"
+    sudo mkdir -p "/mnt/datadisk$i"
+    sudo mount "$${part}" "/mnt/datadisk$i"
+    echo "$${part} /mnt/datadisk$i ext4 defaults 0 0" | sudo tee -a /etc/fstab
+  else
+    echo "Error: disk $${disk} does not exist."
     exit 1
   fi
 done
-echo "Configuration completed successfully for ${count} disks."
+echo "Configuration completed successfully for 3 disks."
+
+# for i in $(seq 1 "${count}"); do
+#   if [ -b "${disk_name}$(printf "\x$(printf %x $((${disk_structure} + i)))")" ]; then
+#     echo "Partitioning and mounting disk ${disk_name}$(printf "\x$(printf %x $((${disk_structure} + i)))") on ${mount_point}$i..."
+#     sudo parted --script "${disk_name}$(printf "\x$(printf %x $((${disk_structure} + i)))")" mklabel gpt
+#     sudo parted --script "${disk_name}$(printf "\x$(printf %x $((${disk_structure} + i)))")" mkpart primary ext4 0% 100%
+#     sudo mkfs.ext4 "${disk_name}$(printf "\x$(printf %x $((${disk_structure} + i)))")1"
+#     sudo mkdir -p "${mount_point}$i"
+#     sudo mount "${disk_name}$(printf "\x$(printf %x $((${disk_structure} + i)))")1" "${mount_point}$i"
+#     echo "${disk_name}$(printf "\x$(printf %x $((${disk_structure} + i)))")1 ${mount_point}$i ext4 defaults 0 0" | sudo tee -a /etc/fstab
+#   else
+#     echo "Error: disk ${disk_name}$(printf "\x$(printf %x $((${disk_structure} + i)))") does not exist."
+#     exit 1
+#   fi
+# done
+# echo "Configuration completed successfully for ${count} disks."

@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 6.0"
+      version = "~> 6.3"
     }
     ssh = {
       source  = "loafoe/ssh"
@@ -26,4 +26,11 @@ terraform {
 
 provider "aws" {
   region = var.region
+}
+
+provider "rancher2" {
+  api_url    = var.rancher_api_url
+  access_key = var.rancher_access_key
+  secret_key = var.rancher_secret_key
+  insecure   = var.rancher_insecure
 }

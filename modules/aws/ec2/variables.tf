@@ -4,10 +4,45 @@ variable "prefix" {
   default     = "aws-tf"
 }
 
-variable "region" {
-  description = "Specifies the AWS region used for all resources. Default is 'eu-west-1'."
+variable "certified_os_image" {
+  description = "Specifies whether to use the Harvester OS image released in the GitHub repository. If set to false, the default OpenSUSE image provided by the cloud provider will be used. Default is 'false'."
+  type        = bool
+  default     = false
+}
+
+variable "certified_os_image_tag" {
+  description = "Specifies which GitHub release to use for the Harvester OpenSUSE image. Default is 'build-1'."
   type        = string
-  default     = "eu-west-1"
+  default     = "build-1"
+  validation {
+    condition     = can(regex("^build-[0-9]+$", var.certified_os_image_tag))
+    error_message = "Invalid value for certified_os_image_tag. Allowed values must match the format 'build-<number>'."
+  }
+}
+
+variable "region" {
+  description = "Specifies the AWS region used for all resources. Default is 'us-east-1'."
+  type        = string
+  default     = "us-east-1"
+  validation {
+    condition = contains([
+      "ap-south-2",
+      "ap-south-1",
+      "eu-west-3",
+      "ap-northeast-2",
+      "ap-northeast-1",
+      "ca-central-1",
+      "sa-east-1",
+      "ap-southeast-1",
+      "ap-southeast-2",
+      "eu-central-1",
+      "us-east-1",
+      "us-east-2",
+      "us-west-1",
+      "us-west-2"
+    ], var.region)
+    error_message = "Invalid Region specified."
+  }
 }
 
 variable "instance_type" {
@@ -35,9 +70,9 @@ variable "ssh_public_key_path" {
 }
 
 variable "ip_cidr_range" {
-  description = "Specifies the range of private IPs available for the AWS Subnet. Default is '10.10.0.0/24'."
+  description = "Specifies the range of private IPs available for the AWS Subnet and VPC. Default is '10.10.0.0'."
   type        = string
-  default     = "10.0.0.0/16"
+  default     = "10.0.0.0"
 }
 
 variable "spot_instance" {
