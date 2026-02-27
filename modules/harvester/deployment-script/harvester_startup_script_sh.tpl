@@ -94,30 +94,24 @@ if [ ${harvester_airgapped} == true ]; then
 table inet filter {
     # INPUT chain: controls incoming traffic to the VM itself
     chain input {
-        type filter hook input priority filter; policy drop;  # Default drop all incoming traffic
-        iif lo accept                                         # Allow traffic on the loopback interface
-        tcp dport 22 accept                                   # Allow SSH access to the VM
-        tcp dport 443 accept                                  # Allow HTTPS access to the Harvester UI
-        tcp dport 6443 accept                                 # Allow inbound access to the Kubernetes API server
-        tcp dport 10250 accept                                # Allow kubelet metrics and node validation (Kubernetes internal)
-        udp dport 8472 accept                                 # Allow Flannel VXLAN overlay network traffic
-        udp dport 4789 accept                                 # Allow VXLAN overlay network traffic (CNI)
-        tcp dport 2379-2380 accept                            # Allow etcd client and peer communication
-        ct state established,related accept                   # Allow established and related connections
-        ip saddr 192.168.0.0/16 accept                        # Allow traffic from the local network
+        type filter hook input priority filter; policy drop;   # Default drop all incoming traffic
+        iif lo accept                                          # Allow traffic on the loopback interface
+        ct state established,related accept                    # Allow established and related connections
+        ip saddr 192.168.0.0/16 accept                         # Allow traffic from the local network
+        tcp dport {22,443,6443,10250,2379-2380} accept         # Allow SSH, Harvester UI, K8s API, kubelet, etcd
+        udp dport {8472,4789} accept                           # Allow Flannel/VXLAN/CNI traffic
     }
+
     # OUTPUT chain: controls outgoing traffic from the VM
     chain output {
-        type filter hook output priority filter; policy drop; # Default drop all outgoing traffic
-        ip daddr 127.0.0.0/8 accept                           # Allow traffic to the loopback interface
-        ip daddr 192.168.0.0/16 accept                        # Allow traffic to the local network
-        ct state established,related accept                   # Allow established and related connections
-        tcp dport 80 accept                                   # Allow outbound HTTP traffic
-        tcp dport 443 accept                                  # Allow outbound HTTPS traffic
-        tcp dport 6443 accept                                 # Allow outbound access to the Kubernetes API server
-        udp dport 53 accept                                   # Allow DNS queries over UDP
-        tcp dport 53 accept                                   # Allow DNS queries over TCP
+        type filter hook output priority filter; policy drop;  # Default drop all outgoing traffic
+        ip daddr {127.0.0.0/8,192.168.0.0/16} accept           # Allow traffic to loopback and local network
+        ct state established,related accept                    # Allow established and related connections
+        tcp dport {22,6443} accept                             # Allow SSH and K8s API access
+        udp dport 53 accept                                    # Allow DNS queries over UDP
+        tcp dport 53 accept                                    # Allow DNS queries over TCP
     }
+
     # FORWARD chain: controls traffic routed through the VM
     chain forward {
         type filter hook forward priority filter; policy drop; # Default drop all forwarded traffic
