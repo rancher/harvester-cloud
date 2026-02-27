@@ -96,12 +96,11 @@ table inet filter {
     chain input {
         type filter hook input priority filter; policy drop;   # Default drop all incoming traffic
         iif lo accept                                          # Allow traffic on the loopback interface
+        iifname "virbr*" accept                                # Allow traffic from VM bridges
         ct state established,related accept                    # Allow established and related connections
-        ip saddr 192.168.0.0/16 accept                         # Allow traffic from the local network
         tcp dport {22,443,6443,10250,2379-2380} accept         # Allow SSH, Harvester UI, K8s API, kubelet, etcd
         udp dport {8472,4789} accept                           # Allow Flannel/VXLAN/CNI traffic
     }
-
     # OUTPUT chain: controls outgoing traffic from the VM
     chain output {
         type filter hook output priority filter; policy drop;  # Default drop all outgoing traffic
@@ -111,10 +110,11 @@ table inet filter {
         udp dport 53 accept                                    # Allow DNS queries over UDP
         tcp dport 53 accept                                    # Allow DNS queries over TCP
     }
-
     # FORWARD chain: controls traffic routed through the VM
     chain forward {
         type filter hook forward priority filter; policy drop; # Default drop all forwarded traffic
+        ct state established,related accept                    # Allow established and related traffic
+        iifname "virbr*" accept                                # Allow forwarding from VM bridges
         ip saddr 192.168.0.0/16 ip daddr 192.168.0.0/16 accept # Allow forwarding within the local network
     }
 }
