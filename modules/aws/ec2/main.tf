@@ -1,9 +1,9 @@
 locals {
-  letters = ["b","c","d","e","f","g","h","i","j","k","l","m","n","o","p"]
+  letters              = ["b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p"]
   private_ssh_key_path = var.ssh_private_key_path == null ? "${path.cwd}/${var.prefix}-ssh_private_key.pem" : var.ssh_private_key_path
   public_ssh_key_path  = var.ssh_public_key_path == null ? "${path.cwd}/${var.prefix}-ssh_public_key.pem" : var.ssh_public_key_path
-  available_azs = data.aws_ec2_instance_type_offerings.available.locations
-  selected_az   = length(local.available_azs) > 0 ? local.available_azs[0] : null
+  available_azs        = data.aws_ec2_instance_type_offerings.available.locations
+  selected_az          = length(local.available_azs) > 0 ? local.available_azs[0] : null
   certified_image_name = "opensuse-leap-15-6-harv-cloud-image.x86_64.vhd"
   certified_image_url  = var.certified_os_image ? "https://github.com/rancher/harvester-cloud/releases/download/${var.certified_os_image_tag}/${local.certified_image_name}" : null
 }
@@ -49,21 +49,21 @@ resource "null_resource" "download_certified_vhd" {
 }
 
 resource "aws_s3_bucket" "images" {
-  count = var.certified_os_image ? 1 : 0
+  count  = var.certified_os_image ? 1 : 0
   bucket = "opensuse-vhd-${var.prefix}"
 }
 
 resource "aws_s3_object" "vhd" {
-  count = var.certified_os_image ? 1 : 0
+  count      = var.certified_os_image ? 1 : 0
   depends_on = [null_resource.download_certified_vhd]
-  bucket = aws_s3_bucket.images[0].id
-  key    = "opensuse-harv.vhd"
-  source = "${path.cwd}/${local.certified_image_name}"
+  bucket     = aws_s3_bucket.images[0].id
+  key        = "opensuse-harv.vhd"
+  source     = "${path.cwd}/${local.certified_image_name}"
 }
 
 resource "aws_iam_role" "vmimport" {
   count = var.certified_os_image ? 1 : 0
-  name = "vmimport"
+  name  = "vmimport"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -78,8 +78,8 @@ resource "aws_iam_role" "vmimport" {
 
 resource "aws_iam_role_policy" "vmimport" {
   count = var.certified_os_image ? 1 : 0
-  name = "vmimport"
-  role = aws_iam_role.vmimport[0].id
+  name  = "vmimport"
+  role  = aws_iam_role.vmimport[0].id
 
   policy = jsonencode({
     Version = "2012-10-17",
@@ -111,9 +111,9 @@ resource "aws_iam_role_policy" "vmimport" {
 }
 
 resource "aws_ebs_snapshot_import" "opensuse_snapshot" {
-  count = var.certified_os_image ? 1 : 0
+  count       = var.certified_os_image ? 1 : 0
   description = "Opensuse Cerfied Image for Harvester cloud"
-  role_name = aws_iam_role.vmimport[0].name
+  role_name   = aws_iam_role.vmimport[0].name
   disk_container {
     format = "VHD"
     user_bucket {
@@ -125,11 +125,11 @@ resource "aws_ebs_snapshot_import" "opensuse_snapshot" {
 }
 
 resource "aws_ami" "opensuse_ami" {
-  count = var.certified_os_image ? 1 : 0
-  name               = "opensuse-harv-ami"
+  count               = var.certified_os_image ? 1 : 0
+  name                = "opensuse-harv-ami"
   virtualization_type = "hvm"
   root_device_name    = "/dev/xvda"
-  ena_support = true
+  ena_support         = true
   ebs_block_device {
     device_name = "/dev/xvda"
     snapshot_id = aws_ebs_snapshot_import.opensuse_snapshot[0].id
@@ -143,7 +143,7 @@ resource "aws_ami" "opensuse_ami" {
 
 
 resource "aws_vpc" "vpc" {
-  cidr_block = "${var.ip_cidr_range}/24"
+  cidr_block           = "${var.ip_cidr_range}/24"
   enable_dns_support   = true
   enable_dns_hostnames = true
   tags = {
@@ -152,10 +152,10 @@ resource "aws_vpc" "vpc" {
 }
 
 resource "aws_subnet" "public" {
-  vpc_id = aws_vpc.vpc.id
-  cidr_block = "${var.ip_cidr_range}/25"
+  vpc_id                  = aws_vpc.vpc.id
+  cidr_block              = "${var.ip_cidr_range}/25"
   map_public_ip_on_launch = true
-  availability_zone = local.available_azs[0]
+  availability_zone       = local.available_azs[0]
   tags = {
     Name = "${var.prefix}-subnet"
   }
@@ -183,7 +183,7 @@ resource "aws_route_table" "public" {
 }
 
 resource "aws_route_table_association" "assoc" {
-  subnet_id = aws_subnet.public.id
+  subnet_id      = aws_subnet.public.id
   route_table_id = aws_route_table.public.id
 }
 
@@ -264,7 +264,7 @@ resource "aws_instance" "vm" {
   ami                         = var.certified_os_image ? aws_ami.opensuse_ami[0].id : data.aws_ami.opensuse[0].id
   instance_type               = var.instance_type
   subnet_id                   = aws_subnet.public.id
-  vpc_security_group_ids = [aws_security_group.sg.id]
+  vpc_security_group_ids      = [aws_security_group.sg.id]
   associate_public_ip_address = false
   key_name                    = var.create_ssh_key_pair ? aws_key_pair.generated[0].key_name : null
   tags = {
@@ -310,7 +310,7 @@ resource "null_resource" "startup_configuration" {
     host        = aws_eip.static_ip.public_ip
     user        = var.certified_os_image ? "opensuse" : "ec2-user"
     timeout     = "5m"
-    private_key = var.create_ssh_key_pair ? tls_private_key.ssh[0].private_key_openssh :  null
+    private_key = var.create_ssh_key_pair ? tls_private_key.ssh[0].private_key_openssh : null
   }
   provisioner "file" {
     source      = var.startup_script

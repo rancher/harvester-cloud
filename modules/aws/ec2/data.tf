@@ -10,7 +10,7 @@ data "aws_ec2_instance_type_offerings" "available" {
 data "aws_ami" "opensuse" {
   count = var.certified_os_image ? 0 : 1
   filter {
-    name = "name"
+    name   = "name"
     values = ["openSUSE-Leap-15.6-*"]
   }
 }
