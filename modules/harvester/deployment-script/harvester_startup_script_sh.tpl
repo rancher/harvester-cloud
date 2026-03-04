@@ -94,28 +94,37 @@ if [ ${harvester_airgapped} == true ]; then
 table inet filter {
     # INPUT chain: controls incoming traffic to the VM itself
     chain input {
-        type filter hook input priority filter; policy drop;   # Default drop all incoming traffic
-        iif lo accept                                          # Allow traffic on the loopback interface
-        iifname "virbr*" accept                                # Allow traffic from VM bridges
-        ct state established,related accept                    # Allow established and related connections
-        tcp dport {22,443,6443,10250,2379-2380} accept         # Allow SSH, Harvester UI, K8s API, kubelet, etcd
-        udp dport {8472,4789} accept                           # Allow Flannel/VXLAN/CNI traffic
+        type filter hook input priority filter; policy drop;                                # Default drop all incoming traffic
+        iif lo accept                                                                       # Allow traffic on the loopback interface
+        ct state established,related accept                                                 # Allow established and related connections
+        ip protocol icmp accept                                                             # Allow ICMP (ping health checks)
+        tcp dport {22,443,6443,10250,2379-2380} accept                                      # Allow SSH, Harvester UI, K8s API, kubelet, etcd
+        udp dport {8472,4789} accept                                                        # Allow Flannel/VXLAN/CNI traffic
     }
     # OUTPUT chain: controls outgoing traffic from the VM
     chain output {
-        type filter hook output priority filter; policy drop;  # Default drop all outgoing traffic
-        ip daddr {127.0.0.0/8,192.168.0.0/16} accept           # Allow traffic to loopback and local network
-        ct state established,related accept                    # Allow established and related connections
-        tcp dport {22,6443} accept                             # Allow SSH and K8s API access
-        udp dport 53 accept                                    # Allow DNS queries over UDP
-        tcp dport 53 accept                                    # Allow DNS queries over TCP
+        type filter hook output priority filter; policy drop;                               # Default drop all outgoing traffic
+        oif lo accept                                                                       # Allow loopback traffic
+        ct state established,related accept                                                 # Allow established and related connections
+        ip daddr 192.168.0.0/16 accept                                                      # Allow traffic to internal 192.168.x.x networks
+        ip daddr 10.0.0.0/8 accept                                                          # Allow traffic to internal 10.x.x.x networks
+        ip daddr 172.16.0.0/12 accept                                                       # Allow traffic to internal 172.16.x.x networks
+        udp dport 123 ip daddr 192.168.122.1 accept                                         # Allow NTP to the local NTP server
+        oifname != "lo" drop                                                                # Block any other outbound traffic (prevents internet access)
     }
     # FORWARD chain: controls traffic routed through the VM
     chain forward {
-        type filter hook forward priority filter; policy drop; # Default drop all forwarded traffic
-        ct state established,related accept                    # Allow established and related traffic
-        iifname "virbr*" accept                                # Allow forwarding from VM bridges
-        ip saddr 192.168.0.0/16 ip daddr 192.168.0.0/16 accept # Allow forwarding within the local network
+        type filter hook forward priority filter; policy drop;                              # Default drop all forwarded traffic
+        ct state established,related accept                                                 # Allow established and related traffic
+        iifname "virbr*" accept                                                             # Incoming traffic from VM bridges
+        oifname "virbr*" accept                                                             # Outgoing traffic to VM bridges
+        iifname "vnet*" accept                                                              # Incoming traffic from vnet interfaces
+        oifname "vnet*" accept                                                              # Outgoing traffic to vnet interfaces
+        iifname "cni*" oifname "cni*" accept                                                # Pod-to-pod traffic in CNI
+        iifname "flannel*" oifname "flannel*" accept                                        # Pod-to-pod traffic in Flannel
+        ip protocol udp udp sport 67 udp dport 68 iifname "virbr*" oifname "virbr*" accept  # DHCP server -> VM
+        ip protocol udp udp sport 68 udp dport 67 iifname "virbr*" oifname "virbr*" accept  # DHCP client -> server
+        # No forwarding to external interfaces (blocks internet access)
     }
 }
 EOF'
