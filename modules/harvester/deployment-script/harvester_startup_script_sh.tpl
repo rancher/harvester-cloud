@@ -91,40 +91,34 @@ fi
 # Restrict internet access to Harvester nodes when harvester_airgapped variable is true
 if [ ${harvester_airgapped} == true ]; then
   sudo bash -c 'cat << "EOF" > /etc/nftables.conf
+flush ruleset
+
 table inet filter {
     # INPUT chain: controls incoming traffic to the VM itself
     chain input {
-        type filter hook input priority filter; policy drop;                                # Default drop all incoming traffic
-        iif lo accept                                                                       # Allow traffic on the loopback interface
-        ct state established,related accept                                                 # Allow established and related connections
-        ip protocol icmp accept                                                             # Allow ICMP (ping health checks)
-        tcp dport {22,443,6443,10250,2379-2380} accept                                      # Allow SSH, Harvester UI, K8s API, kubelet, etcd
-        udp dport {8472,4789} accept                                                        # Allow Flannel/VXLAN/CNI traffic
-    }
-    # OUTPUT chain: controls outgoing traffic from the VM
-    chain output {
-        type filter hook output priority filter; policy drop;                               # Default drop all outgoing traffic
-        oif lo accept                                                                       # Allow loopback traffic
-        ct state established,related accept                                                 # Allow established and related connections
-        ip daddr 192.168.0.0/16 accept                                                      # Allow traffic to internal 192.168.x.x networks
-        ip daddr 10.0.0.0/8 accept                                                          # Allow traffic to internal 10.x.x.x networks
-        ip daddr 172.16.0.0/12 accept                                                       # Allow traffic to internal 172.16.x.x networks
-        udp dport 123 ip daddr 192.168.122.1 accept                                         # Allow NTP to the local NTP server
-        oifname != "lo" drop                                                                # Block any other outbound traffic (prevents internet access)
+        type filter hook input priority 0;
+        policy drop;
+        iif lo accept
+        ct state established,related accept
+        ip protocol icmp accept
+        tcp dport {22,443,6443,10250,2379-2380} accept
+        udp dport {8472,4789} accept
+        udp sport 68 udp dport 67 accept
+        udp sport 67 udp dport 68 accept
     }
     # FORWARD chain: controls traffic routed through the VM
     chain forward {
-        type filter hook forward priority filter; policy drop;                              # Default drop all forwarded traffic
-        ct state established,related accept                                                 # Allow established and related traffic
-        iifname "virbr*" accept                                                             # Incoming traffic from VM bridges
-        oifname "virbr*" accept                                                             # Outgoing traffic to VM bridges
-        iifname "vnet*" accept                                                              # Incoming traffic from vnet interfaces
-        oifname "vnet*" accept                                                              # Outgoing traffic to vnet interfaces
-        iifname "cni*" oifname "cni*" accept                                                # Pod-to-pod traffic in CNI
-        iifname "flannel*" oifname "flannel*" accept                                        # Pod-to-pod traffic in Flannel
-        ip protocol udp udp sport 67 udp dport 68 iifname "virbr*" oifname "virbr*" accept  # DHCP server -> VM
-        ip protocol udp udp sport 68 udp dport 67 iifname "virbr*" oifname "virbr*" accept  # DHCP client -> server
-        # No forwarding to external interfaces (blocks internet access)
+        type filter hook forward priority 0;
+        policy accept;
+    }
+    # OUTPUT chain: controls outgoing traffic from the VM
+    chain output {
+        type filter hook output priority 0;
+        policy drop;
+        oif lo accept
+        ct state established,related accept
+        ip daddr {10.0.0.0/8,172.16.0.0/12,192.168.0.0/16} accept
+        udp dport 123 ip daddr 192.168.0.0/16 accept
     }
 }
 EOF'
