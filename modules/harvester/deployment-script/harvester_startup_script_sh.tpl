@@ -91,8 +91,6 @@ fi
 # Restrict internet access to Harvester nodes when harvester_airgapped variable is true
 if [ ${harvester_airgapped} == true ]; then
   sudo bash -c 'cat << "EOF" > /etc/nftables.conf
-flush ruleset
-
 table inet filter {
     # INPUT chain: controls incoming traffic to the VM itself
     chain input {

@@ -50,7 +50,6 @@ resource "ssh_resource" "create_vlanx" {
 sudo virsh net-define /tmp/${basename(local_file.qemu_vlanx_config[each.key].filename)} || true
 sudo virsh net-start ${local.vlan_base}${each.key + 1} || true
 sudo virsh net-autostart ${local.vlan_base}${each.key + 1} || true
-#sudo nft add rule inet filter forward ip daddr 192.168.0.0/16 accept
 EOT
   ]
 }
