@@ -91,32 +91,49 @@ fi
 # Restrict internet access to Harvester nodes when harvester_airgapped variable is true
 if [ ${harvester_airgapped} == true ]; then
   sudo bash -c 'cat << "EOF" > /etc/nftables.conf
-table inet filter {
-    # INPUT chain: controls incoming traffic to the VM itself
-    chain input {
-        type filter hook input priority 0;
-        policy drop;
-        iif lo accept
-        ct state established,related accept
-        ip protocol icmp accept
-        tcp dport {22,443,6443,10250,2379-2380} accept
-        udp dport {8472,4789} accept
-        udp sport 68 udp dport 67 accept
-        udp sport 67 udp dport 68 accept
-    }
-    # FORWARD chain: controls traffic routed through the VM
+#!/usr/sbin/nft -f
+# =====================================
+# nftables rules
+# =====================================
+flush table ip libvirt_network
+table ip libvirt_network {
+    # ----------------------------
+    # Forward chain principal
+    # ----------------------------
     chain forward {
-        type filter hook forward priority 0;
-        policy accept;
+        type filter hook forward priority filter; policy drop;
+        jump guest_cross
+        jump guest_input
+        jump guest_output
     }
-    # OUTPUT chain: controls outgoing traffic from the VM
-    chain output {
-        type filter hook output priority 0;
-        policy drop;
-        oif lo accept
-        ct state established,related accept
-        ip daddr {10.0.0.0/8,172.16.0.0/12,192.168.0.0/16} accept
-        udp dport 123 ip daddr 192.168.0.0/16 accept
+    # ----------------------------
+    # VMs communication (intra-subnet e inter-subnet)
+    # ----------------------------
+    chain guest_cross {
+        # accepting all the traffic between Harvester subnets 192.168.0.0/16
+        ip saddr 192.168.0.0/16 ip daddr 192.168.0.0/16 accept
+    }
+    # ----------------------------
+    # communication with host gateway (gateway is the first IP of each subnet)
+    # ----------------------------
+    chain guest_input {
+        ip daddr 192.168.0.0/16 accept
+    }
+    # ----------------------------
+    # allowing communication with VMs and blocking the rest
+    # ----------------------------
+    chain guest_output {
+        # allowing Traffic in subnet
+        ip saddr 192.168.0.0/16 accept
+        # blocking internet access
+        reject
+    }
+    # ----------------------------
+    # NAT: not enabled
+    # ----------------------------
+    chain guest_nat {
+        type nat hook postrouting priority srcnat; policy accept
+        # no NAT → impossible to access internet
     }
 }
 EOF'
