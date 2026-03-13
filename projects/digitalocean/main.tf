@@ -19,12 +19,12 @@ locals {
   harvester_memory                       = local.harvester_cluster_size == "small" ? 32768 : 65536
   ssh_private_key_path                   = var.ssh_private_key_path == null ? "${path.cwd}/${var.prefix}-ssh_private_key.pem" : var.ssh_private_key_path
   ssh_public_key_path                    = var.ssh_public_key_path == null ? "${path.cwd}/${var.prefix}-ssh_public_key.pem" : var.ssh_public_key_path
-  ssh_username                           = "opensuse"
+  ssh_username                           = var.certified_os_image ? "opensuse" : "root"
   kubeconfig_file                        = "${path.cwd}/${var.prefix}_kube_config.yml"
   instance_type = (
-    var.harvester_node_count == 1 ? (local.harvester_cluster_size == "small" ? "g-16vcpu-64gb-intel" : "g-32vcpu-128gb-intel") :
-    var.harvester_node_count == 3 ? (local.harvester_cluster_size == "small" ? "g-32vcpu-128gb-intel" : "g-60vcpu-240gb-intel") :
-    "g-60vcpu-240gb-intel"
+    var.harvester_node_count == 1 ? (local.harvester_cluster_size == "small" ? "g-16vcpu-64gb" : "g-32vcpu-128gb") :
+    var.harvester_node_count == 3 ? (local.harvester_cluster_size == "small" ? "g-32vcpu-128gb" : "g-60vcpu-240gb") :
+    "g-60vcpu-240gb"
   )
 }
 

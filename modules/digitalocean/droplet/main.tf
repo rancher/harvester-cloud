@@ -2,8 +2,7 @@ locals {
   private_ssh_key_path = var.ssh_private_key_path == null ? "${path.cwd}/${var.prefix}-ssh_private_key.pem" : var.ssh_private_key_path
   public_ssh_key_path  = var.ssh_public_key_path == null ? "${path.cwd}/${var.prefix}-ssh_public_key.pem" : var.ssh_public_key_path
   instance_count       = 1
-  instance_os_type     = "opensuse"
-  ssh_username         = local.instance_os_type
+  ssh_username         = var.certified_os_image ? "opensuse" : "root"
   certified_image_url  = var.certified_os_image ? "https://github.com/rancher/harvester-cloud/releases/download/${var.certified_os_image_tag}/opensuse-leap-15-6-harv-cloud-image.x86_64.qcow2.bz2" : null
 }
 

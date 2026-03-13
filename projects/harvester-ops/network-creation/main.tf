@@ -54,6 +54,17 @@ EOT
   ]
 }
 
+resource "ssh_resource" "harvester_airgapped" {
+  count       = var.harvester_airgapped ? 1 : 0
+  depends_on  = [ssh_resource.create_vlanx]
+  host        = local.harvester_public_ip
+  user        = var.ssh_username
+  private_key = file("${var.private_ssh_key_file_path}/${var.private_ssh_key_file_name}")
+  commands = [
+    "sudo nft -f /etc/nftables.conf || true"
+  ]
+}
+
 resource "ssh_resource" "attach_network_interface" {
   depends_on  = [ssh_resource.create_vlanx]
   host        = local.harvester_public_ip

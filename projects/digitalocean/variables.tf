@@ -29,7 +29,7 @@ variable "certified_os_image_tag" {
 variable "os_image_name" {
   type        = string
   description = "Specifies the name of the OpenSUSE image uploaded to the DigitalOcean account. Default is 'openSUSE-Leap-15.6'."
-  default     = "openSUSE-Leap-15.6"
+  default     = "openSUSE-Leap-16.0"
   nullable    = false
 }
 

@@ -6,13 +6,9 @@ sudo setenforce 0 2>/dev/null || true && sudo sed -i 's/^SELINUX=.*/SELINUX=perm
 # Installation of pre-requisite packages
 sudo zypper --non-interactive addrepo https://download.opensuse.org/repositories/network/15.6/network.repo
 sudo zypper --non-interactive --gpg-auto-import-keys refresh
-sudo zypper --non-interactive install parted util-linux virt-install libvirt qemu-kvm python3-websockify novnc socat nginx sshpass chrony cron nftables
+sudo zypper --non-interactive install parted util-linux virt-install libvirt qemu-kvm python3-websockify novnc socat nginx sshpass chrony cron
 sudo systemctl enable --now libvirtd
 sudo mkdir -p /srv/www/harvester
-
-#sudo zypper addrepo https://download.opensuse.org/repositories/home:garloff/15.6/home:garloff.repo
-#sudo zypper addrepo https://download.opensuse.org/repositories/home:aeneas_jaissle/15.6/home:aeneas_jaissle.repo
-#sudo zypper --non-interactive install --force libnftnl11 libnftables1 nftables
 
 # Configure Chrony for air-gapped setup (local NTP server)
 if [ ${harvester_airgapped} == true ]; then
