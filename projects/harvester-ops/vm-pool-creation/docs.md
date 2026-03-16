@@ -33,6 +33,10 @@ No resources.
 | <a name="input_memory"></a> [memory](#input\_memory) | Specifies the amount of memory allocated to each VM, in GB. Default is '4'. | `number` | `4` | no |
 | <a name="input_network_name"></a> [network\_name](#input\_network\_name) | Specifies the name of the Harvester VM network that was created. Default is an empty string (''). | `string` | `""` | no |
 | <a name="input_os_disk_size"></a> [os\_disk\_size](#input\_os\_disk\_size) | Specifies the size of the root disk attached to each VM, in GB. Default is '25'. | `number` | `25` | no |
+| <a name="input_s3_bucket_name"></a> [s3\_bucket\_name](#input\_s3\_bucket\_name) | Specifies the name of the S3 bucket to create. Only used when 's3\_server\_install' is true. Default is 'bucket1'. | `string` | `"bucket1"` | no |
+| <a name="input_s3_bucket_region"></a> [s3\_bucket\_region](#input\_s3\_bucket\_region) | Specifies the S3 bucket region name. Only used when 's3\_server\_install' is true. Default is 'region1'. | `string` | `"region1"` | no |
+| <a name="input_s3_garage_version"></a> [s3\_garage\_version](#input\_s3\_garage\_version) | Specifies the URL to the Garage binary version to install. Only used when 's3\_server\_install' is true. | `string` | `"https://garagehq.deuxfleurs.fr/_releases/v1.1.0/x86_64-unknown-linux-musl/garage"` | no |
+| <a name="input_s3_server_install"></a> [s3\_server\_install](#input\_s3\_server\_install) | Enables the automated installation of an S3-compatible server (Garage) on the VM during startup. Default is 'false'. | `bool` | `false` | no |
 | <a name="input_ssh_password"></a> [ssh\_password](#input\_ssh\_password) | Specifies the password used for SSH login. Default is 'SecretPassword.123'. | `string` | `"SecretPassword.123"` | no |
 | <a name="input_ssh_username"></a> [ssh\_username](#input\_ssh\_username) | Specifies the username used for SSH login (Harvester VMs). Default is 'opensuse'. | `string` | `"opensuse"` | no |
 | <a name="input_startup_script"></a> [startup\_script](#input\_startup\_script) | Specifies a custom startup script to be executed when the VM is initialized. Default is 'null'. | `string` | `null` | no |
