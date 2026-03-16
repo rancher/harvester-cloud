@@ -278,6 +278,8 @@ resource "aws_instance" "vm" {
   root_block_device {
     volume_size = var.os_disk_size
     volume_type = "gp3"
+    iops        = "16000"
+    throughput  = "2000"
   }
 
   instance_market_options {
@@ -289,6 +291,8 @@ resource "aws_ebs_volume" "data" {
   availability_zone = aws_instance.vm.availability_zone
   size              = var.data_disk_size
   type              = "gp3"
+  iops              = "16000"
+  throughput        = "2000"
 
   tags = {
     Name = "${var.prefix}-vm"

@@ -52,3 +52,22 @@ Please note that all estimated costs shown are generic approximations that have 
 **Please note that on DigitalOcean it is not possible to deploy spot droplets.**
 
 The calculations were done using the *[DigitalOcean pricing calculator](https://www.digitalocean.com/pricing/calculator)*.
+
+# AWS cost analysis
+
+The following information provides an infrastructure cost estimation for deploying Harvester on AWS using all available options in the Terraform script.
+
+Please note that all estimated costs shown are generic approximations that have been rounded up and may not be 100% accurate, as the total price will vary depending on each specific scenario.
+
+| Type   | Region         |  Mode   |  Disks | Disk Type |  Disk Size | Required Instance | Estimated Cost per Month ($) |
+|--------|----------------|---------|--------|-----------|------------|-------------------|------------------------------|
+| Small  | eu-central-1   | Spot    | 1      | GP3       | 350 GB     | m8i.4xlarge       | 695                          |
+| Small  | eu-central-1   | Spot    | 3      | GP3       | 350 GB     | m8i.8xlarge       | 1405                         |
+| Small  | eu-central-1   | Regular | 1      | GP3       | 350 GB     | m8i.4xlarge       | 940                          |
+| Small  | eu-central-1   | Regular | 3      | GP3       | 350 GB     | m8i.8xlarge       | 1900                         |
+| Medium | eu-central-1   | Spot    | 1      | GP3       | 350 GB     | m8i.8xlarge       | 1065                         |
+| Medium | eu-central-1   | Spot    | 3      | GP3       | 350 GB     | m8i.16xlarge      | 2165                         |
+| Medium | eu-central-1   | Regular | 1      | GP3       | 350 GB     | m8i.8xlarge       | 1560                         |
+| Medium | eu-central-1   | Regular | 3      | GP3       | 350 GB     | m8i.16xlarge      | 3145                         |
+
+The calculations were done using the *[AWS pricing calculator](https://calculator.aws/#/) and official AWS Rufus AI*.
