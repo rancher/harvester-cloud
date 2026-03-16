@@ -32,12 +32,20 @@ variable "cpu" {
   description = "Specifies the number of CPU cores allocated to each VM. Default is '2'."
   type        = number
   default     = 2
+  validation {
+    condition     = var.s3_server_install == false || var.cpu >= 4
+    error_message = "When s3_server_install is enabled, cpu must be at least 4."
+  }
 }
 
 variable "memory" {
   description = "Specifies the amount of memory allocated to each VM, in GB. Default is '4'."
   type        = number
   default     = 4
+  validation {
+    condition     = var.s3_server_install == false || var.memory >= 6
+    error_message = "When s3_server_install is enabled, memory must be at least 6 GB."
+  }
 }
 
 variable "network_name" {
@@ -68,6 +76,10 @@ variable "data_disk_size" {
   description = "Specifies the size of the data disk attached to each VM, in GB. Default is '25'."
   type        = number
   default     = 25
+  validation {
+    condition     = var.s3_server_install == false || var.data_disk_size >= 100
+    error_message = "When s3_server_install is enabled, data_disk_size must be at least 100 GB."
+  }
 }
 
 variable "startup_script" {

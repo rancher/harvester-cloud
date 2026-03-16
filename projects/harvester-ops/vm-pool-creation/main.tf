@@ -11,13 +11,13 @@ module "harvester_vm" {
   vm_namespace      = var.vm_namespace
   ssh_username      = var.ssh_username
   ssh_password      = var.ssh_password
-  cpu               = var.s3_server_install ? 4 : var.cpu
-  memory            = var.s3_server_install ? 6 : var.memory
+  cpu               = var.cpu
+  memory            = var.memory
   network_name      = var.network_name
   image_namespace   = var.image_namespace
   image_name        = var.image_name
   os_disk_size      = var.os_disk_size
-  data_disk_size    = var.s3_server_install ? 100 : var.data_disk_size
+  data_disk_size    = var.data_disk_size
   startup_script    = var.startup_script
   extra_packages    = local.extra_packages
   extra_runcmd      = local.extra_runcmd
