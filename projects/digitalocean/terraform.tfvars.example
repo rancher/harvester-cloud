@@ -11,7 +11,7 @@ certified_os_image = false
 certified_os_image_tag = "build-1"
 
 ## -- Specifies the name of the openSUSE image uploaded to the DigitalOcean account.
-os_image_name = "openSUSE-Leap-15.6"
+os_image_name = "openSUSE-Leap-16.0"
 
 ## -- Specifies the DigitalOcean region used for all resources.
 region = "fra1"
