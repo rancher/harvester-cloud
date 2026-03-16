@@ -45,3 +45,19 @@ kubeconfig_file_path = ""
 
 ## -- Specifies the name of the Kubeconfig file used to access the Harvester cluster.
 kubeconfig_file_name = ""
+
+## -- Workload installation flags
+
+## -- Enables the automated installation of an S3-compatible server (Garage) on the VM during startup.
+s3_server_install = false
+
+## -- S3 Server (Garage) configuration (only used when s3_server_install is true)
+
+## -- Specifies the name of the S3 bucket to create.
+s3_bucket_name = "bucket1"
+
+## -- Specifies the S3 bucket region name.
+s3_bucket_region = "region1"
+
+## -- Specifies the URL to the Garage binary version to install.
+s3_garage_version = "https://garagehq.deuxfleurs.fr/_releases/v1.1.0/x86_64-unknown-linux-musl/garage"

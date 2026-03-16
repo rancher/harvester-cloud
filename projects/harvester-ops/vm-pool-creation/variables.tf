@@ -32,12 +32,20 @@ variable "cpu" {
   description = "Specifies the number of CPU cores allocated to each VM. Default is '2'."
   type        = number
   default     = 2
+  validation {
+    condition     = var.s3_server_install == false || var.cpu >= 4
+    error_message = "When s3_server_install is enabled, cpu must be at least 4."
+  }
 }
 
 variable "memory" {
   description = "Specifies the amount of memory allocated to each VM, in GB. Default is '4'."
   type        = number
   default     = 4
+  validation {
+    condition     = var.s3_server_install == false || var.memory >= 6
+    error_message = "When s3_server_install is enabled, memory must be at least 6 GB."
+  }
 }
 
 variable "network_name" {
@@ -68,12 +76,44 @@ variable "data_disk_size" {
   description = "Specifies the size of the data disk attached to each VM, in GB. Default is '25'."
   type        = number
   default     = 25
+  validation {
+    condition     = var.s3_server_install == false || var.data_disk_size >= 100
+    error_message = "When s3_server_install is enabled, data_disk_size must be at least 100 GB."
+  }
 }
 
 variable "startup_script" {
   description = "Specifies a custom startup script to be executed when the VM is initialized. Default is 'null'."
   type        = string
   default     = null
+}
+
+## -- Workload installation flags
+
+variable "s3_server_install" {
+  description = "Enables the automated installation of an S3-compatible server (Garage) on the VM during startup. Default is 'false'."
+  type        = bool
+  default     = false
+}
+
+## -- S3 Server (Garage) configuration
+
+variable "s3_bucket_name" {
+  description = "Specifies the name of the S3 bucket to create. Only used when 's3_server_install' is true. Default is 'bucket1'."
+  type        = string
+  default     = "bucket1"
+}
+
+variable "s3_bucket_region" {
+  description = "Specifies the S3 bucket region name. Only used when 's3_server_install' is true. Default is 'region1'."
+  type        = string
+  default     = "region1"
+}
+
+variable "s3_garage_version" {
+  description = "Specifies the URL to the Garage binary version to install. Only used when 's3_server_install' is true."
+  type        = string
+  default     = "https://garagehq.deuxfleurs.fr/_releases/v1.1.0/x86_64-unknown-linux-musl/garage"
 }
 
 variable "harvester_url" {
