@@ -63,8 +63,9 @@ for i in $(seq 1 "${count}"); do
     exit 1
   fi
 done
-echo "Configuration completed successfully for 3 disks."
+echo "Configuration completed successfully for ${count} disks."
 
+### PREVIOUS DISK FORMATING SCRIPT
 # for i in $(seq 1 "${count}"); do
 #   if [ -b "${disk_name}$(printf "\x$(printf %x $((${disk_structure} + i)))")" ]; then
 #     echo "Partitioning and mounting disk ${disk_name}$(printf "\x$(printf %x $((${disk_structure} + i)))") on ${mount_point}$i..."
