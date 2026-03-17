@@ -116,6 +116,32 @@ variable "s3_garage_version" {
   default     = "https://garagehq.deuxfleurs.fr/_releases/v1.1.0/x86_64-unknown-linux-musl/garage"
 }
 
+variable "nfs_server_install" {
+  description = "Enables the automated installation of an NFS server on the VM during startup. Default is 'false'."
+  type        = bool
+  default     = false
+}
+
+## -- NFS Server configuration
+
+variable "nfs_export_path" {
+  description = "Specifies the directory path to export via NFS. Only used when 'nfs_server_install' is true. Default is '/mnt/nfs-data'."
+  type        = string
+  default     = "/mnt/nfs-data"
+}
+
+variable "nfs_export_options" {
+  description = "Specifies the NFS export options for /etc/exports. Only used when 'nfs_server_install' is true. Default is '*(rw,sync,no_subtree_check,no_root_squash)'."
+  type        = string
+  default     = "*(rw,sync,no_subtree_check,no_root_squash)"
+}
+
+variable "nfs_data_disk_size" {
+  description = "Specifies the size of the data disk used for NFS exports, in GB. Only used when 'nfs_server_install' is true. Default is '50'."
+  type        = number
+  default     = 100
+}
+
 variable "harvester_url" {
   description = "Specifies the URL of the Harvester cluster API."
   type        = string
