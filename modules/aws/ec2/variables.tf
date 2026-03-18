@@ -45,12 +45,6 @@ variable "region" {
   }
 }
 
-variable "instance_type" {
-  description = "Specifies the name of an AWS EC2 instance. Default is 'm8i.large'."
-  type        = string
-  default     = "m8i.large"
-}
-
 variable "create_ssh_key_pair" {
   description = "Specifies whether a new SSH key pair needs to be created for the instances. Default is 'true'."
   type        = bool
@@ -85,6 +79,12 @@ variable "os_disk_size" {
   description = "Specifies the size of the disk attached to each node, in GB. Default is '50'."
   type        = number
   default     = 50
+}
+
+variable "instance_type" {
+  description = "Specifies the name of an AWS EC2 instance. Default is 'm8i.large'."
+  type        = string
+  default     = "m8i.large"
 }
 
 variable "data_disk_count" {

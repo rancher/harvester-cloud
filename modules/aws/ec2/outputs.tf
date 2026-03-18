@@ -4,12 +4,12 @@ output "public_ssh_key" {
 
 output "instances_private_ip" {
   value       = aws_instance.vm.private_ip
-  description = "AWS EC2 Private IP"
+  description = "AWS EC2 Instances Private IPs"
 }
 
 output "instances_public_ip" {
   value       = aws_eip.static_ip.public_ip
-  description = "AWS EC2 Public IP"
+  description = "AWS EC2 Instances Public IPs"
 }
 
 output "security_group_id" {

@@ -69,7 +69,7 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_instances_private_ip"></a> [instances\_private\_ip](#output\_instances\_private\_ip) | AWS EC2 Private IP |
-| <a name="output_instances_public_ip"></a> [instances\_public\_ip](#output\_instances\_public\_ip) | AWS EC2 Public IP |
+| <a name="output_instances_private_ip"></a> [instances\_private\_ip](#output\_instances\_private\_ip) | AWS EC2 Instances Private IPs |
+| <a name="output_instances_public_ip"></a> [instances\_public\_ip](#output\_instances\_public\_ip) | AWS EC2 Instances Public IPs |
 | <a name="output_public_ssh_key"></a> [public\_ssh\_key](#output\_public\_ssh\_key) | n/a |
 | <a name="output_security_group_id"></a> [security\_group\_id](#output\_security\_group\_id) | n/a |

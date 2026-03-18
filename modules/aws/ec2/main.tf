@@ -80,7 +80,6 @@ resource "aws_iam_role_policy" "vmimport" {
   count = var.certified_os_image ? 1 : 0
   name  = "vmimport"
   role  = aws_iam_role.vmimport[0].id
-
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -141,7 +140,6 @@ resource "aws_ami" "opensuse_ami" {
   }
 }
 
-
 resource "aws_vpc" "vpc" {
   cidr_block           = "${var.ip_cidr_range}/24"
   enable_dns_support   = true
@@ -162,7 +160,7 @@ resource "aws_subnet" "public" {
   lifecycle {
     precondition {
       condition     = local.selected_az != null
-      error_message = "No availability zones in this region support instance type ${var.instance_type}"
+      error_message = "No availability zones available in this region for instance type ${var.instance_type}."
     }
   }
 }
@@ -197,7 +195,6 @@ resource "aws_security_group" "sg" {
     protocol    = "-1"
     self        = true
   }
-
   ingress {
     description = "Allow all inbound SSH to nodes"
     from_port   = "22"
@@ -205,7 +202,6 @@ resource "aws_security_group" "sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
   ingress {
     description = "Allow all inbound kube-apiserver to nodes"
     from_port   = "6443"
@@ -213,7 +209,6 @@ resource "aws_security_group" "sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
   ingress {
     description = "Allow all inbound HTTP to nodes"
     from_port   = "80"
@@ -221,7 +216,6 @@ resource "aws_security_group" "sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
   ingress {
     description = "Allow all inbound HTTPS to nodes"
     from_port   = "443"
@@ -229,7 +223,6 @@ resource "aws_security_group" "sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
   ingress {
     description = "Allow all inbound WebSocket to nodes"
     from_port   = "6080"
@@ -237,7 +230,6 @@ resource "aws_security_group" "sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
   egress {
     description = "Allow all outbound"
     from_port   = "0"
@@ -245,7 +237,6 @@ resource "aws_security_group" "sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
   tags = {
     Name = "${var.prefix}-firewall"
   }
@@ -270,22 +261,20 @@ resource "aws_instance" "vm" {
   tags = {
     Name = "${var.prefix}-vm"
   }
-
   cpu_options {
     nested_virtualization = "enabled"
   }
-
   root_block_device {
     volume_size = var.os_disk_size
     volume_type = "gp3"
     iops        = "16000"
     throughput  = "2000"
   }
-
   instance_market_options {
     market_type = var.spot_instance ? "spot" : null
   }
 }
+
 resource "aws_ebs_volume" "data" {
   count             = var.data_disk_count
   availability_zone = aws_instance.vm.availability_zone
@@ -293,12 +282,10 @@ resource "aws_ebs_volume" "data" {
   type              = "gp3"
   iops              = "16000"
   throughput        = "2000"
-
   tags = {
     Name = "${var.prefix}-vm"
   }
 }
-
 
 resource "aws_volume_attachment" "data_attach" {
   count       = var.data_disk_count

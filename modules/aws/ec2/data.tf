@@ -3,7 +3,6 @@ data "aws_ec2_instance_type_offerings" "available" {
     name   = "instance-type"
     values = [var.instance_type]
   }
-
   location_type = "availability-zone"
 }
 
