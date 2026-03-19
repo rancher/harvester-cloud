@@ -133,12 +133,6 @@ variable "nfs_server_install" {
   default     = false
 }
 
-variable "nfs_server_install" {
-  description = "Enables the automated installation of an NFS server on the VM during startup. Default is 'false'."
-  type        = bool
-  default     = false
-}
-
 variable "nfs_export_path" {
   description = "Specifies the directory path to export via NFS. Only used when 'nfs_server_install' is true. Default is '/mnt/nfs-data'."
   type        = string
