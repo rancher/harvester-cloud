@@ -88,15 +88,26 @@ variable "startup_script" {
   default     = null
 }
 
-## -- Workload installation flags
+variable "harvester_url" {
+  description = "Specifies the URL of the Harvester cluster API."
+  type        = string
+}
+
+variable "kubeconfig_file_path" {
+  description = "Specifies the full path where the Kubeconfig file is located."
+  type        = string
+}
+
+variable "kubeconfig_file_name" {
+  description = "Specifies the name of the Kubeconfig file used to access the Harvester cluster."
+  type        = string
+}
 
 variable "s3_server_install" {
   description = "Enables the automated installation of an S3-compatible server (Garage) on the VM during startup. Default is 'false'."
   type        = bool
   default     = false
 }
-
-## -- S3 Server (Garage) configuration
 
 variable "s3_bucket_name" {
   description = "Specifies the name of the S3 bucket to create. Only used when 's3_server_install' is true. Default is 'bucket1'."
@@ -122,7 +133,11 @@ variable "nfs_server_install" {
   default     = false
 }
 
-## -- NFS Server configuration
+variable "nfs_server_install" {
+  description = "Enables the automated installation of an NFS server on the VM during startup. Default is 'false'."
+  type        = bool
+  default     = false
+}
 
 variable "nfs_export_path" {
   description = "Specifies the directory path to export via NFS. Only used when 'nfs_server_install' is true. Default is '/mnt/nfs-data'."
@@ -140,19 +155,4 @@ variable "nfs_data_disk_size" {
   description = "Specifies the size of the data disk used for NFS exports, in GB. Only used when 'nfs_server_install' is true. Default is '50'."
   type        = number
   default     = 100
-}
-
-variable "harvester_url" {
-  description = "Specifies the URL of the Harvester cluster API."
-  type        = string
-}
-
-variable "kubeconfig_file_path" {
-  description = "Specifies the full path where the Kubeconfig file is located."
-  type        = string
-}
-
-variable "kubeconfig_file_name" {
-  description = "Specifies the name of the Kubeconfig file used to access the Harvester cluster."
-  type        = string
 }
