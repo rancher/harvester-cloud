@@ -131,6 +131,10 @@ variable "nfs_server_install" {
   description = "Enables the automated installation of an NFS server on the VM during startup. Default is 'false'."
   type        = bool
   default     = false
+  validation {
+    condition     = !(var.nfs_server_install && var.s3_server_install)
+    error_message = "You cannot enable both NFS and S3 server installation at the same time. Choose only one."
+  }
 }
 
 variable "nfs_export_path" {
