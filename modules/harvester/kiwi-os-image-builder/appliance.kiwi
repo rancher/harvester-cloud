@@ -55,6 +55,7 @@
         <package name="novnc"/>
         <package name="socat"/>
         <package name="sshpass"/>
+        <package name="openssh-server-config-rootlogin"/>
         <!-- Services / Daemons -->
         <package name="nginx"/>
         <package name="chrony"/>
