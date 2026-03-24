@@ -55,7 +55,8 @@
         <package name="novnc"/>
         <package name="socat"/>
         <package name="sshpass"/>
-        <package name="systemd-network"/>
+        <package name="NetworkManager"/>
+        <package name="NetworkManager-cloud-setup"/>
         <package name="openssh-server-config-rootlogin"/>
         <!-- Services / Daemons -->
         <package name="nginx"/>
