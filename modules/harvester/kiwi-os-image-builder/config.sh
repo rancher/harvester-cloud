@@ -1,6 +1,8 @@
 #!/bin/bash
 set -ex
 
+ssh-keygen -A 
+
 systemctl enable sshd
 systemctl enable libvirtd
 systemctl enable cloud-init
