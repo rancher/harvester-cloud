@@ -295,6 +295,7 @@ resource "aws_volume_attachment" "data_attach" {
 }
 
 resource "null_resource" "startup_configuration" {
+  count      = var.startup_script == null ? 0 : 1
   depends_on = [aws_volume_attachment.data_attach]
   connection {
     type        = "ssh"
