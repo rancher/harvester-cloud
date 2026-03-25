@@ -1,4 +1,4 @@
-name: Test AWS Cloud VM deploy and destroy
+name: Test AWS VM deploy and destroy
 
 on:
   workflow_dispatch:
