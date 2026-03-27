@@ -3,6 +3,7 @@ set -ex
 
 systemctl enable sshd
 systemctl enable libvirtd
+systemctl enable NetworkManager
 systemctl enable cloud-init
 systemctl enable cloud-init-local
 systemctl enable cloud-config
