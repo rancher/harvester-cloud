@@ -88,15 +88,26 @@ variable "startup_script" {
   default     = null
 }
 
-## -- Workload installation flags
+variable "harvester_url" {
+  description = "Specifies the URL of the Harvester cluster API."
+  type        = string
+}
+
+variable "kubeconfig_file_path" {
+  description = "Specifies the full path where the Kubeconfig file is located."
+  type        = string
+}
+
+variable "kubeconfig_file_name" {
+  description = "Specifies the name of the Kubeconfig file used to access the Harvester cluster."
+  type        = string
+}
 
 variable "s3_server_install" {
   description = "Enables the automated installation of an S3-compatible server (Garage) on the VM during startup. Default is 'false'."
   type        = bool
   default     = false
 }
-
-## -- S3 Server (Garage) configuration
 
 variable "s3_bucket_name" {
   description = "Specifies the name of the S3 bucket to create. Only used when 's3_server_install' is true. Default is 'bucket1'."
@@ -116,17 +127,30 @@ variable "s3_garage_version" {
   default     = "https://garagehq.deuxfleurs.fr/_releases/v1.1.0/x86_64-unknown-linux-musl/garage"
 }
 
-variable "harvester_url" {
-  description = "Specifies the URL of the Harvester cluster API."
-  type        = string
+variable "nfs_server_install" {
+  description = "Enables the automated installation of an NFS server on the VM during startup. Default is 'false'."
+  type        = bool
+  default     = false
+  validation {
+    condition     = !(var.nfs_server_install && var.s3_server_install)
+    error_message = "You cannot enable both NFS and S3 server installation at the same time. Choose only one."
+  }
 }
 
-variable "kubeconfig_file_path" {
-  description = "Specifies the full path where the Kubeconfig file is located."
+variable "nfs_export_path" {
+  description = "Specifies the directory path to export via NFS. Only used when 'nfs_server_install' is true. Default is '/mnt/nfs-data'."
   type        = string
+  default     = "/mnt/nfs-data"
 }
 
-variable "kubeconfig_file_name" {
-  description = "Specifies the name of the Kubeconfig file used to access the Harvester cluster."
+variable "nfs_export_options" {
+  description = "Specifies the NFS export options for /etc/exports. Only used when 'nfs_server_install' is true. Default is '*(rw,sync,no_subtree_check,no_root_squash)'."
   type        = string
+  default     = "*(rw,sync,no_subtree_check,no_root_squash)"
+}
+
+variable "nfs_data_disk_size" {
+  description = "Specifies the size of the data disk used for NFS exports, in GB. Only used when 'nfs_server_install' is true. Default is '50'."
+  type        = number
+  default     = 100
 }

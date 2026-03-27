@@ -1,0 +1,55 @@
+name: Test AWS VM deploy and destroy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  aws_vm_terraform_deploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Ensure netcat is installed
+        run: sudo apt-get update && sudo apt-get install -y netcat-openbsd
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.10.5"
+      - name: Authenticate to AWS Cloud
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Initialize Terraform
+        run: terraform init
+        working-directory: tests/aws/infra-only
+      - name: Run Terraform apply
+        run: terraform apply -auto-approve
+        working-directory: tests/aws/infra-only
+      - name: Get public IP from Terraform output
+        id: ip
+        run: |
+          ip=$(terraform output -json first_instance_public_ip | jq -r '.')
+          echo "INSTANCE_IP=$ip" >> $GITHUB_ENV
+        working-directory: tests/aws/infra-only
+      - name: Wait for SSH (port 22) to become available
+        run: |
+          echo "Waiting for port 22 on $INSTANCE_IP..."
+          for i in {1..30}; do
+            if nc -zv $INSTANCE_IP 22; then
+              echo "Port 22 is open."
+              exit 0
+            fi
+            echo "Attempt $i failed, retrying in 10s..."
+            sleep 10
+          done
+          echo "SSH not available after 30 attempts. Failing."
+          exit 1
+        env:
+          INSTANCE_IP: ${{ env.INSTANCE_IP }}
+      - name: Run Terraform Destroy
+        if: always()
+        run: terraform destroy -auto-approve
+        working-directory: tests/aws/infra-only
