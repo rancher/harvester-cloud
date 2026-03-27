@@ -10,7 +10,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - name: Clone tf-rancher-up project
         run: git clone https://github.com/rancher/tf-rancher-up.git tf-rancher-up
       - name: Install prerequisites
@@ -19,11 +19,11 @@ jobs:
           sudo apt-get install -y jq curl
           sudo apt-get install -y netcat-openbsd
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
         with:
           terraform_version: "1.10.5"
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed # v2
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
       - name: Initialize Terraform (Rancher - tf-rancher-up project)
