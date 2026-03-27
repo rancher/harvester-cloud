@@ -63,7 +63,7 @@ resource "aws_s3_object" "vhd" {
 
 resource "aws_iam_role" "vmimport" {
   count = var.certified_os_image ? 1 : 0
-  name  = "vmimport"
+  name  = "${var.prefix}-vmimport"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -78,7 +78,7 @@ resource "aws_iam_role" "vmimport" {
 
 resource "aws_iam_role_policy" "vmimport" {
   count = var.certified_os_image ? 1 : 0
-  name  = "vmimport"
+  name  = "${var.prefix}-vmimport"
   role  = aws_iam_role.vmimport[0].id
   policy = jsonencode({
     Version = "2012-10-17",
@@ -125,7 +125,7 @@ resource "aws_ebs_snapshot_import" "opensuse_snapshot" {
 
 resource "aws_ami" "opensuse_ami" {
   count               = var.certified_os_image ? 1 : 0
-  name                = "opensuse-harv-ami"
+  name                = "${var.prefix}-opensuse-harv-ami"
   virtualization_type = "hvm"
   root_device_name    = "/dev/xvda"
   ena_support         = true
