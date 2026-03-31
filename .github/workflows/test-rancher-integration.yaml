@@ -199,6 +199,7 @@ jobs:
                   print("No clusters found, Harvester integration may have failed.")
                   sys.exit(1)
 
+          except requests.exceptions.RequestException as e:
               print("Error checking clusters:", e)
               sys.exit(1)
           EOF
