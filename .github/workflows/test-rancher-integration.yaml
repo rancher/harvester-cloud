@@ -91,7 +91,7 @@ jobs:
                   f"{RANCHER_URL}/v3-public/localProviders/local?action=login",
                   json={"username": "admin", "password": RANCHER_PASSWORD},
                   headers={"Content-Type": "application/json"},
-                  verify=True
+                  verify=False
               )
               login_resp.raise_for_status()
               TOKEN = login_resp.json()['token']
@@ -103,7 +103,7 @@ jobs:
                       "Content-Type": "application/json",
                       "Authorization": f"Bearer {TOKEN}"
                   },
-                  verify=True
+                  verify=False
               )
               api_resp.raise_for_status()
               FULL_TOKEN = api_resp.json()['token']
@@ -120,6 +120,7 @@ jobs:
                   f.write(f"RANCHER_CI_TOKEN_SECRET_KEY={SECRET_KEY}\n")
 
               print("Rancher API token created successfully.")
+          except requests.exceptions.RequestException as e:
               print("Error creating Rancher API token:", e)
               exit(1)
           EOF
@@ -183,7 +184,7 @@ jobs:
               response = requests.get(
                   f"{RANCHER_URL}/v3/clusters",
                   auth=(ACCESS_KEY, SECRET_KEY),
-                  verify=True
+                  verify=False
               )
               response.raise_for_status()
               data = response.json().get('data', [])
