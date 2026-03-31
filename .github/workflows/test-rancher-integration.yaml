@@ -44,7 +44,7 @@ jobs:
         env:      
           RANCHER_URL: ${{ env.RANCHER_URL }}
         run: |
-          python3 - <<'EOF'
+          python3 -u <<'EOF'
           import os
           import requests
           import time
