@@ -59,7 +59,7 @@ jobs:
                   response = requests.get(
                       f"{RANCHER_URL}/ping",
                       timeout=5,
-                      verify=True
+                      verify=False
                   )
                   if response.status_code == 200:
                       print("Rancher ready!")
