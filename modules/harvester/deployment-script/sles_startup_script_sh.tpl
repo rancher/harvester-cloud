@@ -109,18 +109,19 @@ VAR_VMLINUZ="HARVESTER_$${SAFE_VERSION}_VMLINUZ_SUM_amd64"
 VAR_INITRD="HARVESTER_$${SAFE_VERSION}_INITRD_SUM_amd64"
 VAR_ROOTFS="HARVESTER_$${SAFE_VERSION}_ROOTFS_SUM_amd64"
 VAR_ISO="HARVESTER_$${SAFE_VERSION}_ISO_SUM_amd64"
+echo "VALUE = '${!VAR_VMLINUZ}'"
 sudo curl -L -o /srv/www/harvester/harvester-${version}-vmlinuz-amd64 \
     https://github.com/harvester/harvester/releases/download/${version}/harvester-${version}-vmlinuz-amd64
-echo "${!VAR_VMLINUZ}  /srv/www/harvester/harvester-${version}-vmlinuz-amd64" | sha256sum -c -
+echo "$${!VAR_VMLINUZ}  /srv/www/harvester/harvester-${version}-vmlinuz-amd64" | sha256sum -c -
 sudo curl -L -o /srv/www/harvester/harvester-${version}-initrd-amd64 \
     https://github.com/harvester/harvester/releases/download/${version}/harvester-${version}-initrd-amd64
-echo "${!VAR_INITRD}  /srv/www/harvester/harvester-${version}-initrd-amd64" | sha256sum -c -
+echo "$${!VAR_INITRD}  /srv/www/harvester/harvester-${version}-initrd-amd64" | sha256sum -c -
 sudo curl -L -o /srv/www/harvester/harvester-${version}-rootfs-amd64.squashfs \
     https://releases.rancher.com/harvester/${version}/harvester-${version}-rootfs-amd64.squashfs
-echo "${!VAR_ROOTFS}  /srv/www/harvester/harvester-${version}-rootfs-amd64.squashfs" | sha256sum -c -
+echo "$${!VAR_ROOTFS}  /srv/www/harvester/harvester-${version}-rootfs-amd64.squashfs" | sha256sum -c -
 sudo curl -L -o /srv/www/harvester/harvester-${version}-amd64.iso \
     https://releases.rancher.com/harvester/${version}/harvester-${version}-amd64.iso
-echo "${!VAR_ISO}  /srv/www/harvester/harvester-${version}-amd64.iso" | sha256sum -c -
+echo "$${!VAR_ISO}  /srv/www/harvester/harvester-${version}-amd64.iso" | sha256sum -c -
 touch /tmp/harvester_download_done
 
 # Disk partitioning
