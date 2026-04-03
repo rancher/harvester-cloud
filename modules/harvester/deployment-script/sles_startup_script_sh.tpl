@@ -116,11 +116,11 @@ sudo curl -L -o /usr/local/bin/restart_harvester_vms_script.sh \
     https://raw.githubusercontent.com/rancher/harvester-cloud/refs/heads/bug-fix%2Fissue-172/modules/harvester/deployment-script/restart_harvester_vms_script_sh.tpl
 echo "${RESTART_HARV_VM_SCRIPT_SUM}  /usr/local/bin/restart_harvester_vms_script.sh" | sha256sum -c -
 export HARV_VERSION="${version}"
-export SAFE_VERSION="${HARV_VERSION//./_}"
-export VAR_VMLINUZ="HARVESTER_${SAFE_VERSION}_VMLINUZ_SUM_amd64"
-export VAR_INITRD="HARVESTER_${SAFE_VERSION}_INITRD_SUM_amd64"
-export VAR_ROOTFS="HARVESTER_${SAFE_VERSION}_ROOTFS_SUM_amd64"
-export VAR_ISO="HARVESTER_${SAFE_VERSION}_ISO_SUM_amd64"
+export SAFE_VERSION="$${HARV_VERSION//./_}"
+export VAR_VMLINUZ="HARVESTER_$${SAFE_VERSION}_VMLINUZ_SUM_amd64"
+export VAR_INITRD="HARVESTER_$${SAFE_VERSION}_INITRD_SUM_amd64"
+export VAR_ROOTFS="HARVESTER_$${SAFE_VERSION}_ROOTFS_SUM_amd64"
+export VAR_ISO="HARVESTER_$${SAFE_VERSION}_ISO_SUM_amd64"
 sudo curl -L -o /srv/www/harvester/harvester-${version}-vmlinuz-amd64 \
     https://github.com/harvester/harvester/releases/download/${version}/harvester-${version}-vmlinuz-amd64
 echo "${!VAR_VMLINUZ}  /srv/www/harvester/harvester-${version}-vmlinuz-amd64" | sha256sum -c -
