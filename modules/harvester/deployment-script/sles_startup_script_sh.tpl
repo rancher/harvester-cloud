@@ -109,7 +109,7 @@ VAR_VMLINUZ="HARVESTER_$${SAFE_VERSION}_VMLINUZ_SUM_amd64"
 VAR_INITRD="HARVESTER_$${SAFE_VERSION}_INITRD_SUM_amd64"
 VAR_ROOTFS="HARVESTER_$${SAFE_VERSION}_ROOTFS_SUM_amd64"
 VAR_ISO="HARVESTER_$${SAFE_VERSION}_ISO_SUM_amd64"
-echo "VALUE = '${!VAR_VMLINUZ}'"
+echo "VALUE = $${!VAR_VMLINUZ}"
 sudo curl -L -o /srv/www/harvester/harvester-${version}-vmlinuz-amd64 \
     https://github.com/harvester/harvester/releases/download/${version}/harvester-${version}-vmlinuz-amd64
 echo "$${!VAR_VMLINUZ}  /srv/www/harvester/harvester-${version}-vmlinuz-amd64" | sha256sum -c -
