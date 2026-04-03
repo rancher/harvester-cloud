@@ -28,10 +28,10 @@ if [ ${harvester_airgapped} == true ]; then
 fi
 
 # Checksum definitions for configuration files (harvester-cloud templates)
-NGINX_CONF_SUM="99f56dd5381bfe7b75b6e80dd86d88e1c1d82af7f0830d3d48af1ed716524427"
-VLAN1_XML_SUM="c7fc0cd2d5a928f1fc8bfd39f6175d3ff5bbc87f2013ec5635940627999ca5a0"
-SOCAT_SERVICE_SUM="da8dff6d4ab189ad3d740f0153437ff220488d32b904ebcd8a7ef3ac706e57b5"
-RESTART_HARV_VM_SCRIPT_SUM="18d6fdd9ea5898b2025d37f7b8fe3ca568833747a8413108031612a7560b9b62"
+NGINX_CONF_SUM="3faeb9f605b25ad4c2f6a2366dccfa3e917eb36e3fb5a78cbe3edbe937d20af20828dcc70b78983fe11d346fd0816fda7fb35b33cce9ae2821232d80d2a7f07d"
+VLAN1_XML_SUM="2c83624d65e79b688d4ecfbac4f939d23033d828711cd6f97aa8b4dd7159dcebfb258e4ada106019174a947063af99b24b6722df1956c4fb07171428ec3e8828"
+SOCAT_SERVICE_SUM="894325b20fda3e6ddd5685f436dbfbf2ddd086aa428925e25da03a72ca90161d8c087727002862cabe5ee7bd400f3e226455e3666456a8b592e392d2f00f373e"
+RESTART_HARV_VM_SCRIPT_SUM="3d8b6d998a6e287fcddf1eb0751cd96bbb652ad5533d6fe4a83f136e68907dfc3502331d39bfc9df506c2db5ace0add37e460aeb86e73d131d48038eb3fd81a4"
 
 # Harvester artifacts version and checksum definitions
 # 1.4.0
@@ -93,35 +93,34 @@ HARVESTER_v1_7_1_ISO_SUM_amd64="381e6c6d09f4d5d1cb1b3813c1ad5dd8064618e5e5400b36
 # Download the files needed to start the nested VM
 sudo curl -L -o /etc/nginx/nginx.conf \
     https://raw.githubusercontent.com/rancher/harvester-cloud/refs/heads/bug-fix%2Fissue-172/modules/harvester/deployment-script/nginx_conf.tpl
-echo "$${NGINX_CONF_SUM}  /etc/nginx/nginx.conf" | sha256sum -c -
+echo "$${NGINX_CONF_SUM}  /etc/nginx/nginx.conf" | sha512sum -c -
 sudo curl -L -o /srv/www/harvester/vlan1.xml \
     https://raw.githubusercontent.com/rancher/harvester-cloud/refs/heads/bug-fix%2Fissue-172/modules/harvester/deployment-script/qemu_vlan1_xml.tpl
-echo "$${VLAN1_XML_SUM}  /srv/www/harvester/vlan1.xml" | sha256sum -c -
+echo "$${VLAN1_XML_SUM}  /srv/www/harvester/vlan1.xml" | sha512sum -c -
 sudo curl -L -o /etc/systemd/system/socat-proxy.service \
     https://raw.githubusercontent.com/rancher/harvester-cloud/refs/heads/bug-fix%2Fissue-172/modules/harvester/deployment-script/socat_proxy_service.tpl
-echo "$${SOCAT_SERVICE_SUM}  /etc/systemd/system/socat-proxy.service" | sha256sum -c -
+echo "$${SOCAT_SERVICE_SUM}  /etc/systemd/system/socat-proxy.service" | sha512sum -c -
 sudo curl -L -o /usr/local/bin/restart_harvester_vms_script.sh \
     https://raw.githubusercontent.com/rancher/harvester-cloud/refs/heads/bug-fix%2Fissue-172/modules/harvester/deployment-script/restart_harvester_vms_script_sh.tpl
-echo "$${RESTART_HARV_VM_SCRIPT_SUM}  /usr/local/bin/restart_harvester_vms_script.sh" | sha256sum -c -
+echo "$${RESTART_HARV_VM_SCRIPT_SUM}  /usr/local/bin/restart_harvester_vms_script.sh" | sha512sum -c -
 HARV_VERSION="${version}"
 SAFE_VERSION="$${HARV_VERSION//./_}"
 VAR_VMLINUZ="HARVESTER_$${SAFE_VERSION}_VMLINUZ_SUM_amd64"
 VAR_INITRD="HARVESTER_$${SAFE_VERSION}_INITRD_SUM_amd64"
 VAR_ROOTFS="HARVESTER_$${SAFE_VERSION}_ROOTFS_SUM_amd64"
 VAR_ISO="HARVESTER_$${SAFE_VERSION}_ISO_SUM_amd64"
-echo "VALUE = $${!VAR_VMLINUZ}"
 sudo curl -L -o /srv/www/harvester/harvester-${version}-vmlinuz-amd64 \
     https://github.com/harvester/harvester/releases/download/${version}/harvester-${version}-vmlinuz-amd64
-echo "$${!VAR_VMLINUZ}  /srv/www/harvester/harvester-${version}-vmlinuz-amd64" | sha256sum -c -
+echo "$${!VAR_VMLINUZ}  /srv/www/harvester/harvester-${version}-vmlinuz-amd64" | sha512sum -c -
 sudo curl -L -o /srv/www/harvester/harvester-${version}-initrd-amd64 \
     https://github.com/harvester/harvester/releases/download/${version}/harvester-${version}-initrd-amd64
-echo "$${!VAR_INITRD}  /srv/www/harvester/harvester-${version}-initrd-amd64" | sha256sum -c -
+echo "$${!VAR_INITRD}  /srv/www/harvester/harvester-${version}-initrd-amd64" | sha512sum -c -
 sudo curl -L -o /srv/www/harvester/harvester-${version}-rootfs-amd64.squashfs \
     https://releases.rancher.com/harvester/${version}/harvester-${version}-rootfs-amd64.squashfs
-echo "$${!VAR_ROOTFS}  /srv/www/harvester/harvester-${version}-rootfs-amd64.squashfs" | sha256sum -c -
+echo "$${!VAR_ROOTFS}  /srv/www/harvester/harvester-${version}-rootfs-amd64.squashfs" | sha512sum -c -
 sudo curl -L -o /srv/www/harvester/harvester-${version}-amd64.iso \
     https://releases.rancher.com/harvester/${version}/harvester-${version}-amd64.iso
-echo "$${!VAR_ISO}  /srv/www/harvester/harvester-${version}-amd64.iso" | sha256sum -c -
+echo "$${!VAR_ISO}  /srv/www/harvester/harvester-${version}-amd64.iso" | sha512sum -c -
 touch /tmp/harvester_download_done
 
 # Disk partitioning
