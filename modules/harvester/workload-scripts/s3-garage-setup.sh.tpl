@@ -37,11 +37,10 @@ chmod -R 700 "$BACKUP_DIR"
 
 # 3. Install Garage S3 binary
 echo "[3/7] Installing Garage S3..." >> /opt/script-status.txt
-wget -q -O garage "$GARAGE_VER"
-if [ $? -ne 0 ]; then
+python3 -c "import urllib.request; urllib.request.urlretrieve('$GARAGE_VER', 'garage')" || {
   echo "Error: Failed to download Garage binary. Check the URL and network connectivity." >> /opt/script-status.txt
   exit 1
-fi
+}
 chmod +x garage
 mv garage /usr/local/bin/
 
