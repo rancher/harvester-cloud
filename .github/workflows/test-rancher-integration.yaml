@@ -13,11 +13,6 @@ jobs:
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - name: Clone tf-rancher-up project
         run: git clone https://github.com/rancher/tf-rancher-up.git tf-rancher-up
-      - name: Install prerequisites
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y jq curl
-          sudo apt-get install -y netcat-openbsd
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
         with:
@@ -46,42 +41,89 @@ jobs:
           echo "RANCHER_URL=$url" >> $GITHUB_ENV
         working-directory: tf-rancher-up/recipes/upstream/google-cloud/rke2
       - name: Wait for Rancher API
-        env:
+        env:      
           RANCHER_URL: ${{ env.RANCHER_URL }}
         run: |
-          echo "Waiting Rancher API..."
-          for i in {1..50}; do
-            if curl -k -sf "$RANCHER_URL/ping" > /dev/null; then
-              echo "Rancher ready!"
-              exit 0
-            fi
-            echo "Attempt $i failed, retrying in 10s..."
-            sleep 10
-          done
-          echo "Rancher not ready!"
-          exit 1
-      - name: Create Rancher API token
+          python3 -u <<'EOF'
+          import os
+          import requests
+          import time
+          import sys
+
+          RANCHER_URL = os.environ['RANCHER_URL']
+
+          print("Waiting Rancher API...")
+
+          for i in range(1, 51):
+              try:
+                  response = requests.get(
+                      f"{RANCHER_URL}/ping",
+                      timeout=5,
+                      verify=False
+                  )
+                  if response.status_code == 200:
+                      print("Rancher ready!")
+                      sys.exit(0)
+              except requests.exceptions.RequestException:
+                  pass
+
+              print(f"Attempt {i} failed, retrying in 10s...")
+              time.sleep(10)
+
+          print("Rancher not ready!")
+          sys.exit(1)
+          EOF
+      - name: Create Rancher API token via Python
         env:
           RANCHER_URL: ${{ env.RANCHER_URL }}
           RANCHER_PASSWORD: ${{ secrets.RANCHER_PASSWORD }}
         run: |
-          TOKEN=$(curl -s -k "$RANCHER_URL/v3-public/localProviders/local?action=login" \
-            -H 'Content-Type: application/json' \
-            --data-raw "{\"username\":\"admin\",\"password\":\"$RANCHER_PASSWORD\"}" \
-            | jq -r '.token')
-          API_KEY=$(curl -s -k "$RANCHER_URL/v3/token" \
-            -H "Authorization: Bearer $TOKEN" \
-            -H 'Content-Type: application/json' \
-            --data '{"type":"apiKey","description":"ci token"}')
-          FULL_TOKEN=$(echo "$API_KEY" | jq -r '.token')
-          ACCESS_KEY=$(echo "$FULL_TOKEN" | cut -d':' -f1)
-          SECRET_KEY=$(echo "$FULL_TOKEN" | cut -d':' -f2)
-          echo "::add-mask::$TOKEN"
-          echo "::add-mask::$FULL_TOKEN"
-          echo "::add-mask::$ACCESS_KEY"
-          echo "::add-mask::$SECRET_KEY"
-          echo "RANCHER_CI_TOKEN_ACCESS_KEY=$ACCESS_KEY" >> $GITHUB_ENV
-          echo "RANCHER_CI_TOKEN_SECRET_KEY=$SECRET_KEY" >> $GITHUB_ENV
+          python3 - <<'EOF'
+          import os
+          import requests
+
+          RANCHER_URL = os.environ['RANCHER_URL']
+          RANCHER_PASSWORD = os.environ['RANCHER_PASSWORD']
+          GITHUB_ENV = os.environ.get('GITHUB_ENV', '/tmp/github_env')
+
+          try:
+              login_resp = requests.post(
+                  f"{RANCHER_URL}/v3-public/localProviders/local?action=login",
+                  json={"username": "admin", "password": RANCHER_PASSWORD},
+                  headers={"Content-Type": "application/json"},
+                  verify=False
+              )
+              login_resp.raise_for_status()
+              TOKEN = login_resp.json()['token']
+
+              api_resp = requests.post(
+                  f"{RANCHER_URL}/v3/token",
+                  json={"type": "apiKey", "description": "ci token"},
+                  headers={
+                      "Content-Type": "application/json",
+                      "Authorization": f"Bearer {TOKEN}"
+                  },
+                  verify=False
+              )
+              api_resp.raise_for_status()
+              FULL_TOKEN = api_resp.json()['token']
+
+              ACCESS_KEY, SECRET_KEY = FULL_TOKEN.split(":")
+
+              print(f"::add-mask::{TOKEN}")
+              print(f"::add-mask::{FULL_TOKEN}")
+              print(f"::add-mask::{ACCESS_KEY}")
+              print(f"::add-mask::{SECRET_KEY}")
+
+              with open(GITHUB_ENV, "a") as f:
+                  f.write(f"RANCHER_CI_TOKEN_ACCESS_KEY={ACCESS_KEY}\n")
+                  f.write(f"RANCHER_CI_TOKEN_SECRET_KEY={SECRET_KEY}\n")
+
+              print("Rancher API token created successfully.")
+          except requests.exceptions.RequestException as e:
+              print("Error creating Rancher API token:", e)
+              exit(1)
+          EOF
       - name: Initialize Terraform (Harvester)
         run: terraform init
         working-directory: projects/google-cloud
@@ -127,17 +169,40 @@ jobs:
           RANCHER_CI_TOKEN_ACCESS_KEY: ${{ env.RANCHER_CI_TOKEN_ACCESS_KEY }}
           RANCHER_CI_TOKEN_SECRET_KEY: ${{ env.RANCHER_CI_TOKEN_SECRET_KEY }}
         run: |
-          echo "Checking Harvester integration with Rancher..."
-          RESPONSE=$(curl -s -k -u "$RANCHER_CI_TOKEN_ACCESS_KEY:$RANCHER_CI_TOKEN_SECRET_KEY" "$RANCHER_URL/v3/clusters")
-          CLUSTER_COUNT=$(echo "$RESPONSE" | jq '.data | length')
-          if [ "$CLUSTER_COUNT" -gt 0 ]; then
-            echo "Harvester successfully registered with Rancher."
-            echo "Found $CLUSTER_COUNT cluster(s):"
-            echo "$RESPONSE" | jq -r '.data[] | "- \(.name) (ID: \(.id))"'
-          else
-            echo "No clusters found, Harvester integration may have failed."
-            exit 1
-          fi
+          python3 - <<'EOF'
+          import os
+          import requests
+          import sys
+
+          RANCHER_URL = os.environ['RANCHER_URL']
+          ACCESS_KEY = os.environ['RANCHER_CI_TOKEN_ACCESS_KEY']
+          SECRET_KEY = os.environ['RANCHER_CI_TOKEN_SECRET_KEY']
+
+          try:
+              print("Checking Harvester integration with Rancher...")
+
+              response = requests.get(
+                  f"{RANCHER_URL}/v3/clusters",
+                  auth=(ACCESS_KEY, SECRET_KEY),
+                  verify=False
+              )
+              response.raise_for_status()
+              data = response.json().get('data', [])
+
+              cluster_count = len(data)
+              if cluster_count > 0:
+                  print("Harvester successfully registered with Rancher.")
+                  print(f"Found {cluster_count} cluster(s):")
+                  for cluster in data:
+                      print(f"- {cluster['name']} (ID: {cluster['id']})")
+              else:
+                  print("No clusters found, Harvester integration may have failed.")
+                  sys.exit(1)
+
+          except requests.exceptions.RequestException as e:
+              print("Error checking clusters:", e)
+              sys.exit(1)
+          EOF
       - name: Wait/Verify before destroy
         run: |
           sleep 60s
