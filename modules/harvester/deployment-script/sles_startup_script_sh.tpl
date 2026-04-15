@@ -92,16 +92,16 @@ HARVESTER_v1_7_1_ISO_SUM_amd64="381e6c6d09f4d5d1cb1b3813c1ad5dd8064618e5e5400b36
 
 # Download the files needed to start the nested VM
 sudo curl -L -o /etc/nginx/nginx.conf \
-    https://raw.githubusercontent.com/rancher/harvester-cloud/refs/heads/bug-fix%2Fissue-172/modules/harvester/deployment-script/nginx_conf.tpl
+    https://raw.githubusercontent.com/rancher/harvester-cloud/refs/heads/main/modules/harvester/deployment-script/nginx_conf.tpl
 echo "$${NGINX_CONF_SUM}  /etc/nginx/nginx.conf" | sha512sum -c -
 sudo curl -L -o /srv/www/harvester/vlan1.xml \
-    https://raw.githubusercontent.com/rancher/harvester-cloud/refs/heads/bug-fix%2Fissue-172/modules/harvester/deployment-script/qemu_vlan1_xml.tpl
+    https://raw.githubusercontent.com/rancher/harvester-cloud/refs/heads/main/modules/harvester/deployment-script/qemu_vlan1_xml.tpl
 echo "$${VLAN1_XML_SUM}  /srv/www/harvester/vlan1.xml" | sha512sum -c -
 sudo curl -L -o /etc/systemd/system/socat-proxy.service \
-    https://raw.githubusercontent.com/rancher/harvester-cloud/refs/heads/bug-fix%2Fissue-172/modules/harvester/deployment-script/socat_proxy_service.tpl
+    https://raw.githubusercontent.com/rancher/harvester-cloud/refs/heads/main/modules/harvester/deployment-script/socat_proxy_service.tpl
 echo "$${SOCAT_SERVICE_SUM}  /etc/systemd/system/socat-proxy.service" | sha512sum -c -
 sudo curl -L -o /usr/local/bin/restart_harvester_vms_script.sh \
-    https://raw.githubusercontent.com/rancher/harvester-cloud/refs/heads/bug-fix%2Fissue-172/modules/harvester/deployment-script/restart_harvester_vms_script_sh.tpl
+    https://raw.githubusercontent.com/rancher/harvester-cloud/refs/heads/main/modules/harvester/deployment-script/restart_harvester_vms_script_sh.tpl
 echo "$${RESTART_HARV_VM_SCRIPT_SUM}  /usr/local/bin/restart_harvester_vms_script.sh" | sha512sum -c -
 HARV_VERSION="${version}"
 SAFE_VERSION="$${HARV_VERSION//./_}"
