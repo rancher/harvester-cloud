@@ -15,7 +15,7 @@ jobs:
       contents: read
       issues: read
     env:
-      REPO: "rancherlabs/support-kb"
+      REPO: "rancher/harvester-cloud"
     steps:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
@@ -99,29 +99,38 @@ jobs:
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
           prompt: |
-            You are helping to analyze an idea stored in a GitHub issue.
+            zzz
+            You are analyzing a GitHub issue in the context of the harvester-cloud project.
 
-            In this repository we use GitHub issues to store ideas or knowledge base entries.
+            About the project:
+            - harvester-cloud is a project for deploying Harvester on cloud providers instead of bare-metal infrastructure
+            - It is mainly used for labs, testing, and proof-of-concepts (not production)
+            - It uses tools like Terraform/OpenTofu and supports providers like AWS, Azure, GCP, DigitalOcean
 
             Your task:
-            - Read the issue data
-            - Understand the idea
-            - Check if something similar already exists:
-              - online (official documentation, open source projects, SaaS tools)
-              - inside other issues in this repository: ${{ env.REPO }} (use titles only)
-            - Mention existing tools, projects, or issues if relevant
-            - Keep the answer concise
+            - Read and understand the issue content (title, body, comments)
+            - Summarize the core problem or idea
+            - Check whether a similar issue already exists in this repository
+              - Use the provided list of issue titles
+              - Look for semantic similarity, not just exact matches
+            - If similar issues exist:
+              - List them
+              - Explain briefly why they are similar
+            - If no similar issues are found:
+              - Clearly state that this appears to be a new issue
+
+            Keep the answer concise.
 
             Respond in the following format:
 
-            --- Idea Summary ---
-            <A short summary of the idea in one or two sentences>
+            --- Issue Summary ---
+            <Short summary of the issue>
 
-            --- Existing References ---
-            <List of similar documents, projects, tools, or issues with links or issue numbers>
+            --- Potential Duplicates ---
+            <List similar issue titles or say "None found">
 
             --- Conclusion ---
-            <State whether the idea already exists, or if it is new / original>
+            <State whether this is likely a duplicate or a new issue>
 
             Issue data:
             ---
