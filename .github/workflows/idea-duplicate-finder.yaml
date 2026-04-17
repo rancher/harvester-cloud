@@ -99,7 +99,6 @@ jobs:
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
           prompt: |
-            zzz
             You are analyzing a GitHub issue in the context of the harvester-cloud project.
 
             About the project:
