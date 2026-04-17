@@ -1,0 +1,139 @@
+name: Idea Duplicate Finder
+
+on:
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        required: false
+  issues:
+    types: [opened]
+
+jobs:
+  analyze-idea:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: read
+    env:
+      REPO: "rancherlabs/support-kb"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      # Fetch issue data: title, body, and comments
+      - name: Fetch Issue Data
+        run: |
+          ISSUE=${{ inputs.issue_number || github.event.issue.number }}
+          echo "=== Fetching issue $ISSUE from $REPO ==="
+
+          ISSUE_JSON=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/$REPO/issues/$ISSUE)
+          COMMENTS_JSON=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/$REPO/issues/$ISSUE/comments)
+
+          # Check for valid title field
+          if ! echo "$ISSUE_JSON" | jq -e '.title' >/dev/null 2>&1; then
+            echo "ERROR: Issue $ISSUE not found or access denied!"
+            echo "$ISSUE_JSON"
+            exit 1
+          fi
+
+          # Extract title and body
+          TITLE=$(echo "$ISSUE_JSON" | jq -r '.title // empty')
+          BODY=$(echo "$ISSUE_JSON" | jq -r '.body // empty')
+
+          # Extract comments (may be empty)
+          COMMENTS=$(echo "$COMMENTS_JSON" | jq -r '.[].body // empty')
+
+          # Save issue data into a file
+          echo "=== ISSUE TITLE ===" > issue_data.txt
+          echo "$TITLE" >> issue_data.txt
+          echo -e "\n=== ISSUE BODY ===" >> issue_data.txt
+          echo "$BODY" >> issue_data.txt
+          echo -e "\n=== ISSUE COMMENTS ===" >> issue_data.txt
+          echo "$COMMENTS" >> issue_data.txt
+
+      # Fetch last ~500 issue titles (paginated)
+      - name: Fetch Recent Issue Titles (Paginated)
+        run: |
+          echo "=== Fetching recent issue titles from $REPO ==="
+
+          MAX_PAGES=5
+          ALL_TITLES=""
+
+          for PAGE in $(seq 1 $MAX_PAGES); do
+            echo "Fetching page $PAGE..."
+
+            RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              "https://api.github.com/repos/$REPO/issues?state=all&per_page=100&page=$PAGE&sort=updated&direction=desc")
+
+            TITLES=$(echo "$RESPONSE" | jq -r '.[].title // empty')
+
+            # Stop early if no results
+            if [ -z "$TITLES" ]; then
+              echo "No more issues found. Stopping."
+              break
+            fi
+
+            ALL_TITLES="$ALL_TITLES;$TITLES"
+          done
+
+          # Clean leading semicolon
+          ALL_TITLES=$(echo "$ALL_TITLES" | sed 's/^;//')
+
+          echo "LAST_ISSUE_TITLES=$ALL_TITLES" >> $GITHUB_ENV
+
+      # Load issue data into environment variable for Gemini
+      - name: Load Issue Data to Env
+        run: |
+          {
+            echo 'ISSUE_DATA<<EOF'
+            cat issue_data.txt
+            echo EOF
+          } >> $GITHUB_ENV
+
+      # Run Gemini AI to analyze duplicates
+      - name: Analyze with Gemini
+        uses: google-github-actions/run-gemini-cli@9dbec29a20fab3f35017a40ad0eb798a257d4d51 # v0
+        id: gemini_analysis
+        with:
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          prompt: |
+            You are helping to analyze an idea stored in a GitHub issue.
+
+            In this repository we use GitHub issues to store ideas or knowledge base entries.
+
+            Your task:
+            - Read the issue data
+            - Understand the idea
+            - Check if something similar already exists:
+              - online (official documentation, open source projects, SaaS tools)
+              - inside other issues in this repository: ${{ env.REPO }} (use titles only)
+            - Mention existing tools, projects, or issues if relevant
+            - Keep the answer concise
+
+            Respond in the following format:
+
+            --- Idea Summary ---
+            <A short summary of the idea in one or two sentences>
+
+            --- Existing References ---
+            <List of similar documents, projects, tools, or issues with links or issue numbers>
+
+            --- Conclusion ---
+            <State whether the idea already exists, or if it is new / original>
+
+            Issue data:
+            ---
+            ${{ env.ISSUE_DATA }}
+
+            Other issue titles in repo:
+            ---
+            ${{ env.LAST_ISSUE_TITLES }}
+
+      # Publish Gemini report to workflow summary
+      - name: Publish Report
+        if: always()
+        run: |
+          echo "## Gemini Idea Analysis Report" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.gemini_analysis.outputs.output }}" >> $GITHUB_STEP_SUMMARY
