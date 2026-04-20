@@ -1,0 +1,147 @@
+name: Idea Duplicate Finder
+
+on:
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        required: false
+  issues:
+    types: [opened]
+
+jobs:
+  analyze-idea:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: read
+    env:
+      REPO: "rancher/harvester-cloud"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      # Fetch issue data: title, body, and comments
+      - name: Fetch Issue Data
+        run: |
+          ISSUE=${{ inputs.issue_number || github.event.issue.number }}
+          echo "=== Fetching issue $ISSUE from $REPO ==="
+
+          ISSUE_JSON=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/$REPO/issues/$ISSUE)
+          COMMENTS_JSON=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/$REPO/issues/$ISSUE/comments)
+
+          # Check for valid title field
+          if ! echo "$ISSUE_JSON" | jq -e '.title' >/dev/null 2>&1; then
+            echo "ERROR: Issue $ISSUE not found or access denied!"
+            echo "$ISSUE_JSON"
+            exit 1
+          fi
+
+          # Extract title and body
+          TITLE=$(echo "$ISSUE_JSON" | jq -r '.title // empty')
+          BODY=$(echo "$ISSUE_JSON" | jq -r '.body // empty')
+
+          # Extract comments (may be empty)
+          COMMENTS=$(echo "$COMMENTS_JSON" | jq -r '.[].body // empty')
+
+          # Save issue data into a file
+          echo "=== ISSUE TITLE ===" > issue_data.txt
+          echo "$TITLE" >> issue_data.txt
+          echo -e "\n=== ISSUE BODY ===" >> issue_data.txt
+          echo "$BODY" >> issue_data.txt
+          echo -e "\n=== ISSUE COMMENTS ===" >> issue_data.txt
+          echo "$COMMENTS" >> issue_data.txt
+
+      # Fetch last ~500 issue titles (paginated)
+      - name: Fetch Recent Issue Titles (Paginated)
+        run: |
+          echo "=== Fetching recent issue titles from $REPO ==="
+
+          MAX_PAGES=5
+          ALL_TITLES=""
+
+          for PAGE in $(seq 1 $MAX_PAGES); do
+            echo "Fetching page $PAGE..."
+
+            RESPONSE=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+              "https://api.github.com/repos/$REPO/issues?state=all&per_page=100&page=$PAGE&sort=updated&direction=desc")
+
+            TITLES=$(echo "$RESPONSE" | jq -r '.[].title // empty')
+
+            # Stop early if no results
+            if [ -z "$TITLES" ]; then
+              echo "No more issues found. Stopping."
+              break
+            fi
+
+            ALL_TITLES="$ALL_TITLES;$TITLES"
+          done
+
+          # Clean leading semicolon
+          ALL_TITLES=$(echo "$ALL_TITLES" | sed 's/^;//')
+
+          echo "LAST_ISSUE_TITLES=$ALL_TITLES" >> $GITHUB_ENV
+
+      # Load issue data into environment variable for Gemini
+      - name: Load Issue Data to Env
+        run: |
+          {
+            echo 'ISSUE_DATA<<EOF'
+            cat issue_data.txt
+            echo EOF
+          } >> $GITHUB_ENV
+
+      # Run Gemini AI to analyze duplicates
+      - name: Analyze with Gemini
+        uses: google-github-actions/run-gemini-cli@9dbec29a20fab3f35017a40ad0eb798a257d4d51 # v0
+        id: gemini_analysis
+        with:
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          prompt: |
+            You are analyzing a GitHub issue in the context of the harvester-cloud project.
+
+            About the project:
+            - harvester-cloud is a project for deploying Harvester on cloud providers instead of bare-metal infrastructure
+            - It is mainly used for labs, testing, and proof-of-concepts (not production)
+            - It uses tools like Terraform/OpenTofu and supports providers like AWS, Azure, GCP, DigitalOcean
+
+            Your task:
+            - Read and understand the issue content (title, body, comments)
+            - Summarize the core problem or idea
+            - Check whether a similar issue already exists in this repository
+              - Use the provided list of issue titles
+              - Look for semantic similarity, not just exact matches
+            - If similar issues exist:
+              - List them
+              - Explain briefly why they are similar
+            - If no similar issues are found:
+              - Clearly state that this appears to be a new issue
+
+            Keep the answer concise.
+
+            Respond in the following format:
+
+            --- Issue Summary ---
+            <Short summary of the issue>
+
+            --- Potential Duplicates ---
+            <List similar issue titles or say "None found">
+
+            --- Conclusion ---
+            <State whether this is likely a duplicate or a new issue>
+
+            Issue data:
+            ---
+            ${{ env.ISSUE_DATA }}
+
+            Other issue titles in repo:
+            ---
+            ${{ env.LAST_ISSUE_TITLES }}
+
+      # Publish Gemini report to workflow summary
+      - name: Publish Report
+        if: always()
+        run: |
+          echo "## Gemini Idea Analysis Report" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.gemini_analysis.outputs.output }}" >> $GITHUB_STEP_SUMMARY
