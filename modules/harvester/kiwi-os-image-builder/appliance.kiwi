@@ -74,6 +74,8 @@
         <!-- Google Agents -->
         <package name="google-guest-agent"/>
         <package name="google-osconfig-agent"/>
+        <!-- Azure Agents -->
+        <package name="python-azure-agent"/>
     </packages>
     <packages type="bootstrap">
         <package name="udev"/>
