@@ -11,3 +11,4 @@ systemctl enable cloud-final
 systemctl enable google-guest-agent
 systemctl enable google-osconfig-agent
 systemctl enable google-startup-scripts.service
+systemctl enable waagent
