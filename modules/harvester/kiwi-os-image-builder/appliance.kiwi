@@ -56,7 +56,6 @@
         <package name="socat"/>
         <package name="sshpass"/>
         <package name="NetworkManager"/>
-        <package name="NetworkManager-cloud-setup"/>
         <package name="openssh-server-config-rootlogin"/>
         <!-- Services / Daemons -->
         <package name="nginx"/>
@@ -74,8 +73,6 @@
         <!-- Google Agents -->
         <package name="google-guest-agent"/>
         <package name="google-osconfig-agent"/>
-        <!-- Azure Agents -->
-        <package name="python-azure-agent"/>
     </packages>
     <packages type="bootstrap">
         <package name="udev"/>
