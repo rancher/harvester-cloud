@@ -4,7 +4,9 @@ locals {
   instance_count       = 1
   instance_os_type     = "opensuse"
   ssh_username         = local.instance_os_type
-  certified_image_url  = var.certified_os_image ? "https://github.com/rancher/harvester-cloud/releases/download/${var.certified_os_image_tag}/opensuse-leap-15-6-harv-cloud-image.x86_64.qcow2.bz2" : null
+  certified_image_name = "opensuse-leap-15-6-harv-cloud-image.x86_64.qcow2.bz2"
+  certified_image_url  = var.certified_os_image ? "https://github.com/rancher/harvester-cloud/releases/download/${var.certified_os_image_tag}/${local.certified_image_name}" : null
+  certified_image_sum  = "c7ee0e8df4754173ec17560067f0344bac2a294314fe86da16763160af6b9a488db3df3daf03989981f6f206f1e4f8d6bece7164168787790d3b46271ce9e4af"
 }
 
 resource "tls_private_key" "ssh_private_key" {
@@ -44,11 +46,43 @@ resource "digitalocean_volume_attachment" "data_disk_attachment" {
   droplet_id = digitalocean_droplet.nodes[0].id
 }
 
+resource "null_resource" "download_image" {
+  count = var.certified_os_image ? 1 : 0
+  provisioner "local-exec" {
+    command = <<-EOT
+      set -e
+      FILE="${path.cwd}/${local.certified_image_name}"
+      EXPECTED_SUM="${local.certified_image_sum}"
+      if [ -f "$FILE" ]; then
+        echo "File already exists, verifying SHA512..."
+        ACTUAL_SUM=$(sha512sum "$FILE" | awk '{print $1}')
+        if [ "$ACTUAL_SUM" = "$EXPECTED_SUM" ]; then
+          echo "Checksum matches, skipping download"
+          exit 0
+        else
+          echo "Checksum mismatch, re-downloading file"
+          rm -f "$FILE"
+        fi
+      fi
+      echo "Downloading certified VHD..."
+      curl -L -o "$FILE" "${local.certified_image_url}"
+      echo "Verifying SHA512..."
+      ACTUAL_SUM=$(sha512sum "$FILE" | awk '{print $1}')
+      if [ "$ACTUAL_SUM" != "$EXPECTED_SUM" ]; then
+        echo "ERROR: SHA512 checksum mismatch!"
+        exit 1
+      fi
+      echo "SHA512 checksum OK!"
+    EOT
+  }
+}
+
 resource "digitalocean_custom_image" "upload_certified_image" {
-  count   = var.certified_os_image ? 1 : 0
-  name    = "${var.prefix}-opensuse-certified-img"
-  url     = local.certified_image_url
-  regions = ["nyc3", "${var.region}"]
+  count      = var.certified_os_image ? 1 : 0
+  depends_on = [null_resource.download_image]
+  name       = "${var.prefix}-opensuse-certified-img"
+  url        = local.certified_image_url
+  regions    = ["nyc3", "${var.region}"]
 }
 
 resource "digitalocean_droplet" "nodes" {

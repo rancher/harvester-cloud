@@ -10,6 +10,7 @@ locals {
   ssh_username         = local.instance_os_type
   certified_image_name = "opensuse-leap-15-6-harv-cloud-image.x86_64.vhd"
   certified_image_url  = var.certified_os_image ? "https://github.com/rancher/harvester-cloud/releases/download/${var.certified_os_image_tag}/${local.certified_image_name}" : null
+  certified_image_sum  = "080cac02414e62bbd038259331eb13313b0402e39d0d75aef06f35c61b8f342fe8f127468a7a6268e993072cd0e69fcb31a2672eca027520cb5daa6dd37d9553"
 }
 
 resource "tls_private_key" "ssh_private_key" {
@@ -58,11 +59,26 @@ resource "null_resource" "download_certified_vhd" {
   provisioner "local-exec" {
     command = <<-EOT
       set -e
-      if [ ! -f "${path.cwd}/${local.certified_image_name}" ]; then
-        echo "Downloading certified VHD..."
-        curl -L -o "${path.cwd}/${local.certified_image_name}" "${local.certified_image_url}"
-      else
-        echo "Certified VHD already exists, skipping download"
+      FILE="${path.cwd}/${local.certified_image_name}"
+      EXPECTED_SUM="${local.certified_image_sum}"
+      if [ -f "$FILE" ]; then
+        echo "File already exists, verifying SHA512..."
+        ACTUAL_SUM=$(sha512sum "$FILE" | awk '{print $1}')
+        if [ "$ACTUAL_SUM" = "$EXPECTED_SUM" ]; then
+          echo "Checksum matches, skipping download"
+          exit 0
+        else
+          echo "Checksum mismatch, re-downloading file"
+          rm -f "$FILE"
+        fi
+      fi
+      echo "Downloading certified VHD..."
+      curl -L -o "$FILE" "${local.certified_image_url}"
+      echo "Verifying SHA512..."
+      ACTUAL_SUM=$(sha512sum "$FILE" | awk '{print $1}')
+      if [ "$ACTUAL_SUM" != "$EXPECTED_SUM" ]; then
+        echo "ERROR: SHA512 checksum mismatch!"
+        exit 1
       fi
     EOT
   }

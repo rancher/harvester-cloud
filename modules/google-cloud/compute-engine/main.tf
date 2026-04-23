@@ -8,6 +8,7 @@ locals {
   ssh_username         = local.instance_os_type
   certified_image_name = "opensuse-leap-15-6-harv-cloud-image.x86_64.raw.tar.gz"
   certified_image_url  = var.certified_os_image ? "https://github.com/rancher/harvester-cloud/releases/download/${var.certified_os_image_tag}/${local.certified_image_name}" : null
+  certified_image_sum  = "d2bfa4fe0e19a53fa64df4438e56e3ea789d19dac0906a586e2d5d1e127a8b60c33a9e155ed157f1f3997744e9e2e9f2c947f49f6d3d2eb8585b4245a9da5457"
 }
 
 resource "tls_private_key" "ssh_private_key" {
@@ -101,8 +102,29 @@ resource "google_compute_disk" "data_disk" {
 resource "null_resource" "download_image" {
   count = var.certified_os_image ? 1 : 0
   provisioner "local-exec" {
-    command = <<EOT
-      curl -fL -o ${path.cwd}/${var.prefix}-image.tar.gz ${local.certified_image_url}
+    command = <<-EOT
+      set -e
+      FILE="${path.cwd}/${local.certified_image_name}"
+      EXPECTED_SUM="${local.certified_image_sum}"
+      if [ -f "$FILE" ]; then
+        echo "File already exists, verifying SHA512..."
+        ACTUAL_SUM=$(sha512sum "$FILE" | awk '{print $1}')
+        if [ "$ACTUAL_SUM" = "$EXPECTED_SUM" ]; then
+          echo "Checksum matches, skipping download"
+          exit 0
+        else
+          echo "Checksum mismatch, re-downloading file"
+          rm -f "$FILE"
+        fi
+      fi
+      echo "Downloading certified VHD..."
+      curl -L -o "$FILE" "${local.certified_image_url}"
+      echo "Verifying SHA512..."
+      ACTUAL_SUM=$(sha512sum "$FILE" | awk '{print $1}')
+      if [ "$ACTUAL_SUM" != "$EXPECTED_SUM" ]; then
+        echo "ERROR: SHA512 checksum mismatch!"
+        exit 1
+      fi
     EOT
   }
 }
@@ -119,7 +141,7 @@ resource "google_storage_bucket_object" "certified_image" {
   count      = var.certified_os_image ? 1 : 0
   name       = "${var.prefix}-image-raw.tar.gz"
   bucket     = google_storage_bucket.images_bucket[0].name
-  source     = "${path.cwd}/${var.prefix}-image.tar.gz"
+  source     = "${path.cwd}/${local.certified_image_name}"
 }
 
 resource "google_compute_image" "upload_certified_image" {
