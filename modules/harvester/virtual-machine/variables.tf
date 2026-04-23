@@ -75,3 +75,26 @@ variable "startup_script" {
   type        = string
   default     = null
 }
+
+variable "extra_packages" {
+  description = "Specifies additional packages to install via cloud-init during VM startup. Default is '[]'."
+  type        = list(string)
+  default     = []
+}
+
+variable "extra_runcmd" {
+  description = "Specifies additional runcmd entries to execute via cloud-init during VM startup. Default is '[]'."
+  type        = list(string)
+  default     = []
+}
+
+variable "extra_write_files" {
+  description = "Specifies additional files to write via cloud-init during VM startup. Default is '[]'."
+  type = list(object({
+    path        = string
+    permissions = string
+    encoding    = string
+    content     = string
+  }))
+  default = []
+}

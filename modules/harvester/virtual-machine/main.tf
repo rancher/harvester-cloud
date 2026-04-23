@@ -1,33 +1,43 @@
+locals {
+  base_packages = ["qemu-guest-agent"]
+  all_packages  = concat(local.base_packages, var.extra_packages)
+
+  base_runcmd = [
+    "systemctl enable --now qemu-guest-agent",
+    "sed -i 's/#PasswordAuthentication.*/PasswordAuthentication yes/g' /etc/ssh/sshd_config",
+    "sed -i 's@Include /etc/ssh/sshd_config.d/\\*.conf@#Include /etc/ssh/sshd_config.d/*.conf@g' /etc/ssh/sshd_config",
+    "systemctl restart sshd",
+  ]
+  startup_runcmd = var.startup_script != null ? [var.startup_script] : []
+  all_runcmd     = concat(local.base_runcmd, local.startup_runcmd, var.extra_runcmd)
+
+  cloud_config = merge(
+    {
+      username       = var.ssh_username
+      password       = var.ssh_password
+      chpasswd       = { expire = false }
+      ssh_pwauth     = true
+      package_update = true
+      packages       = local.all_packages
+      runcmd         = local.all_runcmd
+    },
+    length(var.extra_write_files) > 0 ? {
+      write_files = [
+        for f in var.extra_write_files : {
+          path        = f.path
+          permissions = f.permissions
+          encoding    = f.encoding
+          content     = f.content
+        }
+      ]
+    } : {}
+  )
+}
+
 resource "harvester_cloudinit_secret" "cloud-config" {
   name         = "${var.vm_prefix}-cloud-config"
   namespace    = var.vm_namespace
-  user_data    = <<-EOF
-    #cloud-config
-    username: "${var.ssh_username}"
-    password: "${var.ssh_password}"
-    chpasswd:
-      expire: false
-    ssh_pwauth: true
-    package_update: true
-    packages:
-      - qemu-guest-agent
-    runcmd:
-      - - systemctl
-        - enable
-        - '--now'
-        - qemu-guest-agent
-      - - sed
-        - -i
-        - "s/#PasswordAuthentication.*/PasswordAuthentication yes/g"
-        - /etc/ssh/sshd_config
-      - - sed
-        - -i
-        - "s@Include /etc/ssh/sshd_config.d/\\*.conf@#Include /etc/ssh/sshd_config.d/*.conf@g"
-        - /etc/ssh/sshd_config
-      - - systemctl
-        - restart
-        - ssh
-    EOF
+  user_data    = format("%s\n%s", "#cloud-config", yamlencode(local.cloud_config))
   network_data = ""
 }
 
