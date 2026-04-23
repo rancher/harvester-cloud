@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<image schemaversion="7.5" name="opensuse-leap-15-6-harv-cloud-image">
+<image schemaversion="7.5" name="opensuse-leap-16-0-harv-cloud-image">
     <description type="system">
         <author>harvester-cloud maintainers</author>
         <contact>none</contact>
-        <specification>openSUSE Leap 15.6 image certified for harvester-cloud</specification>
+        <specification>openSUSE Leap 16.0 image certified for harvester-cloud</specification>
     </description>
     <preferences>
         <version>1.0.0</version>
@@ -55,6 +55,8 @@
         <package name="novnc"/>
         <package name="socat"/>
         <package name="sshpass"/>
+        <package name="NetworkManager"/>
+        <package name="openssh-server-config-rootlogin"/>
         <!-- Services / Daemons -->
         <package name="nginx"/>
         <package name="chrony"/>
@@ -79,7 +81,7 @@
         <package name="cracklib-dict-full"/>
         <package name="ca-certificates"/>
         <package name="ca-certificates-mozilla"/>
-        <package name="openSUSE-release"/>
+        <package name="openSUSE-repos-Leap"/>
         <package name="zypper"/>
     </packages>
 </image>
