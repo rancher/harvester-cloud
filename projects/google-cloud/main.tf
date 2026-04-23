@@ -122,8 +122,6 @@ module "harvester_node" {
   data_disk_type         = var.data_disk_type
   data_disk_size         = var.data_disk_size
   startup_script         = data.local_file.sles_startup_script.content
-  certified_os_image     = var.certified_os_image
-  certified_os_image_tag = var.certified_os_image_tag
 }
 
 data "local_file" "ssh_private_key" {

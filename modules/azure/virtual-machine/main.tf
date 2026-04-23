@@ -3,13 +3,9 @@ locals {
   public_ssh_key_path  = var.ssh_public_key_path == null ? "${path.cwd}/${var.prefix}-ssh_public_key.pem" : var.ssh_public_key_path
   instance_count       = 1
   instance_os_type     = "opensuse"
-  os_image_publisher   = "suse"
-  os_image_offer       = "opensuse-leap-15-6"
-  os_image_sku         = "gen1"
-  os_image_version     = "latest"
   ssh_username         = local.instance_os_type
-  certified_image_name = "opensuse-leap-15-6-harv-cloud-image.x86_64.vhd"
-  certified_image_url  = var.certified_os_image ? "https://github.com/rancher/harvester-cloud/releases/download/${var.certified_os_image_tag}/${local.certified_image_name}" : null
+  certified_image_name = "opensuse-leap-16-0-harv-cloud-image.x86_64.vhd"
+  certified_image_url  = "https://github.com/rancher/harvester-cloud/releases/download/latest/${local.certified_image_name}"
   certified_image_sum  = "080cac02414e62bbd038259331eb13313b0402e39d0d75aef06f35c61b8f342fe8f127468a7a6268e993072cd0e69fcb31a2672eca027520cb5daa6dd37d9553"
 }
 
@@ -38,7 +34,6 @@ resource "azurerm_resource_group" "rg" {
 }
 
 resource "azurerm_storage_account" "vhd" {
-  count                           = var.certified_os_image ? 1 : 0
   name                            = var.prefix
   resource_group_name             = azurerm_resource_group.rg.name
   location                        = azurerm_resource_group.rg.location
@@ -48,14 +43,12 @@ resource "azurerm_storage_account" "vhd" {
 }
 
 resource "azurerm_storage_container" "vhds" {
-  count                 = var.certified_os_image ? 1 : 0
   name                  = "vhds"
-  storage_account_id    = azurerm_storage_account.vhd[0].id
+  storage_account_id    = azurerm_storage_account.vhd.id
   container_access_type = "private"
 }
 
 resource "null_resource" "download_certified_vhd" {
-  count = var.certified_os_image ? 1 : 0
   provisioner "local-exec" {
     command = <<-EOT
       set -e
@@ -86,21 +79,19 @@ resource "null_resource" "download_certified_vhd" {
 
 resource "azurerm_storage_blob" "harvester_vhd" {
   depends_on             = [null_resource.download_certified_vhd]
-  count                  = var.certified_os_image ? 1 : 0
   name                   = "harvestercloudcertified.vhd"
-  storage_account_name   = azurerm_storage_account.vhd[0].name
-  storage_container_name = azurerm_storage_container.vhds[0].name
+  storage_account_name   = azurerm_storage_account.vhd.name
+  storage_container_name = azurerm_storage_container.vhds.name
   type                   = "Page"
   source                 = "${path.cwd}/${local.certified_image_name}"
 }
 
 resource "null_resource" "wait_blob_accessible" {
-  count      = var.certified_os_image ? 1 : 0
   depends_on = [azurerm_storage_blob.harvester_vhd]
   provisioner "local-exec" {
     command = <<EOT
-      BLOB_URI=${azurerm_storage_blob.harvester_vhd[0].url}
-      ACCOUNT_KEY=$(az storage account keys list -g ${azurerm_resource_group.rg.name} -n ${azurerm_storage_account.vhd[0].name} --query '[0].value' -o tsv)
+      BLOB_URI=${azurerm_storage_blob.harvester_vhd.url}
+      ACCOUNT_KEY=$(az storage account keys list -g ${azurerm_resource_group.rg.name} -n ${azurerm_storage_account.vhd.name} --query '[0].value' -o tsv)
 
       for i in {1..20}; do
         az disk create --name temp-check-disk --resource-group ${azurerm_resource_group.rg.name} --source "$BLOB_URI" --location ${azurerm_resource_group.rg.location} --sku Standard_LRS > /dev/null 2>&1 && break || echo "Blob not ready, retry in 15s" && sleep 15
@@ -113,14 +104,13 @@ resource "null_resource" "wait_blob_accessible" {
 
 resource "azurerm_image" "harvester" {
   depends_on          = [null_resource.wait_blob_accessible]
-  count               = var.certified_os_image ? 1 : 0
   name                = "HarvesterCloudCertifiedImage"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   os_disk {
     os_type      = "Linux"
     os_state     = "Generalized"
-    blob_uri     = azurerm_storage_blob.harvester_vhd[0].url
+    blob_uri     = azurerm_storage_blob.harvester_vhd.url
     storage_type = "Standard_LRS"
   }
 }
@@ -241,17 +231,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
     storage_account_type = var.os_disk_type
     disk_size_gb         = var.os_disk_size
   }
-  source_image_id = var.certified_os_image ? azurerm_image.harvester[0].id : null
-
-  dynamic "source_image_reference" {
-    for_each = var.certified_os_image ? [] : [1]
-    content {
-      publisher = local.os_image_publisher
-      offer     = local.os_image_offer
-      sku       = local.os_image_sku
-      version   = local.os_image_version
-    }
-  }
+  source_image_id = azurerm_image.harvester.id
   custom_data = var.startup_script != null ? base64encode(var.startup_script) : null
 }
 
@@ -275,8 +255,7 @@ resource "azurerm_virtual_machine_data_disk_attachment" "data_disk_attachment" {
 
 resource "null_resource" "cleanup_certified_vhd" {
   depends_on = [azurerm_linux_virtual_machine.vm]
-  count      = var.certified_os_image ? 1 : 0
   provisioner "local-exec" {
-    command = "rm ${path.cwd}/opensuse-leap-15-6-harv-cloud-image.x86_64.vhd"
+    command = "rm ${path.cwd}/${local.certified_image_name}"
   }
 }

@@ -4,8 +4,8 @@ locals {
   instance_count       = 1
   instance_os_type     = "opensuse"
   ssh_username         = local.instance_os_type
-  certified_image_name = "opensuse-leap-15-6-harv-cloud-image.x86_64.qcow2.bz2"
-  certified_image_url  = var.certified_os_image ? "https://github.com/rancher/harvester-cloud/releases/download/${var.certified_os_image_tag}/${local.certified_image_name}" : null
+  certified_image_name = "opensuse-leap-16-0-harv-cloud-image.x86_64.qcow2.bz2"
+  certified_image_url  = "https://github.com/rancher/harvester-cloud/releases/download/latest/${local.certified_image_name}"
   certified_image_sum  = "c7ee0e8df4754173ec17560067f0344bac2a294314fe86da16763160af6b9a488db3df3daf03989981f6f206f1e4f8d6bece7164168787790d3b46271ce9e4af"
 }
 
@@ -47,7 +47,6 @@ resource "digitalocean_volume_attachment" "data_disk_attachment" {
 }
 
 resource "null_resource" "download_image" {
-  count = var.certified_os_image ? 1 : 0
   provisioner "local-exec" {
     command = <<-EOT
       set -e
@@ -78,7 +77,6 @@ resource "null_resource" "download_image" {
 }
 
 resource "digitalocean_custom_image" "upload_certified_image" {
-  count      = var.certified_os_image ? 1 : 0
   depends_on = [null_resource.download_image]
   name       = "${var.prefix}-opensuse-certified-img"
   url        = local.certified_image_url
@@ -92,7 +90,7 @@ resource "digitalocean_droplet" "nodes" {
   tags       = ["user:${var.prefix}"]
   region     = var.region
   size       = var.instance_type
-  image      = var.certified_os_image ? digitalocean_custom_image.upload_certified_image[0].id : data.digitalocean_image.opensuse[0].id
+  image      = digitalocean_custom_image.upload_certified_image.id
   ssh_keys   = [digitalocean_ssh_key.do_pub_created_ssh.id]
 }
 
@@ -131,27 +129,8 @@ resource "digitalocean_firewall" "example_firewall" {
   }
 }
 
-resource "null_resource" "kernel_configuration" {
-  count = var.certified_os_image ? 0 : 1
-  connection {
-    type        = "ssh"
-    host        = digitalocean_droplet.nodes[0].ipv4_address
-    user        = local.ssh_username
-    private_key = var.create_ssh_key_pair ? tls_private_key.ssh_private_key[0].private_key_openssh : file(local.private_ssh_key_path)
-  }
-  provisioner "remote-exec" {
-    inline = [
-      "echo 'Installing required Kernel modules...'",
-      "sudo zypper --non-interactive remove kernel-default-base > /dev/null 2>&1",
-      "sudo zypper --non-interactive install kernel-default cron > /dev/null 2>&1",
-      "sudo reboot > /dev/null 2>&1"
-    ]
-  }
-}
-
 resource "null_resource" "startup_configuration" {
   count      = var.startup_script == null ? 0 : 1
-  depends_on = [null_resource.kernel_configuration]
   connection {
     type        = "ssh"
     host        = digitalocean_droplet.nodes[0].ipv4_address

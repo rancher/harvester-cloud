@@ -108,8 +108,6 @@ module "harvester_node" {
   ip_cidr_range          = var.ip_cidr_range
   os_disk_type           = var.os_disk_type
   os_disk_size           = var.os_disk_size
-  certified_os_image     = var.certified_os_image
-  certified_os_image_tag = var.certified_os_image_tag
   instance_type          = local.instance_type
   create_vnet            = var.create_vnet
   spot_instance          = var.spot_instance
