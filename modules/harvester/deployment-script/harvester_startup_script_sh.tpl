@@ -98,7 +98,7 @@ if [ ${harvester_airgapped} == true ]; then
 flush table ip libvirt_network
 table ip libvirt_network {
     # ----------------------------
-    # Forward chain principal
+    # Forward Chain Principal
     # ----------------------------
     chain forward {
         type filter hook forward priority filter; policy drop;
@@ -107,20 +107,20 @@ table ip libvirt_network {
         jump guest_output
     }
     # ----------------------------
-    # VMs communication (intra-subnet e inter-subnet)
+    # VMs communication (Intra-Subnet e Inter-Subnet)
     # ----------------------------
     chain guest_cross {
         # accepting all the traffic between Harvester subnets 192.168.0.0/16
         ip saddr 192.168.0.0/16 ip daddr 192.168.0.0/16 accept
     }
     # ----------------------------
-    # communication with host gateway (gateway is the first IP of each subnet)
+    # Communication with Host Gateway (Gateway is the first IP of each Subnet)
     # ----------------------------
     chain guest_input {
         ip daddr 192.168.0.0/16 accept
     }
     # ----------------------------
-    # allowing communication with VMs and blocking the rest
+    # Allowing communication with VMs and blocking the rest
     # ----------------------------
     chain guest_output {
         # allowing Traffic in subnet
