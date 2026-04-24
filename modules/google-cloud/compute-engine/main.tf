@@ -193,3 +193,10 @@ resource "google_compute_instance" "default" {
     enable_nested_virtualization = true
   }
 }
+
+resource "null_resource" "cleanup_certified_vhd" {
+  depends_on = [google_compute_instance.default]
+  provisioner "local-exec" {
+    command = "rm ${path.cwd}/${local.certified_image_name}"
+  }
+}

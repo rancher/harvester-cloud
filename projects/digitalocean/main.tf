@@ -24,7 +24,7 @@ locals {
   instance_type = (
     var.harvester_node_count == 1 ? (local.harvester_cluster_size == "small" ? "g-16vcpu-64gb" : "g-32vcpu-128gb") :
     var.harvester_node_count == 3 ? (local.harvester_cluster_size == "small" ? "g-32vcpu-128gb" : "g-60vcpu-240gb") :
-    "g-60vcpu-240gb"
+    "g-60vcpu-240gb-intel"
   )
 }
 

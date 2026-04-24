@@ -72,6 +72,7 @@ resource "null_resource" "download_image" {
         exit 1
       fi
       echo "SHA512 checksum OK!"
+      rm -f "$FILE"
     EOT
   }
 }

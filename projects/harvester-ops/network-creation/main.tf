@@ -1,6 +1,7 @@
 locals {
   harvester_public_ip          = replace(replace(var.harvester_url, "https://", ""), "/$", "")
   qemu_vlanx_xml_template_file = "../../../modules/harvester/deployment-script/qemu_vlanx_xml.tpl"
+  ssh_username                 = "opensuse"
   nic_base                     = "virbr"
   ip_base                      = "192.168."
   vlan_base                    = "vlan"
@@ -31,7 +32,7 @@ resource "null_resource" "copy_qemu_vlanx_xml_file_to_first_node" {
   connection {
     type        = "ssh"
     host        = local.harvester_public_ip
-    user        = var.ssh_username
+    user        = local.ssh_username
     private_key = file("${var.private_ssh_key_file_path}/${var.private_ssh_key_file_name}")
   }
   provisioner "file" {
@@ -44,7 +45,7 @@ resource "ssh_resource" "create_vlanx" {
   for_each    = local.vlanx_network_map
   depends_on  = [null_resource.copy_qemu_vlanx_xml_file_to_first_node]
   host        = local.harvester_public_ip
-  user        = var.ssh_username
+  user        = local.ssh_username
   private_key = file("${var.private_ssh_key_file_path}/${var.private_ssh_key_file_name}")
   commands = [<<EOT
 sudo virsh net-define /tmp/${basename(local_file.qemu_vlanx_config[each.key].filename)} || true
@@ -58,7 +59,7 @@ resource "ssh_resource" "harvester_airgapped" {
   count       = var.harvester_airgapped ? 1 : 0
   depends_on  = [ssh_resource.create_vlanx]
   host        = local.harvester_public_ip
-  user        = var.ssh_username
+  user        = local.ssh_username
   private_key = file("${var.private_ssh_key_file_path}/${var.private_ssh_key_file_name}")
   commands = [
     "sudo nft -f /etc/nftables.conf || true"
@@ -68,7 +69,7 @@ resource "ssh_resource" "harvester_airgapped" {
 resource "ssh_resource" "attach_network_interface" {
   depends_on  = [ssh_resource.create_vlanx]
   host        = local.harvester_public_ip
-  user        = var.ssh_username
+  user        = local.ssh_username
   private_key = file("${var.private_ssh_key_file_path}/${var.private_ssh_key_file_name}")
   commands = [
     <<-EOT
