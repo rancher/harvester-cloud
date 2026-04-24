@@ -131,7 +131,7 @@ resource "digitalocean_firewall" "example_firewall" {
 }
 
 resource "null_resource" "startup_configuration" {
-  count      = var.startup_script == null ? 0 : 1
+  count = var.startup_script == null ? 0 : 1
   connection {
     type        = "ssh"
     host        = digitalocean_droplet.nodes[0].ipv4_address

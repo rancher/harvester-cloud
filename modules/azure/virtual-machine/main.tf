@@ -232,7 +232,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
     disk_size_gb         = var.os_disk_size
   }
   source_image_id = azurerm_image.harvester.id
-  custom_data = var.startup_script != null ? base64encode(var.startup_script) : null
+  custom_data     = var.startup_script != null ? base64encode(var.startup_script) : null
 }
 
 resource "azurerm_managed_disk" "data_disk" {

@@ -75,7 +75,7 @@ resource "aws_s3_object" "vhd" {
 }
 
 resource "aws_iam_role" "vmimport" {
-  name  = "${var.prefix}-vmimport"
+  name = "${var.prefix}-vmimport"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
@@ -89,8 +89,8 @@ resource "aws_iam_role" "vmimport" {
 }
 
 resource "aws_iam_role_policy" "vmimport" {
-  name  = "${var.prefix}-vmimport"
-  role  = aws_iam_role.vmimport.id
+  name = "${var.prefix}-vmimport"
+  role = aws_iam_role.vmimport.id
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [

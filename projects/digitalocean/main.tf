@@ -93,17 +93,17 @@ resource "local_file" "harvester_startup_script" {
 }
 
 module "harvester_node" {
-  depends_on             = [local_file.sles_startup_script_config]
-  source                 = "../../modules/digitalocean/droplet"
-  prefix                 = var.prefix
-  region                 = var.region
-  create_ssh_key_pair    = var.create_ssh_key_pair
-  ssh_private_key_path   = local.ssh_private_key_path
-  ssh_public_key_path    = local.ssh_public_key_path
-  instance_type          = local.instance_type
-  data_disk_count        = var.harvester_node_count * var.data_disk_count
-  data_disk_size         = var.data_disk_size
-  startup_script         = local.sles_startup_script_file
+  depends_on           = [local_file.sles_startup_script_config]
+  source               = "../../modules/digitalocean/droplet"
+  prefix               = var.prefix
+  region               = var.region
+  create_ssh_key_pair  = var.create_ssh_key_pair
+  ssh_private_key_path = local.ssh_private_key_path
+  ssh_public_key_path  = local.ssh_public_key_path
+  instance_type        = local.instance_type
+  data_disk_count      = var.harvester_node_count * var.data_disk_count
+  data_disk_size       = var.data_disk_size
+  startup_script       = local.sles_startup_script_file
 }
 
 data "local_file" "ssh_private_key" {
