@@ -41,6 +41,7 @@ The `projects/` directory combines modules to create different deployment recipe
 
 ## How to get started with the various projects
 
+- [AWS](https://github.com/rancher/harvester-cloud/blob/main/projects/aws/README.md)
 - [Google](https://github.com/rancher/harvester-cloud/blob/main/projects/google-cloud/README.md)
 - [Azure](https://github.com/rancher/harvester-cloud/blob/main/projects/azure/README.md)
 - [DigitalOcean](https://github.com/rancher/harvester-cloud/blob/main/projects/digitalocean/README.md)
