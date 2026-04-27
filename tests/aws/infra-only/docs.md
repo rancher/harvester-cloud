@@ -22,9 +22,7 @@ No resources.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_prefix"></a> [prefix](#input\_prefix) | Specifies the prefix added to the names of all resources. Default is 'harv-cloud-infra-test'. | `string` | `"harv-cloud-infra-test"` | no |
-| <a name="input_certified_os_image"></a> [certified_os_image](#input\_certified_os_image) | Specifies whether to use the Harvester OS image released in the GitHub repository. If set to false, the default OpenSUSE image provided by the cloud provider will be used. Default is 'true'. | `bool` | `true` | yes |
-| <a name="input_certified_os_image_tag"></a> [certified_os_image_tag](#input\_certified_os_image_tag) |  Specifies which GitHub release to use for the Harvester OpenSUSE image. Default is 'build-5'. | `string` | `"build-5"` | yes |
+| <a name="input_prefix"></a> [prefix](#input\_prefix) | Specifies the prefix added to the names of all resources. Default is 'harvcloudinfratest'. | `string` | `"harvcloudinfratest"` | no |
 
 ## Outputs
 

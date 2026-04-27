@@ -1,11 +1,11 @@
 variable "prefix" {
-  description = "Specifies the prefix added to the names of all resources. Default is 'harv-cloud-infra-test'."
+  description = "Specifies the prefix added to the names of all resources. Default is 'harvcloudinfratest'."
   type        = string
-  default     = "harv-cloud-infra-test"
+  default     = "harvcloudinfratest"
 }
 
 variable "do_token" {
-  description = "DigitalOcean API token used to deploy the infrastructure. Default is 'harv-cloud-infra-test'."
+  description = "DigitalOcean API token used to deploy the infrastructure. Default is 'harvcloudinfratest'."
   type        = string
-  default     = "harv-cloud-infra-test"
+  default     = "harvcloudinfratest"
 }
