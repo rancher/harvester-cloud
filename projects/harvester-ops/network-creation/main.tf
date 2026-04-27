@@ -1,6 +1,7 @@
 locals {
   harvester_public_ip          = replace(replace(var.harvester_url, "https://", ""), "/$", "")
   qemu_vlanx_xml_template_file = "../../../modules/harvester/deployment-script/qemu_vlanx_xml.tpl"
+  ssh_username                 = "opensuse"
   nic_base                     = "virbr"
   ip_base                      = "192.168."
   vlan_base                    = "vlan"
@@ -31,7 +32,7 @@ resource "null_resource" "copy_qemu_vlanx_xml_file_to_first_node" {
   connection {
     type        = "ssh"
     host        = local.harvester_public_ip
-    user        = var.ssh_username
+    user        = local.ssh_username
     private_key = file("${var.private_ssh_key_file_path}/${var.private_ssh_key_file_name}")
   }
   provisioner "file" {
@@ -44,31 +45,31 @@ resource "ssh_resource" "create_vlanx" {
   for_each    = local.vlanx_network_map
   depends_on  = [null_resource.copy_qemu_vlanx_xml_file_to_first_node]
   host        = local.harvester_public_ip
-  user        = var.ssh_username
+  user        = local.ssh_username
   private_key = file("${var.private_ssh_key_file_path}/${var.private_ssh_key_file_name}")
-  commands = [
-    "sudo virsh net-define /tmp/${basename(local_file.qemu_vlanx_config[each.key].filename)} || true",
-    "sudo virsh net-start ${local.vlan_base}${each.key + 1} || true",
-    "sudo virsh net-autostart ${local.vlan_base}${each.key + 1} || true",
-    "sudo iptables -I LIBVIRT_FWI 1 -d 192.168.0.0/16 -j ACCEPT",
+  commands = [<<EOT
+sudo virsh net-define /tmp/${basename(local_file.qemu_vlanx_config[each.key].filename)} || true
+sudo virsh net-start ${local.vlan_base}${each.key + 1} || true
+sudo virsh net-autostart ${local.vlan_base}${each.key + 1} || true
+EOT
   ]
 }
 
 resource "ssh_resource" "harvester_airgapped" {
-  for_each    = var.harvester_airgapped ? local.vlanx_network_map : {}
+  count       = var.harvester_airgapped ? 1 : 0
   depends_on  = [ssh_resource.create_vlanx]
   host        = local.harvester_public_ip
-  user        = var.ssh_username
+  user        = local.ssh_username
   private_key = file("${var.private_ssh_key_file_path}/${var.private_ssh_key_file_name}")
   commands = [
-    "sudo iptables -D LIBVIRT_FWO -s ${each.value.ip_base}/24 -i ${each.value.nic} -j ACCEPT"
+    "sudo nft -f /etc/nftables.conf || true"
   ]
 }
 
 resource "ssh_resource" "attach_network_interface" {
-  depends_on  = [ssh_resource.create_vlanx, ssh_resource.harvester_airgapped]
+  depends_on  = [ssh_resource.create_vlanx]
   host        = local.harvester_public_ip
-  user        = var.ssh_username
+  user        = local.ssh_username
   private_key = file("${var.private_ssh_key_file_path}/${var.private_ssh_key_file_name}")
   commands = [
     <<-EOT

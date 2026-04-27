@@ -38,12 +38,6 @@ sudo chmod 755 /etc/systemd/system/socat-proxy.service
 sudo systemctl daemon-reload
 sudo systemctl enable --now socat-proxy.service
 
-# Restrict internet access to Harvester nodes when harvester_airgapped variable is true
-if [ ${harvester_airgapped} == true ]; then
-  sudo iptables -D LIBVIRT_FWO -s 192.168.122.0/24 -i virbr1 -j ACCEPT
-  sudo iptables -I LIBVIRT_FWO 1 -s 192.168.122.0/16 -d 192.168.122.0/16 -j ACCEPT
-fi
-
 # Wait for the Harvester services to start
 attempts=0
 while [ "$attempts" -lt 15 ]; do
@@ -92,4 +86,56 @@ EOF
       disk_index=$((disk_index + 1))
     done
   done
+fi
+
+# Restrict internet access to Harvester nodes when harvester_airgapped variable is true
+if [ ${harvester_airgapped} == true ]; then
+  sudo bash -c 'cat << "EOF" > /etc/nftables.conf
+#!/usr/sbin/nft -f
+# =====================================
+# nftables rules
+# =====================================
+flush table ip libvirt_network
+table ip libvirt_network {
+    # ----------------------------
+    # Forward Chain Principal
+    # ----------------------------
+    chain forward {
+        type filter hook forward priority filter; policy drop;
+        jump guest_cross
+        jump guest_input
+        jump guest_output
+    }
+    # ----------------------------
+    # VMs communication (Intra-Subnet e Inter-Subnet)
+    # ----------------------------
+    chain guest_cross {
+        # accepting all the traffic between Harvester subnets 192.168.0.0/16
+        ip saddr 192.168.0.0/16 ip daddr 192.168.0.0/16 accept
+    }
+    # ----------------------------
+    # Communication with Host Gateway (Gateway is the first IP of each Subnet)
+    # ----------------------------
+    chain guest_input {
+        ip daddr 192.168.0.0/16 accept
+    }
+    # ----------------------------
+    # Allowing communication with VMs and blocking the rest
+    # ----------------------------
+    chain guest_output {
+        # allowing Traffic in subnet
+        ip saddr 192.168.0.0/16 accept
+        # blocking internet access
+        reject
+    }
+    # ----------------------------
+    # NAT: not enabled
+    # ----------------------------
+    chain guest_nat {
+        type nat hook postrouting priority srcnat; policy accept
+        # no NAT → impossible to access internet
+    }
+}
+EOF'
+  sudo nft -f /etc/nftables.conf || true
 fi

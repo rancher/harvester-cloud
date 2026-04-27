@@ -1,9 +1,3 @@
-variable "ssh_username" {
-  description = "Specifies the username used for SSH authentication (Harvester nodes). Default is 'opensuse'."
-  type        = string
-  default     = "opensuse"
-}
-
 variable "cluster_network_count" {
   description = "Specifies the number of networks to be created on Harvester Nested VM's. Default is '1'."
   type        = number

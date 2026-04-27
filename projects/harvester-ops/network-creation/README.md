@@ -9,7 +9,6 @@
     - `private_ssh_key_file_path` to specify the full path where the private SSH key file is located
     - `private_ssh_key_file_name` to specify the name of the private SSH key file used for authentication
     - `cluster_network_count` to specify the number of NIC's to be created on Harvester Nested VM's. The first NIC created on each Harvester node will be configured as VM network on Harvester while the rest of NIC's will remain available to be configured manually.
-    - `ssh_username` to specify the SSH login username for the cloud VM. **opensuse** username is selected by default.
 
 #### Terraform Apply
 
@@ -135,7 +134,6 @@ kubeconfig_file_path      = "../../digitalocean/"
 kubeconfig_file_name      = "jlagos-harvester_kube_config.yml"
 private_ssh_key_file_name = "jlagos-harvester-ssh_private_key.pem"
 private_ssh_key_file_path = "../../digitalocean/"
-ssh_username              = "opensuse"
 ```
 
 #### Demonstration of applying Terraform files
@@ -173,7 +171,6 @@ kubeconfig_file_path      = "../../digitalocean/"
 kubeconfig_file_name      = "jlagos-harvester_kube_config.yml"
 private_ssh_key_file_name = "jlagos-harvester-ssh_private_key.pem"
 private_ssh_key_file_path = "../../digitalocean/"
-ssh_username              = "opensuse"
 cluster_network_count     = 3
 ```
 

@@ -2,12 +2,9 @@ locals {
   private_ssh_key_path = var.ssh_private_key_path == null ? "${path.cwd}/${var.prefix}-ssh_private_key.pem" : var.ssh_private_key_path
   public_ssh_key_path  = var.ssh_public_key_path == null ? "${path.cwd}/${var.prefix}-ssh_public_key.pem" : var.ssh_public_key_path
   instance_count       = 1
-  instance_os_type     = "opensuse"
-  os_image_family      = "opensuse-leap"
-  os_image_project     = "opensuse-cloud"
-  ssh_username         = local.instance_os_type
-  certified_image_name = "opensuse-leap-15-6-harv-cloud-image.x86_64.raw.tar.gz"
-  certified_image_url  = var.certified_os_image ? "https://github.com/rancher/harvester-cloud/releases/download/${var.certified_os_image_tag}/${local.certified_image_name}" : null
+  ssh_username         = "opensuse"
+  certified_image_name = "opensuse-leap-16-0-harv-cloud-image.x86_64.raw.tar.gz"
+  certified_image_url  = "https://github.com/rancher/harvester-cloud/releases/download/latest/${local.certified_image_name}"
   certified_image_sum  = "d2bfa4fe0e19a53fa64df4438e56e3ea789d19dac0906a586e2d5d1e127a8b60c33a9e155ed157f1f3997744e9e2e9f2c947f49f6d3d2eb8585b4245a9da5457"
 }
 
@@ -30,10 +27,6 @@ resource "local_file" "public_key_pem" {
   file_permission = "0600"
 }
 
-data "google_compute_image" "os_image" {
-  family  = local.os_image_family
-  project = local.os_image_project
-}
 
 resource "google_compute_network" "vpc" {
   count                   = var.create_vpc == true ? 1 : 0
@@ -100,7 +93,6 @@ resource "google_compute_disk" "data_disk" {
 }
 
 resource "null_resource" "download_image" {
-  count = var.certified_os_image ? 1 : 0
   provisioner "local-exec" {
     command = <<-EOT
       set -e
@@ -130,7 +122,6 @@ resource "null_resource" "download_image" {
 }
 
 resource "google_storage_bucket" "images_bucket" {
-  count         = var.certified_os_image ? 1 : 0
   name          = "${var.prefix}-certified-img-bucket"
   location      = var.region
   force_destroy = true
@@ -138,18 +129,16 @@ resource "google_storage_bucket" "images_bucket" {
 
 resource "google_storage_bucket_object" "certified_image" {
   depends_on = [null_resource.download_image]
-  count      = var.certified_os_image ? 1 : 0
   name       = "${var.prefix}-image-raw.tar.gz"
-  bucket     = google_storage_bucket.images_bucket[0].name
+  bucket     = google_storage_bucket.images_bucket.name
   source     = "${path.cwd}/${local.certified_image_name}"
 }
 
 resource "google_compute_image" "upload_certified_image" {
   depends_on = [google_storage_bucket_object.certified_image]
-  count      = var.certified_os_image ? 1 : 0
   name       = "${var.prefix}-opensuse-certified-img"
   raw_disk {
-    source = "https://storage.googleapis.com/${google_storage_bucket.images_bucket[0].name}/${google_storage_bucket_object.certified_image[0].name}"
+    source = "https://storage.googleapis.com/${google_storage_bucket.images_bucket.name}/${google_storage_bucket_object.certified_image.name}"
   }
 }
 
@@ -168,7 +157,7 @@ resource "google_compute_instance" "default" {
     initialize_params {
       type  = var.os_disk_type
       size  = var.os_disk_size
-      image = var.certified_os_image ? google_compute_image.upload_certified_image[0].self_link : data.google_compute_image.os_image.self_link
+      image = google_compute_image.upload_certified_image.self_link
     }
   }
   dynamic "scratch_disk" {
@@ -202,5 +191,12 @@ resource "google_compute_instance" "default" {
   }
   advanced_machine_features {
     enable_nested_virtualization = true
+  }
+}
+
+resource "null_resource" "cleanup_certified_vhd" {
+  depends_on = [google_compute_instance.default]
+  provisioner "local-exec" {
+    command = "rm ${path.cwd}/${local.certified_image_name}"
   }
 }

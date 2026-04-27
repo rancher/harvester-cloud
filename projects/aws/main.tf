@@ -19,7 +19,7 @@ locals {
   harvester_memory                       = local.harvester_cluster_size == "small" ? 32768 : 65536
   ssh_private_key_path                   = var.ssh_private_key_path == null ? "${path.cwd}/${var.prefix}-ssh_private_key.pem" : var.ssh_private_key_path
   ssh_public_key_path                    = var.ssh_public_key_path == null ? "${path.cwd}/${var.prefix}-ssh_public_key.pem" : var.ssh_public_key_path
-  ssh_username                           = var.certified_os_image ? "opensuse" : "ec2-user"
+  ssh_username                           = "opensuse"
   kubeconfig_file                        = "${path.cwd}/${var.prefix}_kube_config.yml"
   instance_type = (
     var.harvester_node_count == 1 ? (local.harvester_cluster_size == "small" ? "m8i.4xlarge" : "m8i.8xlarge") :
@@ -98,22 +98,20 @@ resource "local_file" "harvester_startup_script" {
 }
 
 module "harvester_node" {
-  depends_on             = [local_file.sles_startup_script_config]
-  source                 = "../../modules/aws/ec2"
-  prefix                 = var.prefix
-  region                 = var.region
-  create_ssh_key_pair    = var.create_ssh_key_pair
-  ssh_private_key_path   = local.ssh_private_key_path
-  ssh_public_key_path    = local.ssh_public_key_path
-  ip_cidr_range          = var.ip_cidr_range
-  os_disk_size           = var.os_disk_size
-  certified_os_image     = var.certified_os_image
-  certified_os_image_tag = var.certified_os_image_tag
-  instance_type          = local.instance_type
-  spot_instance          = var.spot_instance
-  data_disk_count        = var.harvester_node_count * var.data_disk_count
-  data_disk_size         = var.data_disk_size
-  startup_script         = local.sles_startup_script_file
+  depends_on           = [local_file.sles_startup_script_config]
+  source               = "../../modules/aws/ec2"
+  prefix               = var.prefix
+  region               = var.region
+  create_ssh_key_pair  = var.create_ssh_key_pair
+  ssh_private_key_path = local.ssh_private_key_path
+  ssh_public_key_path  = local.ssh_public_key_path
+  ip_cidr_range        = var.ip_cidr_range
+  os_disk_size         = var.os_disk_size
+  instance_type        = local.instance_type
+  spot_instance        = var.spot_instance
+  data_disk_count      = var.harvester_node_count * var.data_disk_count
+  data_disk_size       = var.data_disk_size
+  startup_script       = local.sles_startup_script_file
 }
 
 data "local_file" "ssh_private_key" {

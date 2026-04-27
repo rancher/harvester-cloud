@@ -5,11 +5,8 @@
   - Update the required variables:
     - `prefix` to give the resources an identifiable name (e.g., your initials or first name)
     - `do_token` to specify the DigitalOcean API token used to create resources
-    - `os_image_name` to specify the OpenSUSE Leap image name uploaded to DO account.
     - `region` to specify the DigitalOcean region where resources will be created
     - `harvester_node_count` to specify the number of Harvester nodes to create (1 or 3)
-- Ensure that the openSUSE Leap image has been uploaded to your DigitalOcean organization. The recommended version for Terraform is openSUSE Leap 15.6. You can download it from [here](https://download.opensuse.org/distribution/leap/15.6/appliances/openSUSE-Leap-15.6-Minimal-VM.x86_64-Cloud.qcow2).  
-  See the steps to upload the downloaded openSUSE image to DigitalOcean [here](https://docs.digitalocean.com/products/custom-images/how-to/upload/).
 - Ensure you have generated a DigitalOcean token by following the steps described [here](../../modules/digitalocean/README.md)
 
 #### Terraform Apply
