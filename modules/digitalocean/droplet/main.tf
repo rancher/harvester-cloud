@@ -98,9 +98,22 @@ resource "digitalocean_droplet" "nodes" {
 resource "digitalocean_firewall" "example_firewall" {
   name        = "${var.prefix}-harvester-firewall"
   droplet_ids = [digitalocean_droplet.nodes[0].id]
+
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "22"
+    source_addresses = var.ssh_public_ip_source_addresses
+  }
+
+  inbound_rule {
+    protocol         = "udp"
+    port_range       = "22"
+    source_addresses = var.ssh_public_ip_source_addresses
+  }
+
   dynamic "inbound_rule" {
     for_each = toset([
-      "22", "68", "443", "2112-32767"
+      "68", "443", "2112-32767"
     ])
     content {
       protocol         = "tcp"
@@ -110,7 +123,7 @@ resource "digitalocean_firewall" "example_firewall" {
   }
   dynamic "inbound_rule" {
     for_each = toset([
-      "22", "68", "443", "2112-32767"
+      "68", "443", "2112-32767"
     ])
     content {
       protocol         = "udp"
