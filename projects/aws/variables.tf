@@ -64,7 +64,7 @@ variable "ip_cidr_range" {
 variable "spot_instance" {
   description = "Specifies whether the instances should be Spot (preemptible) VMs. Default is 'true'."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "os_disk_size" {
