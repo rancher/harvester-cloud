@@ -1,3 +1,7 @@
+data "http" "my_public_ip_address" {
+  url = "https://ipv4.icanhazip.com/"
+}
+
 locals {
   sles_startup_script_template_file      = "../../modules/harvester/deployment-script/sles_startup_script_sh.tpl"
   sles_startup_script_file               = "${path.cwd}/sles_startup_script.sh"
@@ -21,6 +25,7 @@ locals {
   ssh_public_key_path                    = var.ssh_public_key_path == null ? "${path.cwd}/${var.prefix}-ssh_public_key.pem" : var.ssh_public_key_path
   ssh_username                           = "opensuse"
   kubeconfig_file                        = "${path.cwd}/${var.prefix}_kube_config.yml"
+  caller_ip_cidr                         = "${chomp(data.http.my_public_ip_address.response_body)}/32"
   instance_type = (
     var.harvester_node_count == 1 ? (local.harvester_cluster_size == "small" ? "Standard_D16s_v5" : "Standard_D32s_v5") :
     var.harvester_node_count == 3 ? (local.harvester_cluster_size == "small" ? "Standard_D32s_v5" : "Standard_D64s_v5") :
@@ -115,6 +120,7 @@ module "harvester_node" {
   data_disk_type       = var.data_disk_type
   data_disk_size       = var.data_disk_size
   startup_script       = data.local_file.sles_startup_script.content
+  ssh_public_ip_source_addresses = length(var.ssh_public_ip_source_addresses) > 0 ? var.ssh_public_ip_source_addresses : [local.caller_ip_cidr]
 }
 
 data "local_file" "ssh_private_key" {
