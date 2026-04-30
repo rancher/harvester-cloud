@@ -235,3 +235,9 @@ variable "rancher_insecure" {
   type        = bool
   default     = false
 }
+
+variable "ssh_public_ip_source_addresses" {
+  description = "List of CIDRs allowed to reach port 22 (SSH). Defaults to the public IP of the machine running Terraform."
+  type        = list(string)
+  default     = []
+}
