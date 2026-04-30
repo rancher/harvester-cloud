@@ -9,15 +9,15 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout code
-        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Ensure netcat is installed
         run: sudo apt-get update && sudo apt-get install -y netcat-openbsd
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
+        uses: hashicorp/setup-terraform@5e8dbf3c6d9deaf4193ca7a8fb23f2ac83bb6c85 # v4.0.0
         with:
-          terraform_version: "1.10.5"
+          terraform_version: "1.14.6"
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed # v2
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
       - name: Initialize Terraform

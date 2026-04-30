@@ -2,19 +2,19 @@
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 6.36.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 6.42.0 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | 3.1.1 |
-| <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) | 3.0.1 |
-| <a name="requirement_rancher2"></a> [rancher2](#requirement\_rancher2) | 13.1.4 |
+| <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) | 3.1.0 |
+| <a name="requirement_rancher2"></a> [rancher2](#requirement\_rancher2) | 14.1.0 |
 | <a name="requirement_ssh"></a> [ssh](#requirement\_ssh) | 2.7.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_local"></a> [local](#provider\_local) | 2.8.0 |
-| <a name="provider_null"></a> [null](#provider\_null) | 3.2.4 |
-| <a name="provider_rancher2"></a> [rancher2](#provider\_rancher2) | 13.1.4 |
+| <a name="provider_local"></a> [local](#provider\_local) | n/a |
+| <a name="provider_null"></a> [null](#provider\_null) | n/a |
+| <a name="provider_rancher2"></a> [rancher2](#provider\_rancher2) | 14.1.0 |
 | <a name="provider_ssh"></a> [ssh](#provider\_ssh) | 2.7.0 |
 
 ## Modules
@@ -36,7 +36,7 @@
 | [null_resource.copy_files_to_first_node](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [null_resource.harvester_iso_download_checking](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [null_resource.harvester_node_startup](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
-| [rancher2_cluster.rancher_cluster](https://registry.terraform.io/providers/rancher/rancher2/13.1.4/docs/resources/cluster) | resource |
+| [rancher2_cluster.rancher_cluster](https://registry.terraform.io/providers/rancher/rancher2/14.1.0/docs/resources/cluster) | resource |
 | [ssh_resource.retrieve_kubeconfig](https://registry.terraform.io/providers/loafoe/ssh/2.7.0/docs/resources/resource) | resource |
 | [local_file.sles_startup_script](https://registry.terraform.io/providers/hashicorp/local/latest/docs/data-sources/file) | data source |
 | [local_file.ssh_private_key](https://registry.terraform.io/providers/hashicorp/local/latest/docs/data-sources/file) | data source |
@@ -53,7 +53,7 @@
 | <a name="input_harvester_first_node_token"></a> [harvester\_first\_node\_token](#input\_harvester\_first\_node\_token) | Specifies the token used to join additional nodes to the Harvester cluster (HA setup). Default is 'SecretToken.123'. | `string` | `"SecretToken.123"` | no |
 | <a name="input_harvester_node_count"></a> [harvester\_node\_count](#input\_harvester\_node\_count) | Specifies the number of Harvester nodes to create (1, 3, or 5). Default is '1'. | `number` | `1` | no |
 | <a name="input_harvester_password"></a> [harvester\_password](#input\_harvester\_password) | Specifies the password used to access the Harvester nodes. Default is 'SecretPassword.123'. | `string` | `"SecretPassword.123"` | no |
-| <a name="input_harvester_version"></a> [harvester\_version](#input\_harvester\_version) | Specifies the Harvester version. Default is 'v1.7.0'. | `string` | `"v1.7.0"` | no |
+| <a name="input_harvester_version"></a> [harvester\_version](#input\_harvester\_version) | Specifies the Harvester version. Default is 'v1.7.1'. | `string` | `"v1.7.1"` | no |
 | <a name="input_ip_cidr_range"></a> [ip\_cidr\_range](#input\_ip\_cidr\_range) | Specifies the range of private IPs available for the AWS Subnet and VPC. Default is '10.10.0.0'. | `string` | `"10.0.0.0"` | no |
 | <a name="input_os_disk_size"></a> [os\_disk\_size](#input\_os\_disk\_size) | Specifies the size of the disk attached to each node, in GB. Default is '50'. | `number` | `50` | no |
 | <a name="input_prefix"></a> [prefix](#input\_prefix) | Specifies the prefix added to the names of all resources. Default is 'aws-tf'. | `string` | `"aws-tf"` | no |
@@ -62,7 +62,7 @@
 | <a name="input_rancher_insecure"></a> [rancher\_insecure](#input\_rancher\_insecure) | Specifies whether to allow insecure connections to the Rancher API. Default is 'false'. | `bool` | `false` | no |
 | <a name="input_rancher_secret_key"></a> [rancher\_secret\_key](#input\_rancher\_secret\_key) | Specifies the Rancher secret key for authentication. Default is empty. | `string` | `""` | no |
 | <a name="input_region"></a> [region](#input\_region) | Specifies the AWS region used for all resources. Default is 'us-east-1'. | `string` | `"us-east-1"` | no |
-| <a name="input_spot_instance"></a> [spot\_instance](#input\_spot\_instance) | Specifies whether the instances should be Spot (preemptible) VMs. Default is 'true'. | `bool` | `false` | no |
+| <a name="input_spot_instance"></a> [spot\_instance](#input\_spot\_instance) | Specifies whether the instances should be Spot (preemptible) VMs. Default is 'true'. | `bool` | `true` | no |
 | <a name="input_ssh_private_key_path"></a> [ssh\_private\_key\_path](#input\_ssh\_private\_key\_path) | Specifies the full path where the pre-generated SSH PRIVATE key is located (not generated by Terraform). Default is 'null'. | `string` | `null` | no |
 | <a name="input_ssh_public_key_path"></a> [ssh\_public\_key\_path](#input\_ssh\_public\_key\_path) | Specifies the full path where the pre-generated SSH PUBLIC key is located (not generated by Terraform). Default is 'null'. | `string` | `null` | no |
 | <a name="input_startup_script"></a> [startup\_script](#input\_startup\_script) | Specifies a custom startup script to run when the VMs start. Default is 'null'. | `string` | `null` | no |

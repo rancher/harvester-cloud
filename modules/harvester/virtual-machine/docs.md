@@ -2,13 +2,13 @@
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_harvester"></a> [harvester](#requirement\_harvester) | 0.6.7 |
+| <a name="requirement_harvester"></a> [harvester](#requirement\_harvester) | 1.8.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_harvester"></a> [harvester](#provider\_harvester) | 0.6.7 |
+| <a name="provider_harvester"></a> [harvester](#provider\_harvester) | 1.8.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | n/a |
 
 ## Modules
@@ -19,8 +19,8 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [harvester_cloudinit_secret.cloud-config](https://registry.terraform.io/providers/harvester/harvester/0.6.7/docs/resources/cloudinit_secret) | resource |
-| [harvester_virtualmachine.default](https://registry.terraform.io/providers/harvester/harvester/0.6.7/docs/resources/virtualmachine) | resource |
+| [harvester_cloudinit_secret.cloud-config](https://registry.terraform.io/providers/harvester/harvester/1.8.0/docs/resources/cloudinit_secret) | resource |
+| [harvester_virtualmachine.default](https://registry.terraform.io/providers/harvester/harvester/1.8.0/docs/resources/virtualmachine) | resource |
 | [random_string.random](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/string) | resource |
 
 ## Inputs
@@ -31,7 +31,7 @@ No modules.
 | <a name="input_data_disk_size"></a> [data\_disk\_size](#input\_data\_disk\_size) | Specifies the size of the data disk attached to each VM, in GB. Default is '25'. | `number` | `25` | no |
 | <a name="input_extra_packages"></a> [extra\_packages](#input\_extra\_packages) | Specifies additional packages to install via cloud-init during VM startup. Default is '[]'. | `list(string)` | `[]` | no |
 | <a name="input_extra_runcmd"></a> [extra\_runcmd](#input\_extra\_runcmd) | Specifies additional runcmd entries to execute via cloud-init during VM startup. Default is '[]'. | `list(string)` | `[]` | no |
-| <a name="input_extra_write_files"></a> [extra\_write\_files](#input\_extra\_write\_files) | Specifies additional files to write via cloud-init during VM startup. Default is '[]'. | <pre>list(object({<br/>    path        = string<br/>    permissions = string<br/>    encoding    = string<br/>    content     = string<br/>  }))</pre> | `[]` | no |
+| <a name="input_extra_write_files"></a> [extra\_write\_files](#input\_extra\_write\_files) | Specifies additional files to write via cloud-init during VM startup. Default is '[]'. | <pre>list(object({<br>    path        = string<br>    permissions = string<br>    encoding    = string<br>    content     = string<br>  }))</pre> | `[]` | no |
 | <a name="input_image_name"></a> [image\_name](#input\_image\_name) | Specifies the OS image name. Default is 'opensuse-leap-15-6'. | `string` | `"opensuse-leap-15-6"` | no |
 | <a name="input_image_namespace"></a> [image\_namespace](#input\_image\_namespace) | Specifies the namespace in which the Harvester image was created. Default is 'default'. | `string` | `"default"` | no |
 | <a name="input_memory"></a> [memory](#input\_memory) | Specifies the amount of memory allocated to each VM, in GB. Default is '4'. | `number` | `4` | no |
