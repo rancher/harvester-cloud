@@ -1,6 +1,8 @@
 locals {
   private_ssh_key_path = var.ssh_private_key_path == null ? "${path.cwd}/${var.prefix}-ssh_private_key.pem" : var.ssh_private_key_path
   public_ssh_key_path  = var.ssh_public_key_path == null ? "${path.cwd}/${var.prefix}-ssh_public_key.pem" : var.ssh_public_key_path
+  tcp_ports            = ["443", "2379", "2380", "2381", "10010", "2112", "30000-32767", "3260", "5900", "6080", "6444", "8181", "8443", "8444", "9091", "9099", "9345", "9796", "10245", "10246-10249", "10250", "10251", "10252", "10256", "10257", "10258", "10259"]
+  udp_ports            = ["68", "8472"]
   instance_count       = 1
   instance_os_type     = "opensuse"
   ssh_username         = local.instance_os_type
@@ -95,47 +97,44 @@ resource "digitalocean_droplet" "nodes" {
   ssh_keys   = [digitalocean_ssh_key.do_pub_created_ssh.id]
 }
 
-resource "digitalocean_firewall" "example_firewall" {
-  name        = "${var.prefix}-harvester-firewall"
+resource "digitalocean_firewall" "harvester_firewall" {
+  name        = "${var.prefix}-allow-cluster-plane"
   droplet_ids = [digitalocean_droplet.nodes[0].id]
-
+  # Management plane
   inbound_rule {
     protocol         = "tcp"
     port_range       = "22"
     source_addresses = var.public_ip_source_addresses
   }
-
   inbound_rule {
-    protocol         = "udp"
-    port_range       = "22"
-    source_addresses = var.public_ip_source_addresses
-  }
-
-  inbound_rule {
-    protocol         = "udp"
+    protocol         = "tcp"
     port_range       = "6443"
     source_addresses = var.public_ip_source_addresses
   }
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "6080"
+    source_addresses = var.public_ip_source_addresses
+  }
+  # Cluster plane TCP
   dynamic "inbound_rule" {
-    for_each = toset([
-      "68", "443", "2112-32767"
-    ])
+    for_each = toset(local.tcp_ports)
     content {
       protocol         = "tcp"
       port_range       = inbound_rule.value
       source_addresses = ["0.0.0.0/0", "::/0"]
     }
   }
+  # Cluster plane UDP (solo quelle giuste)
   dynamic "inbound_rule" {
-    for_each = toset([
-      "68", "443", "2112-32767"
-    ])
+    for_each = toset(local.udp_ports)
     content {
       protocol         = "udp"
       port_range       = inbound_rule.value
       source_addresses = ["0.0.0.0/0", "::/0"]
     }
   }
+  # Outbound
   outbound_rule {
     protocol              = "tcp"
     port_range            = "all"
