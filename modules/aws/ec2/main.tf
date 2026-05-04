@@ -205,18 +205,18 @@ resource "aws_security_group" "sg" {
     self        = true
   }
   ingress {
-    description = "Allow all inbound SSH to nodes"
+    description = "Allow inbound SSH"
     from_port   = "22"
     to_port     = "22"
     protocol    = "tcp"
-    cidr_blocks = var.ssh_public_ip_source_addresses
+    cidr_blocks = var.public_ip_source_addresses
   }
   ingress {
-    description = "Allow all inbound kube-apiserver to nodes"
+    description = "Allow inbound kube-apiserver"
     from_port   = "6443"
     to_port     = "6443"
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.public_ip_source_addresses
   }
   ingress {
     description = "Allow all inbound HTTP to nodes"

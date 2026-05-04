@@ -53,7 +53,7 @@ resource "google_compute_firewall" "default" {
   #https://docs.harvesterhci.io/v1.3/install/requirements#port-requirements-for-harvester-nodes
   allow {
     protocol = "tcp"
-    ports    = ["2379", "2381", "2380", "10010", "6443", "9345", "10252", "10257", "10251", "10259", "10250", "10256", "10258", "9091", "9099", "2112", "6444", "10246-10249", "8181", "8444", "10245", "9796", "30000-32767", "3260", "5900", "6080"]
+    ports    = ["2379", "2381", "2380", "10010", "9345", "10252", "10257", "10251", "10259", "10250", "10256", "10258", "9091", "9099", "2112", "6444", "10246-10249", "8181", "8444", "10245", "9796", "30000-32767", "3260", "5900", "6080"]
   }
   allow {
     protocol = "udp"
@@ -69,13 +69,13 @@ resource "google_compute_firewall" "default" {
 
 resource "google_compute_firewall" "ssh" {
   count   = var.create_firewall ? 1 : 0
-  name    = "${var.prefix}-firewall-ssh"
+  name    = "${var.prefix}-firewall-ssh-6443"
   network = var.vpc == null ? resource.google_compute_network.vpc[0].name : var.vpc
   allow {
     protocol = "tcp"
-    ports    = ["22"]
+    ports    = ["22", "6443"]
   }
-  source_ranges = var.ssh_public_ip_source_addresses
+  source_ranges = var.public_ip_source_addresses
   target_tags   = ["${var.prefix}"]
 }
 

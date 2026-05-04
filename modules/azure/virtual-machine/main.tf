@@ -147,7 +147,7 @@ resource "azurerm_network_security_group" "nsg" {
 resource "azurerm_network_security_rule" "allow_inbound" {
   for_each = toset([
     "68", "443", "2379", "2380", "2381", "10010", "2112", "30000-32767",
-    "3260", "5900", "6080", "6443", "6444", "8181", "8443", "8444", "8472",
+    "3260", "5900", "6080", "6444", "8181", "8443", "8444", "8472",
     "9091", "9099", "9345", "9796", "10245", "10246-10249", "10250", "10251",
     "10252", "10256", "10257", "10258", "10259"
   ])
@@ -155,7 +155,7 @@ resource "azurerm_network_security_rule" "allow_inbound" {
   name = "${var.prefix}-allow-inbound-${each.key}"
   priority = 100 + index([
     "68", "443", "2379", "2380", "2381", "10010", "2112", "30000-32767",
-    "3260", "5900", "6080", "6443", "6444", "8181", "8443", "8444", "8472",
+    "3260", "5900", "6080", "6444", "8181", "8443", "8444", "8472",
     "9091", "9099", "9345", "9796", "10245", "10246-10249", "10250", "10251",
     "10252", "10256", "10257", "10258", "10259"
   ], each.key)
@@ -170,15 +170,15 @@ resource "azurerm_network_security_rule" "allow_inbound" {
   network_security_group_name = azurerm_network_security_group.nsg.name
 }
 
-resource "azurerm_network_security_rule" "allow_ssh" {
-  name                        = "${var.prefix}-allow-inbound-22"
+resource "azurerm_network_security_rule" "allow_ssh_and_k8s" {
+  name                        = "${var.prefix}-allow-inbound-22-6443"
   priority                    = 134
   direction                   = "Inbound"
   access                      = "Allow"
   protocol                    = "Tcp"
   source_port_range           = "*"
-  destination_port_range      = "22"
-  source_address_prefixes     = var.ssh_public_ip_source_addresses
+  destination_port_ranges     = ["22", "6443"]
+  source_address_prefixes     = var.public_ip_source_addresses
   destination_address_prefix  = "*"
   resource_group_name         = azurerm_resource_group.rg.name
   network_security_group_name = azurerm_network_security_group.nsg.name

@@ -102,15 +102,20 @@ resource "digitalocean_firewall" "example_firewall" {
   inbound_rule {
     protocol         = "tcp"
     port_range       = "22"
-    source_addresses = var.ssh_public_ip_source_addresses
+    source_addresses = var.public_ip_source_addresses
   }
 
   inbound_rule {
     protocol         = "udp"
     port_range       = "22"
-    source_addresses = var.ssh_public_ip_source_addresses
+    source_addresses = var.public_ip_source_addresses
   }
 
+  inbound_rule {
+    protocol         = "udp"
+    port_range       = "6443"
+    source_addresses = var.public_ip_source_addresses
+  }
   dynamic "inbound_rule" {
     for_each = toset([
       "68", "443", "2112-32767"

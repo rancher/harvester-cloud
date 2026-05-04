@@ -103,24 +103,24 @@ resource "local_file" "harvester_startup_script" {
 }
 
 module "harvester_node" {
-  depends_on                     = [local_file.sles_startup_script_config]
-  source                         = "../../modules/azure/virtual-machine"
-  prefix                         = var.prefix
-  region                         = var.region
-  create_ssh_key_pair            = var.create_ssh_key_pair
-  ssh_private_key_path           = local.ssh_private_key_path
-  ssh_public_key_path            = local.ssh_public_key_path
-  ip_cidr_range                  = var.ip_cidr_range
-  os_disk_type                   = var.os_disk_type
-  os_disk_size                   = var.os_disk_size
-  instance_type                  = local.instance_type
-  create_vnet                    = var.create_vnet
-  spot_instance                  = var.spot_instance
-  data_disk_count                = var.harvester_node_count * var.data_disk_count
-  data_disk_type                 = var.data_disk_type
-  data_disk_size                 = var.data_disk_size
-  startup_script                 = data.local_file.sles_startup_script.content
-  ssh_public_ip_source_addresses = length(var.ssh_public_ip_source_addresses) > 0 ? var.ssh_public_ip_source_addresses : [local.caller_ip_cidr]
+  depends_on                 = [local_file.sles_startup_script_config]
+  source                     = "../../modules/azure/virtual-machine"
+  prefix                     = var.prefix
+  region                     = var.region
+  create_ssh_key_pair        = var.create_ssh_key_pair
+  ssh_private_key_path       = local.ssh_private_key_path
+  ssh_public_key_path        = local.ssh_public_key_path
+  ip_cidr_range              = var.ip_cidr_range
+  os_disk_type               = var.os_disk_type
+  os_disk_size               = var.os_disk_size
+  instance_type              = local.instance_type
+  create_vnet                = var.create_vnet
+  spot_instance              = var.spot_instance
+  data_disk_count            = var.harvester_node_count * var.data_disk_count
+  data_disk_type             = var.data_disk_type
+  data_disk_size             = var.data_disk_size
+  startup_script             = data.local_file.sles_startup_script.content
+  public_ip_source_addresses = length(var.public_ip_source_addresses) > 0 ? var.public_ip_source_addresses : [local.caller_ip_cidr]
 }
 
 data "local_file" "ssh_private_key" {
