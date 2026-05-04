@@ -1,3 +1,7 @@
+data "http" "my_public_ip_address" {
+  url = "https://ipv4.icanhazip.com/"
+}
+
 locals {
   sles_startup_script_template_file      = "../../modules/harvester/deployment-script/sles_startup_script_sh.tpl"
   sles_startup_script_file               = "${path.cwd}/sles_startup_script.sh"
@@ -26,6 +30,7 @@ locals {
     var.harvester_node_count == 3 ? (local.harvester_cluster_size == "small" ? "g-32vcpu-128gb" : "g-60vcpu-240gb") :
     "g-60vcpu-240gb-intel"
   )
+  current_public_ip_cidr = "${chomp(data.http.my_public_ip_address.response_body)}/32"
 }
 
 resource "local_file" "sles_startup_script_config" {
@@ -93,17 +98,18 @@ resource "local_file" "harvester_startup_script" {
 }
 
 module "harvester_node" {
-  depends_on           = [local_file.sles_startup_script_config]
-  source               = "../../modules/digitalocean/droplet"
-  prefix               = var.prefix
-  region               = var.region
-  create_ssh_key_pair  = var.create_ssh_key_pair
-  ssh_private_key_path = local.ssh_private_key_path
-  ssh_public_key_path  = local.ssh_public_key_path
-  instance_type        = local.instance_type
-  data_disk_count      = var.harvester_node_count * var.data_disk_count
-  data_disk_size       = var.data_disk_size
-  startup_script       = local.sles_startup_script_file
+  depends_on                 = [local_file.sles_startup_script_config]
+  source                     = "../../modules/digitalocean/droplet"
+  prefix                     = var.prefix
+  region                     = var.region
+  create_ssh_key_pair        = var.create_ssh_key_pair
+  ssh_private_key_path       = local.ssh_private_key_path
+  ssh_public_key_path        = local.ssh_public_key_path
+  instance_type              = local.instance_type
+  data_disk_count            = var.harvester_node_count * var.data_disk_count
+  data_disk_size             = var.data_disk_size
+  startup_script             = local.sles_startup_script_file
+  public_ip_source_addresses = length(var.public_ip_source_addresses) > 0 ? var.public_ip_source_addresses : [local.current_public_ip_cidr]
 }
 
 data "local_file" "ssh_private_key" {
