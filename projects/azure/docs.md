@@ -4,6 +4,7 @@
 |------|---------|
 | <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 4.70.0 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | 3.1.1 |
+| <a name="requirement_http"></a> [http](#requirement\_http) | 3.5.0 |
 | <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) | 3.1.0 |
 | <a name="requirement_rancher2"></a> [rancher2](#requirement\_rancher2) | 14.1.0 |
 | <a name="requirement_ssh"></a> [ssh](#requirement\_ssh) | 2.7.0 |
@@ -12,6 +13,7 @@
 
 | Name | Version |
 |------|---------|
+| <a name="provider_http"></a> [http](#provider\_http) | 3.5.0 |
 | <a name="provider_local"></a> [local](#provider\_local) | n/a |
 | <a name="provider_null"></a> [null](#provider\_null) | n/a |
 | <a name="provider_rancher2"></a> [rancher2](#provider\_rancher2) | 14.1.0 |
@@ -38,6 +40,7 @@
 | [null_resource.harvester_node_startup](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [rancher2_cluster.rancher_cluster](https://registry.terraform.io/providers/rancher/rancher2/14.1.0/docs/resources/cluster) | resource |
 | [ssh_resource.retrieve_kubeconfig](https://registry.terraform.io/providers/loafoe/ssh/2.7.0/docs/resources/resource) | resource |
+| [http_http.my_public_ip_address](https://registry.terraform.io/providers/hashicorp/http/3.5.0/docs/data-sources/http) | data source |
 | [local_file.sles_startup_script](https://registry.terraform.io/providers/hashicorp/local/latest/docs/data-sources/file) | data source |
 | [local_file.ssh_private_key](https://registry.terraform.io/providers/hashicorp/local/latest/docs/data-sources/file) | data source |
 
@@ -60,6 +63,7 @@
 | <a name="input_os_disk_size"></a> [os\_disk\_size](#input\_os\_disk\_size) | Specifies the size of the disk attached to each node, in GB. Default is '50'. | `number` | `50` | no |
 | <a name="input_os_disk_type"></a> [os\_disk\_type](#input\_os\_disk\_type) | Specifies the type of the disk attached to each node ('Standard\_LRS, 'StandardSSD\_LRS', 'Premium\_LRS' or 'UltraSSD\_LRS'). Default is 'Premium\_LRS'. | `string` | `"Premium_LRS"` | no |
 | <a name="input_prefix"></a> [prefix](#input\_prefix) | Specifies the prefix added to the names of all resources. Default is 'azure-tf'. | `string` | `"azure"` | no |
+| <a name="input_public_ip_source_addresses"></a> [public\_ip\_source\_addresses](#input\_public\_ip\_source\_addresses) | Specifies a list of CIDR blocks allowed to access port 22 (SSH). Default is an empty list (no restrictions defined at variable level). | `list(string)` | `[]` | no |
 | <a name="input_rancher_access_key"></a> [rancher\_access\_key](#input\_rancher\_access\_key) | Specifies the Rancher access key for authentication. Default is empty. | `string` | `""` | no |
 | <a name="input_rancher_api_url"></a> [rancher\_api\_url](#input\_rancher\_api\_url) | Specifies the Rancher API endpoint used to manage the Harvester cluster. Default is empty. | `string` | `""` | no |
 | <a name="input_rancher_insecure"></a> [rancher\_insecure](#input\_rancher\_insecure) | Specifies whether to allow insecure connections to the Rancher API. Default is 'false'. | `bool` | `false` | no |

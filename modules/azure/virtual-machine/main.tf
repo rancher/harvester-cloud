@@ -1,6 +1,13 @@
 locals {
   private_ssh_key_path = var.ssh_private_key_path == null ? "${path.cwd}/${var.prefix}-ssh_private_key.pem" : var.ssh_private_key_path
   public_ssh_key_path  = var.ssh_public_key_path == null ? "${path.cwd}/${var.prefix}-ssh_public_key.pem" : var.ssh_public_key_path
+  inbound_ports = [
+    "68", "443", "2379", "2380", "2381", "10010", "2112",
+    "30000-32767", "3260", "5900", "6444", "8181",
+    "8443", "8444", "8472", "9091", "9099", "9345", "9796",
+    "10245", "10246-10249", "10250", "10251", "10252",
+    "10256", "10257", "10258", "10259"
+  ]
   instance_count       = 1
   instance_os_type     = "opensuse"
   ssh_username         = local.instance_os_type
@@ -145,20 +152,9 @@ resource "azurerm_network_security_group" "nsg" {
 }
 
 resource "azurerm_network_security_rule" "allow_inbound" {
-  for_each = toset([
-    "68", "443", "2379", "2380", "2381", "10010", "2112", "30000-32767",
-    "3260", "5900", "6080", "6444", "8181", "8443", "8444", "8472",
-    "9091", "9099", "9345", "9796", "10245", "10246-10249", "10250", "10251",
-    "10252", "10256", "10257", "10258", "10259"
-  ])
-
-  name = "${var.prefix}-allow-inbound-${each.key}"
-  priority = 100 + index([
-    "68", "443", "2379", "2380", "2381", "10010", "2112", "30000-32767",
-    "3260", "5900", "6080", "6444", "8181", "8443", "8444", "8472",
-    "9091", "9099", "9345", "9796", "10245", "10246-10249", "10250", "10251",
-    "10252", "10256", "10257", "10258", "10259"
-  ], each.key)
+  for_each                    = toset(local.inbound_ports)
+  name                        = "${var.prefix}-allow-inbound-${each.key}"
+  priority                    = 100 + index(local.inbound_ports, each.key)
   direction                   = "Inbound"
   access                      = "Allow"
   protocol                    = "*"
@@ -170,14 +166,14 @@ resource "azurerm_network_security_rule" "allow_inbound" {
   network_security_group_name = azurerm_network_security_group.nsg.name
 }
 
-resource "azurerm_network_security_rule" "allow_ssh_and_k8s" {
-  name                        = "${var.prefix}-allow-inbound-22-6443"
+resource "azurerm_network_security_rule" "allow_admin_and_api_access" {
+  name                        = "${var.prefix}-allow-admin-access"
   priority                    = 134
   direction                   = "Inbound"
   access                      = "Allow"
   protocol                    = "Tcp"
   source_port_range           = "*"
-  destination_port_ranges     = ["22", "6443"]
+  destination_port_ranges     = ["22", "6443", "6080"]
   source_address_prefixes     = var.public_ip_source_addresses
   destination_address_prefix  = "*"
   resource_group_name         = azurerm_resource_group.rg.name
