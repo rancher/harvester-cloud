@@ -29,7 +29,7 @@ locals {
   create_firewall                        = var.create_firewall == true ? false : var.create_firewall
   ssh_username                           = "opensuse"
   kubeconfig_file                        = "${path.cwd}/${var.prefix}_kube_config.yml"
-  caller_ip_cidr                         = "${chomp(data.http.my_public_ip_address.response_body)}/32"
+  current_public_ip_cidr                 = "${chomp(data.http.my_public_ip_address.response_body)}/32"
   instance_type = (
     var.harvester_node_count == 1 ? (local.harvester_cluster_size == "small" ? "n2-standard-16" : "n2-standard-32") :
     var.harvester_node_count == 3 ? (local.harvester_cluster_size == "small" ? "n2-standard-32" : "n2-standard-64") :
@@ -127,7 +127,7 @@ module "harvester_node" {
   data_disk_type             = var.data_disk_type
   data_disk_size             = var.data_disk_size
   startup_script             = data.local_file.sles_startup_script.content
-  public_ip_source_addresses = length(var.public_ip_source_addresses) > 0 ? var.public_ip_source_addresses : [local.caller_ip_cidr]
+  public_ip_source_addresses = length(var.public_ip_source_addresses) > 0 ? var.public_ip_source_addresses : [local.current_public_ip_cidr]
 }
 
 data "local_file" "ssh_private_key" {

@@ -1,13 +1,7 @@
 locals {
   private_ssh_key_path = var.ssh_private_key_path == null ? "${path.cwd}/${var.prefix}-ssh_private_key.pem" : var.ssh_private_key_path
   public_ssh_key_path  = var.ssh_public_key_path == null ? "${path.cwd}/${var.prefix}-ssh_public_key.pem" : var.ssh_public_key_path
-  inbound_ports = [
-    "68", "443", "2379", "2380", "2381", "10010", "2112",
-    "30000-32767", "3260", "5900", "6444", "8181",
-    "8443", "8444", "8472", "9091", "9099", "9345", "9796",
-    "10245", "10246-10249", "10250", "10251", "10252",
-    "10256", "10257", "10258", "10259"
-  ]
+  inbound_ports        = ["68", "443", "2379", "2380", "2381", "10010", "2112", "30000-32767", "3260", "5900", "6444", "8181", "8443", "8444", "8472", "9091", "9099", "9345", "9796", "10245", "10246-10249", "10250", "10251", "10252", "10256", "10257", "10258", "10259"]
   instance_count       = 1
   instance_os_type     = "opensuse"
   ssh_username         = local.instance_os_type

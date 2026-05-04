@@ -1,6 +1,9 @@
 locals {
   private_ssh_key_path = var.ssh_private_key_path == null ? "${path.cwd}/${var.prefix}-ssh_private_key.pem" : var.ssh_private_key_path
   public_ssh_key_path  = var.ssh_public_key_path == null ? "${path.cwd}/${var.prefix}-ssh_public_key.pem" : var.ssh_public_key_path
+  inbound_ports        = ["68", "443", "2379", "2380", "2381", "10010", "2112", "30000-32767", "3260", "5900", "6444", "8181", "8443", "8444", "8472", "9091", "9099", "9345", "9796", "10245", "10246-10249", "10250", "10251", "10252", "10256", "10257", "10258", "10259"]
+  tcp_ports            = ["8443", "443"]
+  udp_ports            = ["8472", "68"]
   instance_count       = 1
   ssh_username         = "opensuse"
   certified_image_name = "opensuse-leap-16-0-harv-cloud-image.x86_64.raw.tar.gz"
@@ -27,7 +30,6 @@ resource "local_file" "public_key_pem" {
   file_permission = "0600"
 }
 
-
 resource "google_compute_network" "vpc" {
   count                   = var.create_vpc == true ? 1 : 0
   name                    = "${var.prefix}-vpc"
@@ -35,7 +37,7 @@ resource "google_compute_network" "vpc" {
 }
 
 resource "google_compute_subnetwork" "subnet" {
-  depends_on    = [resource.google_compute_firewall.default[0]]
+  depends_on    = [resource.google_compute_firewall.cluster_plane[0]]
   count         = var.create_vpc == true ? 1 : 0
   name          = "${var.prefix}-subnet"
   region        = var.region
@@ -43,40 +45,36 @@ resource "google_compute_subnetwork" "subnet" {
   ip_cidr_range = var.ip_cidr_range
 }
 
-resource "google_compute_firewall" "default" {
+resource "google_compute_firewall" "cluster_plane" {
   count   = var.create_firewall ? 1 : 0
-  name    = "${var.prefix}-firewall"
-  network = var.vpc == null ? resource.google_compute_network.vpc[0].name : var.vpc
+  name    = "${var.prefix}-allow-cluster-plane"
+  network = var.vpc == null ? google_compute_network.vpc[0].name : var.vpc
+  #https://docs.harvesterhci.io/v1.3/install/requirements#port-requirements-for-harvester-nodes
   allow {
     protocol = "icmp"
   }
-  #https://docs.harvesterhci.io/v1.3/install/requirements#port-requirements-for-harvester-nodes
   allow {
     protocol = "tcp"
-    ports    = ["2379", "2381", "2380", "10010", "9345", "10252", "10257", "10251", "10259", "10250", "10256", "10258", "9091", "9099", "2112", "6444", "10246-10249", "8181", "8444", "10245", "9796", "30000-32767", "3260", "5900", "6080"]
+    ports    = local.tcp_ports
   }
   allow {
     protocol = "udp"
-    ports    = ["8472", "68"]
-  }
-  allow {
-    protocol = "tcp"
-    ports    = ["8443", "443"]
+    ports    = local.udp_ports
   }
   source_ranges = ["0.0.0.0/0"]
-  target_tags   = ["${var.prefix}"]
+  target_tags   = [var.prefix]
 }
 
-resource "google_compute_firewall" "ssh" {
+resource "google_compute_firewall" "management_plane" {
   count   = var.create_firewall ? 1 : 0
-  name    = "${var.prefix}-firewall-ssh-6443"
-  network = var.vpc == null ? resource.google_compute_network.vpc[0].name : var.vpc
+  name    = "${var.prefix}-allow-management-plane"
+  network = var.vpc == null ? google_compute_network.vpc[0].name : var.vpc
   allow {
     protocol = "tcp"
-    ports    = ["22", "6443"]
+    ports    = ["22", "6443", "6080"]
   }
   source_ranges = var.public_ip_source_addresses
-  target_tags   = ["${var.prefix}"]
+  target_tags   = [var.prefix]
 }
 
 data "google_compute_zones" "available" {
