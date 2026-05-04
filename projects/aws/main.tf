@@ -30,7 +30,7 @@ locals {
     var.harvester_node_count == 3 ? (local.harvester_cluster_size == "small" ? "m8i.8xlarge" : "m8i.16xlarge") :
     "m8i.16xlarge"
   )
-  caller_ip_cidr = "${chomp(data.http.my_public_ip_address.response_body)}/32"
+  current_public_ip_cidr = "${chomp(data.http.my_public_ip_address.response_body)}/32"
 }
 
 resource "local_file" "sles_startup_script_config" {
@@ -117,7 +117,7 @@ module "harvester_node" {
   data_disk_count            = var.harvester_node_count * var.data_disk_count
   data_disk_size             = var.data_disk_size
   startup_script             = local.sles_startup_script_file
-  public_ip_source_addresses = length(var.public_ip_source_addresses) > 0 ? var.public_ip_source_addresses : [local.caller_ip_cidr]
+  public_ip_source_addresses = length(var.public_ip_source_addresses) > 0 ? var.public_ip_source_addresses : [local.current_public_ip_cidr]
 }
 
 data "local_file" "ssh_private_key" {

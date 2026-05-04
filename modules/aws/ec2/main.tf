@@ -198,49 +198,49 @@ resource "aws_security_group" "sg" {
   name   = "${var.prefix}-sg"
   vpc_id = aws_vpc.vpc.id
   ingress {
-    description = "Allow all inbound from nodes in the cluster"
+    description = "Allow all intra-cluster traffic between instances in the same security group"
     from_port   = "0"
     to_port     = "0"
     protocol    = "-1"
     self        = true
   }
   ingress {
-    description = "Allow inbound SSH"
+    description = "Allow inbound SSH access restricted to CIDR list"
     from_port   = "22"
     to_port     = "22"
     protocol    = "tcp"
     cidr_blocks = var.public_ip_source_addresses
   }
   ingress {
-    description = "Allow inbound kube-apiserver"
+    description = "Allow inbound Kubernetes API server (6443) access restricted to CIDR list"
     from_port   = "6443"
     to_port     = "6443"
     protocol    = "tcp"
     cidr_blocks = var.public_ip_source_addresses
   }
   ingress {
-    description = "Allow all inbound HTTP to nodes"
+    description = "Allow inbound HTTP access restricted to CIDR list"
     from_port   = "80"
     to_port     = "80"
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.public_ip_source_addresses
   }
   ingress {
-    description = "Allow all inbound HTTPS to nodes"
+    description = "Allow public HTTPS inbound access to nodes"
     from_port   = "443"
     to_port     = "443"
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
   ingress {
-    description = "Allow all inbound WebSocket to nodes"
+    description = "Allow inbound WebSocket access restricted to CIDR list"
     from_port   = "6080"
     to_port     = "6080"
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.public_ip_source_addresses
   }
   egress {
-    description = "Allow all outbound"
+    description = "Allow public HTTPS inbound access to nodes"
     from_port   = "0"
     to_port     = "0"
     protocol    = "-1"
