@@ -10,6 +10,7 @@
 - Make sure you are logged into your Azure account from your local Terminal. See the preparatory steps [here](../../modules/azure/README.md).
 - Make sure the quotas assigned to the region you use are high enough to allow you to deploy. Take a look [here](https://learn.microsoft.com/en-us/azure/quotas/quotas-overview#adjustable-and-non-adjustable-quotas).
 - If you need to change the size of your VM, make sure you choose those with an [Intel processor](https://azure.microsoft.com/en-us/blog/nested-virtualization-in-azure/). `libvirt` works very well on this processor family.
+- If you plan to create a [Virtual Machine Network](https://docs.harvesterhci.io/v1.7/networking/harvester-network/#vlan-network) by selecting mgmt cluster network, make sure to use VLAN ID 1 to prevent potential connectivity issues.
 
 #### Terraform Apply
 

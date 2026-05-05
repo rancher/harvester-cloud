@@ -9,6 +9,7 @@
     - `private_ssh_key_file_path` to specify the full path where the private SSH key file is located
     - `private_ssh_key_file_name` to specify the name of the private SSH key file used for authentication
     - `cluster_network_count` to specify the number of NIC's to be created on Harvester Nested VM's. The first NIC created on each Harvester node will be configured as VM network on Harvester while the rest of NIC's will remain available to be configured manually.
+- If you plan to create a [Virtual Machine Network](https://docs.harvesterhci.io/v1.7/networking/harvester-network/#vlan-network) by selecting one of the new interfaces added to the nodes, make sure to use VLAN ID 1 to prevent potential connectivity issues.
 
 #### Terraform Apply
 

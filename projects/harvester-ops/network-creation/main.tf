@@ -61,8 +61,56 @@ resource "ssh_resource" "harvester_airgapped" {
   host        = local.harvester_public_ip
   user        = local.ssh_username
   private_key = file("${var.private_ssh_key_file_path}/${var.private_ssh_key_file_name}")
-  commands = [
-    "sudo nft -f /etc/nftables.conf || true"
+  commands = [<<EOT
+sudo bash -c 'cat << "EOF" > /etc/nftables.conf
+#!/usr/sbin/nft -f
+# =====================================
+# nftables rules
+# =====================================
+flush table ip libvirt_network
+table ip libvirt_network {
+    # ----------------------------
+    # Forward Chain Principal
+    # ----------------------------
+    chain forward {
+        type filter hook forward priority filter; policy drop;
+        jump guest_cross
+        jump guest_input
+        jump guest_output
+    }
+    # ----------------------------
+    # VMs communication (Intra-Subnet e Inter-Subnet)
+    # ----------------------------
+    chain guest_cross {
+        # accepting all the traffic between Harvester subnets 192.168.0.0/16
+        ip saddr 192.168.0.0/16 ip daddr 192.168.0.0/16 accept
+    }
+    # ----------------------------
+    # Communication with Host Gateway (Gateway is the first IP of each Subnet)
+    # ----------------------------
+    chain guest_input {
+        ip daddr 192.168.0.0/16 accept
+    }
+    # ----------------------------
+    # Allowing communication with VMs and blocking the rest
+    # ----------------------------
+    chain guest_output {
+        # allowing Traffic in subnet
+        ip saddr 192.168.0.0/16 accept
+        # blocking internet access
+        reject
+    }
+    # ----------------------------
+    # NAT: not enabled
+    # ----------------------------
+    chain guest_nat {
+        type nat hook postrouting priority srcnat; policy accept
+        # no NAT → impossible to access internet
+    }
+}
+EOF'
+  sudo nft -f /etc/nftables.conf || true
+EOT
   ]
 }
 
@@ -82,6 +130,19 @@ resource "ssh_resource" "attach_network_interface" {
       for i in $(seq 1 $NODE_COUNT); do
         sudo virsh reboot harvester-node-$i
       done
+    EOT
+  ]
+}
+
+resource "ssh_resource" "creating_subnet_nftables_rule" {
+  count       = var.harvester_airgapped ? 0 : 1
+  depends_on  = [ssh_resource.attach_network_interface]
+  host        = local.harvester_public_ip
+  user        = local.ssh_username
+  private_key = file("${var.private_ssh_key_file_path}/${var.private_ssh_key_file_name}")
+  commands = [
+    <<-EOT
+      sudo nft insert rule ip libvirt_network guest_input position 0 ip saddr 192.168.0.0/16 ip daddr 192.168.0.0/16 accept
     EOT
   ]
 }

@@ -7,6 +7,7 @@
     - `region` to specify the AWS region where resources will be created
     - `harvester_node_count` to specify the number of Harvester nodes to create (1 or 3)
 - Make sure you are logged into your AWS account from your local Terminal. See the preparatory steps [here](../../modules/aws/README.md).
+- If you plan to create a [Virtual Machine Network](https://docs.harvesterhci.io/v1.7/networking/harvester-network/#vlan-network) by selecting mgmt cluster network, make sure to use VLAN ID 1 to prevent potential connectivity issues.
 
 #### Terraform Apply
 
