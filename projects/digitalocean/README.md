@@ -8,6 +8,8 @@
     - `region` to specify the DigitalOcean region where resources will be created
     - `harvester_node_count` to specify the number of Harvester nodes to create (1 or 3)
 - Ensure you have generated a DigitalOcean token by following the steps described [here](../../modules/digitalocean/README.md)
+- If you plan to create a [Virtual Machine Network](https://docs.harvesterhci.io/v1.7/networking/harvester-network/#vlan-network) by selecting mgmt cluster network, make sure to use VLAN ID 1 to prevent potential connectivity issues.
+
 
 #### Terraform Apply
 
