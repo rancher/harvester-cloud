@@ -125,7 +125,7 @@ resource "digitalocean_firewall" "harvester_firewall" {
       source_addresses = ["0.0.0.0/0", "::/0"]
     }
   }
-  # Cluster plane UDP (solo quelle giuste)
+  # Cluster plane UDP
   dynamic "inbound_rule" {
     for_each = toset(local.udp_ports)
     content {
