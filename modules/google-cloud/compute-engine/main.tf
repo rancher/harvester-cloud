@@ -5,7 +5,7 @@ locals {
   ssh_username         = "opensuse"
   certified_image_name = "opensuse-leap-16-0-harv-cloud-image.x86_64.raw.tar.gz"
   certified_image_url  = "https://github.com/rancher/harvester-cloud/releases/download/latest/${local.certified_image_name}"
-  certified_image_sum  = "54884a2bbf9fa320975bf8513d51ce2f1ebe99e0c1d1dc673ded9ed4c34a006726552fc5d37c2cedd96f2123efba559843988c932fef73405fb46aac20e8048d"
+  certified_image_sum  = "a6e789a154d365361444dcf26a060391906976b718d985ecaf47b295e989ca1e5f363af86422527c2d41e78c439a04fef4708b7f6ef0a1bc06b63875a05745bc"
 }
 
 resource "tls_private_key" "ssh_private_key" {
