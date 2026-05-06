@@ -46,6 +46,8 @@
         <package name="iputils"/>
         <package name="lvm2"/>
         <!-- Networking / KVM / Cloud -->
+        <package name="ovmf"/>
+        <package name="ipxe-bootimgs"/>
         <package name="libvirt"/>
         <package name="qemu-kvm"/>
         <package name="virt-install"/>
