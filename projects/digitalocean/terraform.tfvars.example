@@ -25,6 +25,9 @@ data_disk_count = 1
 ## -- Specifies the size of each additional data disks attached to the Droplet, in GB.
 data_disk_size = 350
 
+## -- Specifies a list of CIDR blocks allowed to access port 22 (SSH).
+public_ip_source_addresses = []
+
 ## -- Specifies a custom startup script to run when the Droplets start.
 startup_script = null
 

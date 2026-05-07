@@ -1,3 +1,7 @@
+data "http" "my_public_ip_address" {
+  url = "https://ipv4.icanhazip.com/"
+}
+
 locals {
   sles_startup_script_template_file      = "../../modules/harvester/deployment-script/sles_startup_script_sh.tpl"
   sles_startup_script_file               = "${path.cwd}/sles_startup_script.sh"
@@ -21,6 +25,7 @@ locals {
   ssh_public_key_path                    = var.ssh_public_key_path == null ? "${path.cwd}/${var.prefix}-ssh_public_key.pem" : var.ssh_public_key_path
   ssh_username                           = "opensuse"
   kubeconfig_file                        = "${path.cwd}/${var.prefix}_kube_config.yml"
+  current_public_ip_cidr                 = "${chomp(data.http.my_public_ip_address.response_body)}/32"
   instance_type = (
     var.harvester_node_count == 1 ? (local.harvester_cluster_size == "small" ? "Standard_D16s_v5" : "Standard_D32s_v5") :
     var.harvester_node_count == 3 ? (local.harvester_cluster_size == "small" ? "Standard_D32s_v5" : "Standard_D64s_v5") :
@@ -98,23 +103,24 @@ resource "local_file" "harvester_startup_script" {
 }
 
 module "harvester_node" {
-  depends_on           = [local_file.sles_startup_script_config]
-  source               = "../../modules/azure/virtual-machine"
-  prefix               = var.prefix
-  region               = var.region
-  create_ssh_key_pair  = var.create_ssh_key_pair
-  ssh_private_key_path = local.ssh_private_key_path
-  ssh_public_key_path  = local.ssh_public_key_path
-  ip_cidr_range        = var.ip_cidr_range
-  os_disk_type         = var.os_disk_type
-  os_disk_size         = var.os_disk_size
-  instance_type        = local.instance_type
-  create_vnet          = var.create_vnet
-  spot_instance        = var.spot_instance
-  data_disk_count      = var.harvester_node_count * var.data_disk_count
-  data_disk_type       = var.data_disk_type
-  data_disk_size       = var.data_disk_size
-  startup_script       = data.local_file.sles_startup_script.content
+  depends_on                 = [local_file.sles_startup_script_config]
+  source                     = "../../modules/azure/virtual-machine"
+  prefix                     = var.prefix
+  region                     = var.region
+  create_ssh_key_pair        = var.create_ssh_key_pair
+  ssh_private_key_path       = local.ssh_private_key_path
+  ssh_public_key_path        = local.ssh_public_key_path
+  ip_cidr_range              = var.ip_cidr_range
+  os_disk_type               = var.os_disk_type
+  os_disk_size               = var.os_disk_size
+  instance_type              = local.instance_type
+  create_vnet                = var.create_vnet
+  spot_instance              = var.spot_instance
+  data_disk_count            = var.harvester_node_count * var.data_disk_count
+  data_disk_type             = var.data_disk_type
+  data_disk_size             = var.data_disk_size
+  startup_script             = data.local_file.sles_startup_script.content
+  public_ip_source_addresses = length(var.public_ip_source_addresses) > 0 ? var.public_ip_source_addresses : [local.current_public_ip_cidr]
 }
 
 data "local_file" "ssh_private_key" {

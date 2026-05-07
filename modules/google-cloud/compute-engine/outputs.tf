@@ -31,5 +31,5 @@ output "subnet" {
 }
 
 output "firewall" {
-  value = google_compute_firewall.default
+  value = google_compute_firewall.cluster_plane
 }

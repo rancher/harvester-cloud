@@ -49,6 +49,9 @@ data_disk_type = "pd-ssd"
 ## -- Specifies the size of the additional data disks for each VM instance, in GB.
 data_disk_size = 350
 
+## -- Specifies a list of CIDR blocks allowed to access port 22 (SSH).
+public_ip_source_addresses = []
+
 ## -- Specifies a custom startup script to run when the VMs start.
 startup_script = null
 
