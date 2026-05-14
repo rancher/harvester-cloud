@@ -88,46 +88,54 @@ As anticipated in the introduction, the two main scripts that coordinate everyth
 1. Installation of pre-requisite packages
 
 ```console
-sudo zypper --non-interactive addrepo https://download.opensuse.org/repositories/network/SLE_15/network.repo
-sudo zypper --non-interactive --gpg-auto-import-keys refresh
-sudo zypper --non-interactive install parted util-linux virt-install libvirt qemu-kvm python3-websockify novnc socat nginx sshpass
+exec > >(sudo tee /var/log/harvester-install.log) 2>&1
+
+set -euo pipefail
+
+# Set SELinux to permissive permanently
+sudo setenforce 0 2>/dev/null || true
+sudo sed -i 's/^SELINUX=.*/SELINUX=permissive/' /etc/selinux/config 2>/dev/null || true
+
+# Libvirt service initialization and Harvester directory setup
 sudo systemctl enable --now libvirtd
 sudo mkdir -p /srv/www/harvester
 ```
 
-Explanation of the packages that will be installed:
-
-- `parted`: Disk partition management tool.  
-- `util-linux`: Essential system utilities (mount, fdisk, etc.).  
-- `virt-install`: CLI tool to create KVM virtual machines.  
-- `libvirt`: API and tools for managing virtual machines.  
-- `qemu-kvm`: KVM-based virtualization with QEMU.  
-- `python3-websockify`: WebSocket proxy for VNC/RDP connections.  
-- `novnc`: Web-based VNC client for remote access.  
-- `socat`: Utility for bidirectional data transfer between endpoints.  
-- `nginx`: Web server and reverse proxy.  
-- `sshpass`: Automates SSH login with password authentication. 
-
 2. Download the files needed to start the nested VM
 
 ```console
+# Download the files needed to start the nested VM
 sudo curl -L -o /etc/nginx/nginx.conf \
-  https://raw.githubusercontent.com/rancher/harvester-cloud/refs/heads/main/modules/harvester/deployment-script/nginx_conf.tpl
+    https://raw.githubusercontent.com/rancher/harvester-cloud/refs/heads/main/modules/harvester/deployment-script/nginx_conf.tpl
+echo "$${NGINX_CONF_SUM}  /etc/nginx/nginx.conf" | sha512sum -c -
 sudo curl -L -o /srv/www/harvester/vlan1.xml \
-  https://raw.githubusercontent.com/rancher/harvester-cloud/refs/heads/main/modules/harvester/deployment-script/qemu_vlan1_xml.tpl
+    https://raw.githubusercontent.com/rancher/harvester-cloud/refs/heads/main/modules/harvester/deployment-script/qemu_vlan1_xml.tpl
+echo "$${VLAN1_XML_SUM}  /srv/www/harvester/vlan1.xml" | sha512sum -c -
 sudo curl -L -o /etc/systemd/system/socat-proxy.service \
-  https://raw.githubusercontent.com/rancher/harvester-cloud/refs/heads/main/modules/harvester/deployment-script/socat_proxy_service.tpl
+    https://raw.githubusercontent.com/rancher/harvester-cloud/refs/heads/main/modules/harvester/deployment-script/socat_proxy_service.tpl
+echo "$${SOCAT_SERVICE_SUM}  /etc/systemd/system/socat-proxy.service" | sha512sum -c -
 sudo curl -L -o /usr/local/bin/restart_harvester_vms_script.sh \
-  https://raw.githubusercontent.com/rancher/harvester-cloud/refs/heads/main/modules/harvester/deployment-script/restart_harvester_vms_script_sh.tpl
+    https://raw.githubusercontent.com/rancher/harvester-cloud/refs/heads/main/modules/harvester/deployment-script/restart_harvester_vms_script_sh.tpl
+echo "$${RESTART_HARV_VM_SCRIPT_SUM}  /usr/local/bin/restart_harvester_vms_script.sh" | sha512sum -c -
+HARV_VERSION="${version}"
+SAFE_VERSION="$${HARV_VERSION//./_}"
+VAR_VMLINUZ="HARVESTER_$${SAFE_VERSION}_VMLINUZ_SUM_amd64"
+VAR_INITRD="HARVESTER_$${SAFE_VERSION}_INITRD_SUM_amd64"
+VAR_ROOTFS="HARVESTER_$${SAFE_VERSION}_ROOTFS_SUM_amd64"
+VAR_ISO="HARVESTER_$${SAFE_VERSION}_ISO_SUM_amd64"
 sudo curl -L -o /srv/www/harvester/harvester-${version}-vmlinuz-amd64 \
-  https://github.com/harvester/harvester/releases/download/${version}/harvester-${version}-vmlinuz-amd64
+    https://github.com/harvester/harvester/releases/download/${version}/harvester-${version}-vmlinuz-amd64
+echo "$${!VAR_VMLINUZ}  /srv/www/harvester/harvester-${version}-vmlinuz-amd64" | sha512sum -c -
 sudo curl -L -o /srv/www/harvester/harvester-${version}-initrd-amd64 \
-  https://github.com/harvester/harvester/releases/download/${version}/harvester-${version}-initrd-amd64
+    https://github.com/harvester/harvester/releases/download/${version}/harvester-${version}-initrd-amd64
+echo "$${!VAR_INITRD}  /srv/www/harvester/harvester-${version}-initrd-amd64" | sha512sum -c -
 sudo curl -L -o /srv/www/harvester/harvester-${version}-rootfs-amd64.squashfs \
-  https://releases.rancher.com/harvester/${version}/harvester-${version}-rootfs-amd64.squashfs
+    https://releases.rancher.com/harvester/${version}/harvester-${version}-rootfs-amd64.squashfs
+echo "$${!VAR_ROOTFS}  /srv/www/harvester/harvester-${version}-rootfs-amd64.squashfs" | sha512sum -c -
 sudo curl -L -o /srv/www/harvester/harvester-${version}-amd64.iso \
-  https://releases.rancher.com/harvester/${version}/harvester-${version}-amd64.iso && \
-  touch /tmp/harvester_download_done
+    https://releases.rancher.com/harvester/${version}/harvester-${version}-amd64.iso
+echo "$${!VAR_ISO}  /srv/www/harvester/harvester-${version}-amd64.iso" | sha512sum -c -
+touch /tmp/harvester_download_done
 ```
 
 This portion of the script downloads Harvester boot and installation files, storing them in `/srv/www/harvester/`. A flag file (`/tmp/harvester_download_done`) marks completion.  
@@ -135,17 +143,28 @@ This portion of the script downloads Harvester boot and installation files, stor
 3. Disk partitioning
 
 ```console
+# Disk partitioning
 for i in $(seq 1 "${count}"); do
-  if [ -b "${disk_name}$(printf "\x$(printf %x $((97 + i)))")" ]; then
-    echo "Partitioning and mounting disk ${disk_name}$(printf "\x$(printf %x $((97 + i)))") on ${mount_point}$i..."
-    sudo parted --script "${disk_name}$(printf "\x$(printf %x $((97 + i)))")" mklabel gpt
-    sudo parted --script "${disk_name}$(printf "\x$(printf %x $((97 + i)))")" mkpart primary ext4 0% 100%
-    sudo mkfs.ext4 "${disk_name}$(printf "\x$(printf %x $((97 + i)))")1"
-    sudo mkdir -p "${mount_point}$i"
-    sudo mount "${disk_name}$(printf "\x$(printf %x $((97 + i)))")1" "${mount_point}$i"
-    echo "${disk_name}$(printf "\x$(printf %x $((97 + i)))")1 ${mount_point}$i ext4 defaults 0 0" | sudo tee -a /etc/fstab
+  if [[ "${disk_name}" == /dev/sd ]]; then
+    disk="${disk_name}$(printf "\x$(printf %x $((${disk_structure} + i)))")"
+    part="$${disk}1"
+  elif [[ "${disk_name}" == /dev/nvme ]]; then
+    disk="${disk_name}$${i}n1"
+    part="$${disk}p1"
   else
-    echo "Error: disk ${disk_name}$(printf "\x$(printf %x $((97 + i)))") does not exist."
+    echo "Error: unsupported disk type $disk_name"
+    exit 1
+  fi
+  if [ -b "$${disk}" ]; then
+    echo "Partitioning and mounting disk $${disk} on /mnt/datadisk$i..."
+    sudo parted --script "$${disk}" mklabel gpt
+    sudo parted --script "$${disk}" mkpart primary ext4 0% 100%
+    sudo mkfs.ext4 "$${part}"
+    sudo mkdir -p "/mnt/datadisk$i"
+    sudo mount "$${part}" "/mnt/datadisk$i"
+    echo "$${part} /mnt/datadisk$i ext4 defaults 0 0" | sudo tee -a /etc/fstab
+  else
+    echo "Error: disk $${disk} does not exist."
     exit 1
   fi
 done
@@ -171,16 +190,23 @@ In this section, the script defines, starts, and enables autostart for the `vlan
 ###### */srv/www/harvester/vlan1.xml*
 
 ```console
-<network>
+<network xmlns:dnsmasq='http://libvirt.org/schemas/network/dnsmasq/1.0'>
   <name>vlan1</name>
   <bridge name="virbr1"/>
   <forward mode="nat"/>
   <ip address="192.168.122.1" netmask="255.255.255.0">
-    <dhcp>
-      <range start="192.168.122.2" end="192.168.122.254"/>
-      <bootp file="http://192.168.122.1/default.ipxe"/>
+      <tftp root='/srv/www/harvester'/>
+      <dhcp>
+      <range start="192.168.122.2" end="192.168.122.254">
+        <lease expiry='168' unit='hours'/>
+      </range>
     </dhcp>
   </ip>
+  <dnsmasq:options>
+    <dnsmasq:option value='dhcp-match=set:is_ipxe,175'/>
+    <dnsmasq:option value='dhcp-boot=tag:!is_ipxe,ipxe.efi'/>
+    <dnsmasq:option value='dhcp-boot=tag:is_ipxe,http://192.168.122.1/default.ipxe'/>
+  </dnsmasq:options>
 </network>
 ```
 
@@ -224,22 +250,23 @@ http {
 3. Creation of nested VMs
 
 ```console
+# Creation of nested VMs
 for i in $(seq 1 ${count}); do
   if [ $i == 1 ]; then
     sudo sed -i "s/${hostname}/${hostname}-$i/g" /srv/www/harvester/create_cloud_config.yaml
-    sudo virt-install --name harvester-node-$i --memory ${memory} --vcpus ${cpu} --cpu host-passthrough --disk path=/mnt/datadisk$i/harvester-data.qcow2,size=250,bus=virtio,format=qcow2 --os-type linux --os-variant generic --network bridge=virbr1,model=virtio --graphics vnc,listen=0.0.0.0,password=yourpass,port=$((5900 + i)) --console pty,target_type=serial --pxe --autostart &
-    sleep 30
+    sudo virt-install --name harvester-node-$i --memory ${memory} --vcpus ${cpu} --cpu host-passthrough --disk path=/mnt/datadisk$i/harvester-data.qcow2,size=${harvester_default_disk_size},bus=virtio,format=qcow2 --boot loader=/usr/share/qemu/ovmf-x86_64-code.bin,loader_ro=yes,loader_type=pflash,nvram_template=/usr/share/qemu/ovmf-x86_64-vars.bin --os-type linux --os-variant generic --network bridge=virbr1,model=virtio --graphics vnc,listen=0.0.0.0,password=yourpass,port=$((5900 + i)) --console pty,target_type=serial --pxe --autostart &
+    sleep 45
   elif [ $i == 2 ]; then
     sudo sed -i "s/${hostname}/${hostname}-$i/g" /srv/www/harvester/join_cloud_config.yaml
     sudo sed -i "s/create_cloud_config.yaml/join_cloud_config.yaml/g" /srv/www/harvester/default.ipxe
-    sudo virt-install --name harvester-node-$i --memory ${memory} --vcpus ${cpu} --cpu host-passthrough --disk path=/mnt/datadisk$i/harvester-data.qcow2,size=250,bus=virtio,format=qcow2 --os-type linux --os-variant generic --network bridge=virbr1,model=virtio --graphics vnc,listen=0.0.0.0,password=yourpass,port=$((5900 + i)) --console pty,target_type=serial --pxe --autostart &
-    sleep 30
+    sudo virt-install --name harvester-node-$i --memory ${memory} --vcpus ${cpu} --cpu host-passthrough --disk path=/mnt/datadisk$i/harvester-data.qcow2,size=${harvester_default_disk_size},bus=virtio,format=qcow2 --boot loader=/usr/share/qemu/ovmf-x86_64-code.bin,loader_ro=yes,loader_type=pflash,nvram_template=/usr/share/qemu/ovmf-x86_64-vars.bin --os-type linux --os-variant generic --network bridge=virbr1,model=virtio --graphics vnc,listen=0.0.0.0,password=yourpass,port=$((5900 + i)) --console pty,target_type=serial --pxe --autostart &
+    sleep 45
   else
     sudo cp /srv/www/harvester/join_cloud_config.yaml /srv/www/harvester/join_cloud_config_$((i - 1)).yaml
-    sudo sed -i "s/${hostname}-$((i - 1))/${hostname}-$i/g" /srv/www/harvester/join_cloud_config_$((i - 1)).yaml
-    sudo sed -i "s/join_cloud_config.yaml/join_cloud_config_$((i - 1)).yaml/g" /srv/www/harvester/default.ipxe
-    sudo virt-install --name harvester-node-$i --memory ${memory} --vcpus ${cpu} --cpu host-passthrough --disk path=/mnt/datadisk$i/harvester-data.qcow2,size=250,bus=virtio,format=qcow2 --os-type linux --os-variant generic --network bridge=virbr1,model=virtio --graphics vnc,listen=0.0.0.0,password=yourpass,port=$((5900 + i)) --console pty,target_type=serial --pxe --autostart &
-    sleep 30
+    sudo sed -i "s/  hostname:.*/  hostname: ${hostname}-$i/" /srv/www/harvester/join_cloud_config_$((i - 1)).yaml
+    sudo sed -i "s|join_cloud_config[^ ]*\.yaml|join_cloud_config_$((i - 1)).yaml|" /srv/www/harvester/default.ipxe
+    sudo virt-install --name harvester-node-$i --memory ${memory} --vcpus ${cpu} --cpu host-passthrough --disk path=/mnt/datadisk$i/harvester-data.qcow2,size=${harvester_default_disk_size},bus=virtio,format=qcow2 --boot loader=/usr/share/qemu/ovmf-x86_64-code.bin,loader_ro=yes,loader_type=pflash,nvram_template=/usr/share/qemu/ovmf-x86_64-vars.bin --os-type linux --os-variant generic --network bridge=virbr1,model=virtio --graphics vnc,listen=0.0.0.0,password=yourpass,port=$((5900 + i)) --console pty,target_type=serial --pxe --autostart &
+    sleep 45
   fi
 done
 ```
@@ -253,18 +280,18 @@ Here, the script installs multiple `harvester-node` nested Virtual Machines base
 ```console
 #!ipxe
 dhcp
-kernel http://192.168.122.1/harvester-v1.4.1-vmlinuz-amd64 \
-    initrd=harvester-v1.4.1-initrd-amd64 \
+kernel ${base}/harvester-${version}-vmlinuz-amd64 \
+    initrd=harvester-${version}-initrd-amd64 \
     ip=dhcp \
     console=tty1 \
     net.ifnames=1 \
     rd.cos.disable \
     rd.noverifyssl \
-    root=live:http://192.168.122.1/harvester-v1.4.1-rootfs-amd64.squashfs \
-    harvester.install.config_url=http://192.168.122.1/create_cloud_config.yaml\
+    root=live:${base}/harvester-${version}-rootfs-amd64.squashfs \
+    harvester.install.config_url=${base}/create_cloud_config.yaml \
     harvester.install.skipchecks=true \
     harvester.install.automatic=true
-initrd http://192.168.122.1/harvester-v1.4.1-initrd-amd64
+initrd ${base}/harvester-${version}-initrd-amd64
 boot
 ```
 
@@ -273,13 +300,17 @@ boot
 ```console
 #cloud-config
 scheme_version: 1
-token: SecretToken.123
+token: ${token}
 os:
-  hostname: your-prefix-1
-  password: SecretPassword.123
+  hostname: ${hostname}
+  password: ${password}
   ntp_servers:
-  - 0.suse.pool.ntp.org
-  - 1.suse.pool.ntp.org
+  %{ if harvester_airgapped }
+    - 192.168.122.1
+  %{ else }
+    - 0.suse.pool.ntp.org
+    - 1.suse.pool.ntp.org
+  %{ endif }
 install:
   mode: create
   management_interface:
@@ -291,10 +322,14 @@ install:
       mode: active-backup
       miimon: 100
   device: /dev/vda
-  iso_url: http://192.168.122.1/harvester-v1.4.1-amd64.iso
+  iso_url: http://192.168.122.1/harvester-${version}-amd64.iso
   tty: tty1,115200n8
   vip: 192.168.122.120
   vip_mode: static
+%{ if cluster_registration_url != "" }
+system_settings:
+  cluster-registration-url: ${cluster_registration_url}
+%{ endif }
 ```
 
 - For the second node, it customizes the cloud configuration for joining the cloud and updates the default iPXE boot file.
@@ -480,6 +515,7 @@ sudo sed -i "/certificate-authority-data:/c\\    insecure-skip-tls-verify: true"
 8. Creating additional disks if `data_disk_count` variable is > 1
 
 ```console
+# Creating additional disks if `data_disk_count` variable is > 1
 if [ ${data_disk_count} -gt 1 ]; then
   disk_index=$(( ${count} + 1 ))  # Start indexing additional disks after the default disk
   for i in $(seq 1 ${count}); do
