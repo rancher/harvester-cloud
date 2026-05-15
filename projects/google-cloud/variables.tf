@@ -213,6 +213,12 @@ variable "harvester_airgapped" {
   default     = false
 }
 
+variable "harvester_witness_node" {
+  description = "Specifies whether the Harvester cluster is deployed with one witness node. Setting this variable as 'true' will create a 3 nodes cluster"
+  type        = bool
+  default     = false
+}
+
 variable "harvester_cluster_size" {
   description = "Specifies the size of the Harvester cluster. Allowed values are 'small' (8 CPUs, 32 GB RAM) and 'medium' (16 CPUs, 64 GB RAM). Default is 'small'."
   type        = string
