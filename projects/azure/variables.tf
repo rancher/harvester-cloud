@@ -217,6 +217,16 @@ variable "harvester_airgapped" {
   default     = false
 }
 
+variable "harvester_witness_node" {
+  description = "Specifies whether the Harvester cluster is deployed with one witness node. When set to 'true', the Harvester cluster must be deployed with exactly 3 nodes. Default is 'false'."
+  type        = bool
+  default     = false
+  validation {
+    condition     = !var.harvester_witness_node || var.harvester_node_count == 3
+    error_message = "When harvester_witness_node is set to true, harvester_node_count must be 3."
+  }
+}
+
 variable "harvester_cluster_size" {
   description = "Specifies the size of the Harvester cluster. Allowed values are 'small' (8 CPUs, 32 GB RAM) and 'medium' (16 CPUs, 64 GB RAM). Default is 'small'."
   type        = string

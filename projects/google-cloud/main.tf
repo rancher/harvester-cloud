@@ -101,6 +101,7 @@ resource "local_file" "harvester_startup_script" {
     password                    = var.harvester_password
     harvester_default_disk_size = local.data_disk_size
     harvester_airgapped         = var.harvester_airgapped
+    harvester_witness           = var.harvester_witness_node
   })
   file_permission = "0644"
   filename        = local.harvester_startup_script_file

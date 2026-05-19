@@ -13,6 +13,7 @@ os:
     - 1.suse.pool.ntp.org
   %{ endif }
 install:
+  role: default
   mode: join
   management_interface:
     interfaces:
