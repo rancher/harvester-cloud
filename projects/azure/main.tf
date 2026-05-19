@@ -18,8 +18,7 @@ locals {
   harvester_startup_script_template_file = "../../modules/harvester/deployment-script/harvester_startup_script_sh.tpl"
   harvester_startup_script_file          = "${path.cwd}/harvester_startup_script.sh"
   data_disk_size                         = var.data_disk_size * 0.9
-  harvester_cluster_size                 = local.harvester_node_count == 5 ? "small" : var.harvester_cluster_size
-  harvester_node_count                   = var.harvester_witness_node ? 3 : var.harvester_node_count
+  harvester_cluster_size                 = var.harvester_node_count == 5 ? "small" : var.harvester_cluster_size
   harvester_cpu                          = local.harvester_cluster_size == "small" ? 8 : 16
   harvester_memory                       = local.harvester_cluster_size == "small" ? 32768 : 65536
   ssh_private_key_path                   = var.ssh_private_key_path == null ? "${path.cwd}/${var.prefix}-ssh_private_key.pem" : var.ssh_private_key_path
@@ -28,8 +27,8 @@ locals {
   kubeconfig_file                        = "${path.cwd}/${var.prefix}_kube_config.yml"
   current_public_ip_cidr                 = "${chomp(data.http.my_public_ip_address.response_body)}/32"
   instance_type = (
-    local.harvester_node_count == 1 ? (local.harvester_cluster_size == "small" ? "Standard_D16s_v5" : "Standard_D32s_v5") :
-    local.harvester_node_count == 3 ? (local.harvester_cluster_size == "small" ? "Standard_D32s_v5" : "Standard_D64s_v5") :
+    var.harvester_node_count == 1 ? (local.harvester_cluster_size == "small" ? "Standard_D16s_v5" : "Standard_D32s_v5") :
+    var.harvester_node_count == 3 ? (local.harvester_cluster_size == "small" ? "Standard_D32s_v5" : "Standard_D64s_v5") :
     "Standard_D64s_v5"
   )
 }
@@ -37,7 +36,7 @@ locals {
 resource "local_file" "sles_startup_script_config" {
   content = templatefile("${local.sles_startup_script_template_file}", {
     version             = var.harvester_version
-    count               = local.harvester_node_count * var.data_disk_count
+    count               = var.harvester_node_count * var.data_disk_count
     disk_name           = local.data_disk_name
     mount_point         = local.data_disk_mount_point
     disk_structure      = local.disk_structure
@@ -90,7 +89,7 @@ resource "local_file" "harvester_startup_script" {
   content = templatefile("${local.harvester_startup_script_template_file}", {
     hostname                    = var.prefix
     public_ip                   = module.harvester_node.instances_public_ip[0]
-    count                       = local.harvester_node_count
+    count                       = var.harvester_node_count
     disk_structure              = local.disk_structure
     data_disk_count             = var.data_disk_count
     cpu                         = local.harvester_cpu
@@ -118,7 +117,7 @@ module "harvester_node" {
   instance_type              = local.instance_type
   create_vnet                = var.create_vnet
   spot_instance              = var.spot_instance
-  data_disk_count            = local.harvester_node_count * var.data_disk_count
+  data_disk_count            = var.harvester_node_count * var.data_disk_count
   data_disk_type             = var.data_disk_type
   data_disk_size             = var.data_disk_size
   startup_script             = data.local_file.sles_startup_script.content

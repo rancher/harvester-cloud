@@ -147,9 +147,13 @@ variable "harvester_airgapped" {
 }
 
 variable "harvester_witness_node" {
-  description = "Specifies whether the Harvester cluster is deployed with one witness node. Setting this variable as 'true' will create a 3 nodes cluster"
+  description = "Specifies whether the Harvester cluster is deployed with one witness node. When set to 'true', the Harvester cluster must be deployed with exactly 3 nodes. Default is 'false'."
   type        = bool
   default     = false
+  validation {
+    condition     = !var.harvester_witness_node || var.harvester_node_count == 3
+    error_message = "When harvester_witness_node is set to true, harvester_node_count must be 3."
+  }
 }
 
 variable "harvester_cluster_size" {
