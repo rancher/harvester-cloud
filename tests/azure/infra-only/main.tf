@@ -6,10 +6,11 @@ locals {
 }
 
 module "harvester_node" {
-  source               = "../../../modules/azure/virtual-machine"
-  prefix               = var.prefix
-  region               = local.region
-  ssh_private_key_path = local.ssh_private_key_path
-  ssh_public_key_path  = local.ssh_public_key_path
-  instance_type        = local.instance_type
+  source                     = "../../../modules/azure/virtual-machine"
+  prefix                     = var.prefix
+  region                     = local.region
+  ssh_private_key_path       = local.ssh_private_key_path
+  ssh_public_key_path        = local.ssh_public_key_path
+  instance_type              = local.instance_type
+  public_ip_source_addresses = var.public_ip_source_addresses
 }

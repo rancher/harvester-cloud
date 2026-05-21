@@ -24,6 +24,7 @@ No resources.
 |------|-------------|------|---------|:--------:|
 | <a name="input_prefix"></a> [prefix](#input\_prefix) | Specifies the prefix added to the names of all resources. Default is 'harvcloudinfratest'. | `string` | `"harvcloudinfratest"` | no |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Specifies the Google Project ID that will contain all created resources. Default is 'harvcloudinfratest'. | `string` | `"harvcloudinfratest"` | no |
+| <a name="input_public_ip_source_addresses"></a> [public\_ip\_source\_addresses](#input\_public\_ip\_source\_addresses) | Specifies a list of CIDR blocks allowed to access port 22 (SSH). Default is an empty list (no restrictions defined at variable level). | `list(string)` | `[]` | no |
 
 ## Outputs
 

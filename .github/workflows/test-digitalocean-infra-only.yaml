@@ -16,13 +16,19 @@ jobs:
         uses: hashicorp/setup-terraform@5e8dbf3c6d9deaf4193ca7a8fb23f2ac83bb6c85 # v4.0.0
         with:
           terraform_version: "1.14.6"
+      - name: Get public IP from the GitHub Runner (security purpose)
+        id: get_ip
+        run: |
+          RUNNER_IP=$(curl -s https://api.ipify.org)
+          echo "RUNNER_IP=$RUNNER_IP" >> $GITHUB_ENV
+          echo "Detected GitHub Runner IP: $RUNNER_IP"
       - name: Initialize Terraform
         run: terraform init
         working-directory: tests/digitalocean/infra-only
       - name: Run Terraform apply
         env:
           DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
-        run: terraform apply -var "do_token=$DIGITALOCEAN_TOKEN" -auto-approve
+        run: terraform apply -var "do_token=$DIGITALOCEAN_TOKEN" -var "public_ip_source_addresses=[\"$RUNNER_IP/32\"]" -auto-approve
         working-directory: tests/digitalocean/infra-only
       - name: Get public IP from Terraform output
         id: ip
@@ -49,5 +55,5 @@ jobs:
         if: always()
         env:
           DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
-        run: terraform destroy -var "do_token=$DIGITALOCEAN_TOKEN" -auto-approve
+        run: terraform destroy -var "do_token=$DIGITALOCEAN_TOKEN" -var "public_ip_source_addresses=[\"$RUNNER_IP/32\"]" -auto-approve
         working-directory: tests/digitalocean/infra-only

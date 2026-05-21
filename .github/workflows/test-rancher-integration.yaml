@@ -20,6 +20,12 @@ jobs:
         uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+      - name: Get public IP from the GitHub Runner (security purpose)
+        id: get_ip
+        run: |
+          RUNNER_IP=$(curl -s https://api.ipify.org)
+          echo "RUNNER_IP=$RUNNER_IP" >> $GITHUB_ENV
+          echo "Detected GitHub Runner IP: $RUNNER_IP"
       - name: Initialize Terraform (Rancher - tf-rancher-up project)
         run: terraform init
         working-directory: tf-rancher-up/recipes/upstream/google-cloud/rke2
@@ -31,6 +37,7 @@ jobs:
           terraform apply -auto-approve \
             -var "prefix=rancher-harv-integration-wf" \
             -var "project_id=$PROJECT_ID" \
+            -var "region=europe-west3" \
             -var "rancher_password=$RANCHER_PASSWORD"
         working-directory: tf-rancher-up/recipes/upstream/google-cloud/rke2
       - name: Get Rancher endpoint from Terraform output
@@ -136,6 +143,7 @@ jobs:
           terraform apply -auto-approve \
             -var "prefix=harv-rancher-integration-wf" \
             -var "project_id=$GCP_PROJECT_ID" \
+            -var "public_ip_source_addresses=[\"$RUNNER_IP/32\"]" \
             -var "rancher_api_url=$RANCHER_URL" \
             -var "rancher_access_key=$RANCHER_CI_TOKEN_ACCESS_KEY" \
             -var "rancher_secret_key=$RANCHER_CI_TOKEN_SECRET_KEY" \
@@ -213,6 +221,7 @@ jobs:
           terraform destroy -auto-approve \
             -var "prefix=harv-rancher-integration-wf" \
             -var "project_id=$GCP_PROJECT_ID" \
+            -var "public_ip_source_addresses=[\"$RUNNER_IP/32\"]" \
             -var "rancher_api_url=$RANCHER_URL" \
             -var "rancher_access_key=$RANCHER_CI_TOKEN_ACCESS_KEY" \
             -var "rancher_secret_key=$RANCHER_CI_TOKEN_SECRET_KEY" \
