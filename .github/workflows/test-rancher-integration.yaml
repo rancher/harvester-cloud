@@ -37,6 +37,7 @@ jobs:
           terraform apply -auto-approve \
             -var "prefix=rancher-harv-integration-wf" \
             -var "project_id=$PROJECT_ID" \
+            -var "region=europe-west3" \
             -var "rancher_password=$RANCHER_PASSWORD"
         working-directory: tf-rancher-up/recipes/upstream/google-cloud/rke2
       - name: Get Rancher endpoint from Terraform output
