@@ -22,11 +22,17 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
+      - name: Get public IP from the GitHub Runner (security purpose)
+        id: get_ip
+        run: |
+          RUNNER_IP=$(curl -s https://api.ipify.org)
+          echo "RUNNER_IP=$RUNNER_IP" >> $GITHUB_ENV
+          echo "Detected GitHub Runner IP: $RUNNER_IP"
       - name: Initialize Terraform
         run: terraform init
         working-directory: tests/aws/infra-only
       - name: Run Terraform apply
-        run: terraform apply -auto-approve
+        run: terraform apply -var "public_ip_source_addresses=[\"$RUNNER_IP/32\"]" -auto-approve
         working-directory: tests/aws/infra-only
       - name: Get public IP from Terraform output
         id: ip
@@ -51,5 +57,5 @@ jobs:
           INSTANCE_IP: ${{ env.INSTANCE_IP }}
       - name: Run Terraform Destroy
         if: always()
-        run: terraform destroy -auto-approve
+        run: terraform destroy -var "public_ip_source_addresses=[\"$RUNNER_IP/32\"]" -auto-approve
         working-directory: tests/aws/infra-only
