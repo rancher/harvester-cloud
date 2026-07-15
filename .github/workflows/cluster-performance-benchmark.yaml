@@ -1,0 +1,414 @@
+name: Harvester cluster performance benchmark
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+env:
+  PREFIX: harv-benchmark-wf
+  HARVESTER_PASSWORD: harvester
+
+jobs:
+  cluster-performance-benchmark:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: feature/issue-140
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@5e8dbf3c6d9deaf4193ca7a8fb23f2ac83bb6c85 # v4.0.0
+        with:
+          terraform_version: "1.14.6"
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+      - name: Get public IP from GitHub Runner
+        run: |
+          RUNNER_IP=$(curl -s https://api.ipify.org)
+          echo "RUNNER_IP=$RUNNER_IP" >> "$GITHUB_ENV"
+          echo "Runner IP: $RUNNER_IP"
+      - name: Terraform Init
+        run: terraform init
+        working-directory: projects/google-cloud
+      - name: Terraform Apply
+        env:
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        run: |
+          terraform apply -auto-approve \
+            -var "prefix=${PREFIX}" \
+            -var "project_id=${GCP_PROJECT_ID}" \
+            -var "harvester_node_count=3" \
+            -var "harvester_password=${HARVESTER_PASSWORD}" \
+            -var "public_ip_source_addresses=[\"${RUNNER_IP}/32\"]"
+        working-directory: projects/google-cloud
+      - name: Get first instance public IP
+        run: |
+          INSTANCE_IP=$(terraform output -json first_instance_public_ip | jq -r '.[0]')
+          echo "INSTANCE_IP=$INSTANCE_IP" >> "$GITHUB_ENV"
+          echo "INSTANCE_IP=$INSTANCE_IP"
+        working-directory: projects/google-cloud
+      - name: Wait for SSH
+        run: |
+          echo "Waiting for SSH on ${INSTANCE_IP}..."
+
+          for i in {1..30}; do
+            if nc -z "${INSTANCE_IP}" 22; then
+              echo "SSH available."
+              exit 0
+            fi
+
+            echo "Attempt ${i}/30..."
+            sleep 10
+          done
+
+          echo "SSH never became available."
+          exit 1
+      - name: Discover nested Harvester VMs
+        working-directory: projects/google-cloud
+        run: |
+          set -euo pipefail
+
+          KEY_FILE="${PREFIX}-ssh_private_key.pem"
+
+          ssh \
+            -o StrictHostKeyChecking=no \
+            -i "${KEY_FILE}" \
+            opensuse@"${INSTANCE_IP}" <<'EOF'
+
+          set -euo pipefail
+
+          EXPECTED_NODES=3
+          MAX_ATTEMPTS=60
+
+          get_vm_ip() {
+
+            local vm="$1"
+            local mac
+            local ip
+
+            mac=$(sudo virsh domiflist "$vm" \
+              | awk '/virtio/ {print $5}')
+
+            ip=$(sudo virsh net-dhcp-leases vlan1 \
+              | awk -v mac="$mac" '
+                  BEGIN { IGNORECASE=1 }
+                  $2 == mac {
+                    split($4,a,"/")
+                    print a[1]
+                  }')
+
+            if [ -z "$ip" ]; then
+              ip=$(ip neigh \
+                | awk -v mac="$mac" '
+                    BEGIN { IGNORECASE=1 }
+                    tolower($5)==tolower(mac) {
+                      print $1
+                      exit
+                    }')
+            fi
+
+            echo "$ip"
+          }
+
+          echo "Waiting for ${EXPECTED_NODES} Harvester VM(s)..."
+
+          #
+          # Wait until all VMs exist
+          #
+          for ((attempt=1; attempt<=MAX_ATTEMPTS; attempt++)); do
+
+            mapfile -t VMS < <(
+              sudo virsh list --name | grep '^harvester-node-' || true
+            )
+
+            if [ "${#VMS[@]}" -eq "${EXPECTED_NODES}" ]; then
+              echo "Found ${EXPECTED_NODES} Harvester VM(s)."
+              break
+            fi
+
+            echo "Attempt ${attempt}/${MAX_ATTEMPTS}: found ${#VMS[@]} VM(s). Waiting..."
+            sleep 10
+
+          done
+
+          if [ "${#VMS[@]}" -ne "${EXPECTED_NODES}" ]; then
+            echo "Timed out waiting for Harvester VMs."
+            sudo virsh list --all
+            exit 1
+          fi
+
+          echo ""
+          echo "Waiting for all VMs to obtain an IP address..."
+
+          #
+          # Wait until every VM has an IP
+          #
+          for ((attempt=1; attempt<=MAX_ATTEMPTS; attempt++)); do
+
+            READY=0
+
+            for VM in "${VMS[@]}"; do
+
+              IP=$(get_vm_ip "${VM}")
+
+              if [ -n "${IP}" ]; then
+                READY=$((READY + 1))
+              fi
+
+            done
+
+            if [ "${READY}" -eq "${EXPECTED_NODES}" ]; then
+              echo "All Harvester VM(s) have an IP."
+              break
+            fi
+
+            echo "Attempt ${attempt}/${MAX_ATTEMPTS}: ${READY}/${EXPECTED_NODES} ready."
+            sleep 10
+
+          done
+
+          if [ "${READY}" -ne "${EXPECTED_NODES}" ]; then
+            echo "Timed out waiting for Harvester VM IP addresses."
+            exit 1
+          fi
+
+          echo ""
+          echo "==== Harvester nodes ===="
+
+          : > /tmp/nodes.txt
+
+          for VM in "${VMS[@]}"; do
+
+            IP=$(get_vm_ip "${VM}")
+
+            echo "${VM} -> ${IP}"
+
+            echo "${VM} ${IP}" >> /tmp/nodes.txt
+
+          done
+
+          echo ""
+          echo "Saved node mapping:"
+          cat /tmp/nodes.txt
+
+          EOF
+      - name: Copy benchmark script to host
+        working-directory: projects/google-cloud
+        run: |
+          set -euo pipefail
+
+          KEY_FILE="${PREFIX}-ssh_private_key.pem"
+
+          scp \
+            -o StrictHostKeyChecking=no \
+            -i "${KEY_FILE}" \
+            ../../tests/performance-analysis/benchmarks.sh \
+            opensuse@"${INSTANCE_IP}":/tmp/benchmarks.sh
+#      - name: Run benchmark on nested Harvester VMs
+#        working-directory: projects/google-cloud
+#        run: |
+#          set -euo pipefail
+#
+#          KEY_FILE="${PREFIX}-ssh_private_key.pem"
+#
+#          ssh \
+#            -o StrictHostKeyChecking=no \
+#            -i "${KEY_FILE}" \
+#            opensuse@"${INSTANCE_IP}" \
+#            HARVESTER_PASSWORD="${HARVESTER_PASSWORD}" bash -s <<'EOF'
+#
+#          set -euo pipefail
+#
+#          echo "Running benchmarks using precomputed node list..."
+#
+#          mkdir -p /tmp/benchmark-results
+#
+#          if [ ! -f /tmp/nodes.txt ]; then
+#            echo "nodes.txt not found! Aborting."
+#            exit 1
+#          fi
+#
+#          while read -r VM IP; do
+#
+#            echo ""
+#            echo "=============================="
+#            echo "VM: $VM -> $IP"
+#            echo "=============================="
+#
+#            sshpass -p "${HARVESTER_PASSWORD}" \
+#              ssh \
+#                -o StrictHostKeyChecking=no \
+#                rancher@"${IP}" \
+#                'cat >/tmp/benchmarks.sh && chmod +x /tmp/benchmarks.sh' \
+#                < /tmp/benchmarks.sh
+#
+#            sshpass -p "${HARVESTER_PASSWORD}" \
+#              ssh \
+#                -o StrictHostKeyChecking=no \
+#                rancher@"${IP}" \
+#                "sudo /tmp/benchmarks.sh" \
+#                | tee "/tmp/benchmark-results/${VM}.log"
+#
+#          done < /tmp/nodes.txt
+#
+#          EOF
+      - name: Run benchmark on nested Harvester VMs
+        working-directory: projects/google-cloud
+        run: |
+          set -euo pipefail
+
+          KEY_FILE="${PREFIX}-ssh_private_key.pem"
+
+          ssh \
+            -o StrictHostKeyChecking=no \
+            -i "${KEY_FILE}" \
+            opensuse@"${INSTANCE_IP}" \
+            HARVESTER_PASSWORD="${HARVESTER_PASSWORD}" bash -s <<'EOF'
+
+          set -euo pipefail
+
+          echo "Running benchmarks using precomputed node list..."
+
+          mkdir -p /tmp/benchmark-results
+
+          if [ ! -f /tmp/nodes.txt ]; then
+            echo "nodes.txt not found! Aborting."
+            exit 1
+          fi
+
+          mapfile -t NODES < /tmp/nodes.txt
+
+          for NODE in "${NODES[@]}"; do
+
+            read -r VM IP <<< "${NODE}"
+
+            echo ""
+            echo "=============================="
+            echo "VM: ${VM} -> ${IP}"
+            echo "=============================="
+
+            echo "Copying benchmark script..."
+
+            sshpass -p "${HARVESTER_PASSWORD}" \
+              ssh \
+                -o StrictHostKeyChecking=no \
+                rancher@"${IP}" \
+                'cat >/tmp/benchmarks.sh && chmod +x /tmp/benchmarks.sh' \
+                < /tmp/benchmarks.sh
+
+            echo "Running benchmark..."
+
+            sshpass -p "${HARVESTER_PASSWORD}" \
+              ssh \
+                -n \
+                -o StrictHostKeyChecking=no \
+                rancher@"${IP}" \
+                "sudo /tmp/benchmarks.sh" \
+                | tee "/tmp/benchmark-results/${VM}.log"
+
+            echo "Benchmark completed on ${VM}"
+
+          done
+
+          echo ""
+          echo "All benchmarks completed."
+
+          EOF
+      - name: Collect benchmark results
+        working-directory: projects/google-cloud
+        run: |
+          set -euo pipefail
+
+          KEY_FILE="${PREFIX}-ssh_private_key.pem"
+
+          mkdir -p benchmark-results
+
+          scp \
+            -o StrictHostKeyChecking=no \
+            -i "${KEY_FILE}" \
+            -r \
+            opensuse@"${INSTANCE_IP}":/tmp/benchmark-results/. \
+            benchmark-results/
+
+          echo "Contents:"
+          find .
+          echo ""
+          find benchmark-results
+          echo ""
+          ls -lah benchmark-results
+      - name: Build Gemini prompt
+        working-directory: projects/google-cloud
+        run: |
+          cp ../../tests/performance-analysis/ai_prompt.md prompt.md
+
+          echo "" >> prompt.md
+          echo "---" >> prompt.md
+          echo "# Benchmark results" >> prompt.md
+          echo "" >> prompt.md
+
+          for f in benchmark-results/*.log; do
+            echo "## $(basename "$f")" >> prompt.md
+            cat "$f" >> prompt.md
+            echo "" >> prompt.md
+          done
+          cat prompt.md
+      - name: Analyze benchmark with Gemini
+        id: gemini_analysis
+        working-directory: projects/google-cloud
+        run: |
+          jq -n \
+            --rawfile prompt prompt.md \
+            '{
+              contents: [
+                {
+                  parts: [
+                    {
+                      text: $prompt
+                    }
+                  ]
+                }
+              ]
+            }' > request.json
+
+          RESPONSE=$(curl -s \
+            -X POST \
+            -H "Content-Type: application/json" \
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${{ secrets.GEMINI_API_KEY }}" \
+            -d @request.json)
+
+          echo "$RESPONSE" > gemini_response.json
+
+          OUTPUT=$(jq -r '.candidates[0].content.parts[0].text // empty' gemini_response.json)
+
+          if [ -z "$OUTPUT" ]; then
+            echo "ERROR: Empty response from Gemini"
+            cat gemini_response.json
+            exit 1
+          fi
+
+          {
+            echo "output<<EOF"
+            echo "$OUTPUT"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+      - name: Publish benchmark report
+        if: always()
+        run: |
+          echo "## Harvester Cluster Performance Report" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "${{ steps.gemini_analysis.outputs.output }}" >> "$GITHUB_STEP_SUMMARY"
+      - name: Terraform Destroy
+        if: always()
+        env:
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        run: |
+          terraform destroy -auto-approve \
+            -var "prefix=${PREFIX}" \
+            -var "project_id=${GCP_PROJECT_ID}" \
+            -var "harvester_node_count=3" \
+            -var "harvester_password=${HARVESTER_PASSWORD}" \
+            -var "public_ip_source_addresses=[\"${RUNNER_IP}/32\"]"
+        working-directory: projects/google-cloud
