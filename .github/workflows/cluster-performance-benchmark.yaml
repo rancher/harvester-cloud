@@ -114,9 +114,7 @@ jobs:
 
           echo "Waiting for ${EXPECTED_NODES} Harvester VM(s)..."
 
-          #
           # Wait until all VMs exist
-          #
           for ((attempt=1; attempt<=MAX_ATTEMPTS; attempt++)); do
 
             mapfile -t VMS < <(
@@ -142,9 +140,7 @@ jobs:
           echo ""
           echo "Waiting for all VMs to obtain an IP address..."
 
-          #
           # Wait until every VM has an IP
-          #
           for ((attempt=1; attempt<=MAX_ATTEMPTS; attempt++)); do
 
             READY=0
@@ -206,54 +202,6 @@ jobs:
             -i "${KEY_FILE}" \
             ../../tests/performance-analysis/benchmarks.sh \
             opensuse@"${INSTANCE_IP}":/tmp/benchmarks.sh
-#      - name: Run benchmark on nested Harvester VMs
-#        working-directory: projects/google-cloud
-#        run: |
-#          set -euo pipefail
-#
-#          KEY_FILE="${PREFIX}-ssh_private_key.pem"
-#
-#          ssh \
-#            -o StrictHostKeyChecking=no \
-#            -i "${KEY_FILE}" \
-#            opensuse@"${INSTANCE_IP}" \
-#            HARVESTER_PASSWORD="${HARVESTER_PASSWORD}" bash -s <<'EOF'
-#
-#          set -euo pipefail
-#
-#          echo "Running benchmarks using precomputed node list..."
-#
-#          mkdir -p /tmp/benchmark-results
-#
-#          if [ ! -f /tmp/nodes.txt ]; then
-#            echo "nodes.txt not found! Aborting."
-#            exit 1
-#          fi
-#
-#          while read -r VM IP; do
-#
-#            echo ""
-#            echo "=============================="
-#            echo "VM: $VM -> $IP"
-#            echo "=============================="
-#
-#            sshpass -p "${HARVESTER_PASSWORD}" \
-#              ssh \
-#                -o StrictHostKeyChecking=no \
-#                rancher@"${IP}" \
-#                'cat >/tmp/benchmarks.sh && chmod +x /tmp/benchmarks.sh' \
-#                < /tmp/benchmarks.sh
-#
-#            sshpass -p "${HARVESTER_PASSWORD}" \
-#              ssh \
-#                -o StrictHostKeyChecking=no \
-#                rancher@"${IP}" \
-#                "sudo /tmp/benchmarks.sh" \
-#                | tee "/tmp/benchmark-results/${VM}.log"
-#
-#          done < /tmp/nodes.txt
-#
-#          EOF
       - name: Run benchmark on nested Harvester VMs
         working-directory: projects/google-cloud
         run: |
