@@ -102,7 +102,7 @@ HARVESTER_v1_8_1_ROOTFS_SUM_amd64="8418fb5a3b72a37c9862a78dcf17e787ab89a74fcd040
 HARVESTER_v1_8_1_ISO_SUM_amd64="b1950e7d0543b813711e1b5006eafe1bb042cc3625449180a987a21d31bc70de9111df270b7911fafbfbd53a86b834f7f8f3fbfcd2ad81ee86fa2d9f1bd8a5a0"
 
 # Download the files needed to start the nested VM
-sudo curl -L -o /etc/nginx/nginx.conf \i
+sudo curl -L -o /etc/nginx/nginx.conf \
     https://raw.githubusercontent.com/rancher/harvester-cloud/refs/heads/main/modules/harvester/deployment-script/nginx_conf.tpl
 echo "$${NGINX_CONF_SUM}  /etc/nginx/nginx.conf" | sha512sum -c -
 sudo curl -L -o /srv/www/harvester/vlan1.xml \
