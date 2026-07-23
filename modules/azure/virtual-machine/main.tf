@@ -86,12 +86,11 @@ resource "null_resource" "download_certified_vhd" {
 }
 
 resource "azurerm_storage_blob" "harvester_vhd" {
-  depends_on             = [null_resource.download_certified_vhd]
-  name                   = "harvestercloudcertified.vhd"
-  storage_account_name   = azurerm_storage_account.vhd.name
-  storage_container_name = azurerm_storage_container.vhds.name
-  type                   = "Page"
-  source                 = "${path.cwd}/${local.certified_image_name}"
+  depends_on           = [null_resource.download_certified_vhd]
+  name                 = "harvestercloudcertified.vhd"
+  storage_container_id = azurerm_storage_container.vhds.id
+  type                 = "Page"
+  source               = "${path.cwd}/${local.certified_image_name}"
 }
 
 resource "null_resource" "wait_blob_accessible" {
