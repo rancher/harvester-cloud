@@ -80,27 +80,12 @@ jobs:
             ALL_TITLES="$ALL_TITLES"$'\n'"$TITLES"
           done
 
-          # Clean leading semicolon
-          ALL_TITLES=$(echo "$ALL_TITLES" | sed '/^$/d' | tr '\n' ' ' | sed 's/  */ /g')
-
-          {
-            echo "LAST_ISSUE_TITLES<<EOF"
-            echo "$ALL_TITLES"
-            echo "EOF"
-          } >> $GITHUB_ENV
-      # Load issue data into environment variable for Gemini
-      - name: Load Issue Data to Env
-        run: |
-          {
-            echo 'ISSUE_DATA<<EOF'
-            cat issue_data.txt
-            echo EOF
-          } >> "$GITHUB_ENV"
+          echo "$ALL_TITLES" | sed '/^$/d' > recent_titles.txt
       # Run Gemini directly via API
       - name: Analyze with Gemini
         id: gemini_analysis
         run: |
-          cat > prompt.txt <<'EOF'
+          cat > prompt_template.txt <<'EOF'
           You are analyzing a GitHub issue in the context of the harvester-cloud project.
 
           About the project:
@@ -135,15 +120,15 @@ jobs:
 
           Issue data:
           ---
-          ${{ env.ISSUE_DATA }}
-
-          Other issue titles in repo:
-          ---
-          ${{ env.LAST_ISSUE_TITLES }}
           EOF
 
+          # Secure prompt composition by combining templates, issue data, and titles.
+          cat prompt_template.txt issue_data.txt > full_prompt.txt
+          echo -e "\nOther issue titles in repo:\n---" >> full_prompt.txt
+          cat recent_titles.txt >> full_prompt.txt
+
           jq -n \
-            --rawfile prompt prompt.txt \
+            --rawfile prompt full_prompt.txt \
             '{
               contents: [
                 {
@@ -180,7 +165,9 @@ jobs:
       # Publish Gemini report to workflow summary
       - name: Publish Report
         if: always()
+        env:
+          REPORT: ${{ steps.gemini_analysis.outputs.output }}
         run: |
           echo "## Gemini Idea Analysis Report" >> "$GITHUB_STEP_SUMMARY"
           echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "${{ steps.gemini_analysis.outputs.output }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "$REPORT" >> "$GITHUB_STEP_SUMMARY"
