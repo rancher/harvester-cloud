@@ -2,7 +2,7 @@
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_digitalocean"></a> [digitalocean](#requirement\_digitalocean) | 2.59.0 |
+| <a name="requirement_digitalocean"></a> [digitalocean](#requirement\_digitalocean) | 2.95.0 |
 
 ## Providers
 
