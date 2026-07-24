@@ -2,7 +2,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "6.42.0"
+      version = "6.56.0"
     }
     ssh = {
       source  = "loafoe/ssh"
@@ -10,19 +10,19 @@ terraform {
     }
     http = {
       source  = "hashicorp/http"
-      version = "3.5.0"
+      version = "3.6.0"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
-      version = "3.1.0"
+      version = "3.2.1"
     }
     helm = {
       source  = "hashicorp/helm"
-      version = "3.1.1"
+      version = "3.2.0"
     }
     rancher2 = {
       source  = "rancher/rancher2"
-      version = "14.1.0"
+      version = "14.1.1"
     }
   }
 }

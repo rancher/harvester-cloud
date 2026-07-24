@@ -5,9 +5,9 @@ variable "create_image" {
 }
 
 variable "image_name" {
-  description = "Specifies the name of the Harvester image to be created. Default is 'opensuse-leap-15-6'."
+  description = "Specifies the name of the Harvester image to be created. Default is 'opensuse-leap-16-0'."
   type        = string
-  default     = "opensuse-leap-15-6"
+  default     = "opensuse-leap-16-0"
 }
 
 variable "image_namespace" {
@@ -23,9 +23,9 @@ variable "image_source_type" {
 }
 
 variable "image_url" {
-  description = "Specifies the URL used to download the Harvester image. Default is 'https://download.opensuse.org/distribution/leap/15.6/appliances/openSUSE-Leap-15.6-Minimal-VM.x86_64-Cloud.qcow2'."
+  description = "Specifies the URL used to download the Harvester image. Default is 'https://download.opensuse.org/distribution/leap/16.0/appliances/openSUSE-Leap-16.0-Minimal-VM.x86_64-Cloud.qcow2'."
   type        = string
-  default     = "https://download.opensuse.org/distribution/leap/15.6/appliances/openSUSE-Leap-15.6-Minimal-VM.x86_64-Cloud.qcow2"
+  default     = "https://download.opensuse.org/distribution/openSUSE-current/appliances/Leap-16.0-Minimal-VM.x86_64-Cloud.qcow2"
 }
 
 variable "harvester_url" {
