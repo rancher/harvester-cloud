@@ -61,9 +61,9 @@ variable "image_namespace" {
 }
 
 variable "image_name" {
-  description = "Specifies the OS image name. Default is 'opensuse-leap-15-6'."
+  description = "Specifies the OS image name. Default is 'opensuse-leap-16-0'."
   type        = string
-  default     = "opensuse-leap-15-6"
+  default     = "opensuse-leap-16-0"
 }
 
 variable "os_disk_size" {

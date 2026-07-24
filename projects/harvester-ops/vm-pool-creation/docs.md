@@ -2,7 +2,7 @@
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_harvester"></a> [harvester](#requirement\_harvester) | 1.8.0 |
+| <a name="requirement_harvester"></a> [harvester](#requirement\_harvester) | 1.8.1 |
 | <a name="requirement_ssh"></a> [ssh](#requirement\_ssh) | 2.7.0 |
 
 ## Providers
@@ -26,7 +26,7 @@ No resources.
 | <a name="input_cpu"></a> [cpu](#input\_cpu) | Specifies the number of CPU cores allocated to each VM. Default is '2'. | `number` | `2` | no |
 | <a name="input_data_disk_size"></a> [data\_disk\_size](#input\_data\_disk\_size) | Specifies the size of the data disk attached to each VM, in GB. Default is '25'. | `number` | `25` | no |
 | <a name="input_harvester_url"></a> [harvester\_url](#input\_harvester\_url) | Specifies the URL of the Harvester cluster API. | `string` | n/a | yes |
-| <a name="input_image_name"></a> [image\_name](#input\_image\_name) | Specifies the OS image name. Default is 'opensuse-leap-15-6'. | `string` | `"opensuse-leap-15-6"` | no |
+| <a name="input_image_name"></a> [image\_name](#input\_image\_name) | Specifies the OS image name. Default is 'opensuse-leap-16-0'. | `string` | `"opensuse-leap-16-0"` | no |
 | <a name="input_image_namespace"></a> [image\_namespace](#input\_image\_namespace) | Specifies the namespace in which the Harvester image was created. Default is 'default'. | `string` | `"default"` | no |
 | <a name="input_kubeconfig_file_name"></a> [kubeconfig\_file\_name](#input\_kubeconfig\_file\_name) | Specifies the name of the Kubeconfig file used to access the Harvester cluster. | `string` | n/a | yes |
 | <a name="input_kubeconfig_file_path"></a> [kubeconfig\_file\_path](#input\_kubeconfig\_file\_path) | Specifies the full path where the Kubeconfig file is located. | `string` | n/a | yes |

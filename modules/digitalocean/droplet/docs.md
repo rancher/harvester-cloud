@@ -2,13 +2,13 @@
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_digitalocean"></a> [digitalocean](#requirement\_digitalocean) | ~> 2.0 |
+| <a name="requirement_digitalocean"></a> [digitalocean](#requirement\_digitalocean) | 2.95.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_digitalocean"></a> [digitalocean](#provider\_digitalocean) | ~> 2.0 |
+| <a name="provider_digitalocean"></a> [digitalocean](#provider\_digitalocean) | 2.95.0 |
 | <a name="provider_local"></a> [local](#provider\_local) | n/a |
 | <a name="provider_null"></a> [null](#provider\_null) | n/a |
 | <a name="provider_tls"></a> [tls](#provider\_tls) | n/a |
@@ -21,12 +21,12 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [digitalocean_custom_image.upload_certified_image](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/custom_image) | resource |
-| [digitalocean_droplet.nodes](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/droplet) | resource |
-| [digitalocean_firewall.harvester_firewall](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/firewall) | resource |
-| [digitalocean_ssh_key.do_pub_created_ssh](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/ssh_key) | resource |
-| [digitalocean_volume.data_disk](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/volume) | resource |
-| [digitalocean_volume_attachment.data_disk_attachment](https://registry.terraform.io/providers/digitalocean/digitalocean/latest/docs/resources/volume_attachment) | resource |
+| [digitalocean_custom_image.upload_certified_image](https://registry.terraform.io/providers/digitalocean/digitalocean/2.95.0/docs/resources/custom_image) | resource |
+| [digitalocean_droplet.nodes](https://registry.terraform.io/providers/digitalocean/digitalocean/2.95.0/docs/resources/droplet) | resource |
+| [digitalocean_firewall.harvester_firewall](https://registry.terraform.io/providers/digitalocean/digitalocean/2.95.0/docs/resources/firewall) | resource |
+| [digitalocean_ssh_key.do_pub_created_ssh](https://registry.terraform.io/providers/digitalocean/digitalocean/2.95.0/docs/resources/ssh_key) | resource |
+| [digitalocean_volume.data_disk](https://registry.terraform.io/providers/digitalocean/digitalocean/2.95.0/docs/resources/volume) | resource |
+| [digitalocean_volume_attachment.data_disk_attachment](https://registry.terraform.io/providers/digitalocean/digitalocean/2.95.0/docs/resources/volume_attachment) | resource |
 | [local_file.private_key_pem](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
 | [local_file.public_key_pem](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
 | [null_resource.download_image](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |

@@ -2,13 +2,13 @@
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_harvester"></a> [harvester](#requirement\_harvester) | 1.8.0 |
+| <a name="requirement_harvester"></a> [harvester](#requirement\_harvester) | 1.8.1 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_harvester"></a> [harvester](#provider\_harvester) | 1.8.0 |
+| <a name="provider_harvester"></a> [harvester](#provider\_harvester) | 1.8.1 |
 
 ## Modules
 
@@ -18,10 +18,10 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [harvester_clusternetwork.vlan](https://registry.terraform.io/providers/harvester/harvester/1.8.0/docs/resources/clusternetwork) | resource |
-| [harvester_network.cluster_vlan](https://registry.terraform.io/providers/harvester/harvester/1.8.0/docs/resources/network) | resource |
-| [harvester_vlanconfig.cluster_vlan_allnodes](https://registry.terraform.io/providers/harvester/harvester/1.8.0/docs/resources/vlanconfig) | resource |
-| [harvester_clusternetwork.vlan](https://registry.terraform.io/providers/harvester/harvester/1.8.0/docs/data-sources/clusternetwork) | data source |
+| [harvester_clusternetwork.vlan](https://registry.terraform.io/providers/harvester/harvester/1.8.1/docs/resources/clusternetwork) | resource |
+| [harvester_network.cluster_vlan](https://registry.terraform.io/providers/harvester/harvester/1.8.1/docs/resources/network) | resource |
+| [harvester_vlanconfig.cluster_vlan_allnodes](https://registry.terraform.io/providers/harvester/harvester/1.8.1/docs/resources/vlanconfig) | resource |
+| [harvester_clusternetwork.vlan](https://registry.terraform.io/providers/harvester/harvester/1.8.1/docs/data-sources/clusternetwork) | data source |
 
 ## Inputs
 
