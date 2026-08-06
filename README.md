@@ -39,6 +39,7 @@ The `projects/` directory combines modules to create different deployment recipe
 - [How to Configure an iSCSI Disk in a Harvester Cluster](https://github.com/rancher/harvester-cloud/blob/main/docs/ISCS_DISK_SETUP.md)
 - [How to build locally the certified openSUSE Leap 15.6 image for harvester-cloud](https://github.com/rancher/harvester-cloud/blob/main/docs/KIWI_OS_IMAGE_BUILDER.md)
 - [How to access the Harvester nodes’ serial console through a browser](https://github.com/rancher/harvester-cloud/blob/main/docs/HARVESTER_NODES_SERIAL_CONSOLE.md)
+- [How to delete a Harvester node and join a new one to an existing cluster](https://github.com/rancher/harvester-cloud/blob/main/docs/REPLACE_HARVESTER_NODE.md)
 
 ## How to get started with the various projects
 
