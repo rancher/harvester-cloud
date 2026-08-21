@@ -109,7 +109,7 @@ variable "spot_instance" {
 }
 
 variable "os_disk_type" {
-  description = "Specifies the type of the disk attached to each node (e.g., 'pd-standard', 'pd-ssd', or 'pd-balanced', or 'hyperdisk-balanced'). Default is 'hyperdisk-balanced'."
+  description = "Specifies the type of the disk attached to each node (e.g., 'pd-standard', 'pd-ssd', 'pd-balanced', or 'hyperdisk-balanced'). Default is 'hyperdisk-balanced'."
   type        = string
   default     = "hyperdisk-balanced"
 }
@@ -121,7 +121,7 @@ variable "os_disk_size" {
 }
 
 variable "instance_type" {
-  description = "Specifies the name of a Google Compute Engine machine type. Default is 'n2-standard-16'."
+  description = "Specifies the name of a Google Compute Engine machine type. Default is 'n4-standard-16'."
   type        = string
   default     = "n4-standard-16"
 }
@@ -133,7 +133,7 @@ variable "data_disk_count" {
 }
 
 variable "data_disk_type" {
-  description = "Specifies the type of the disks attached to each node (e.g., 'pd-standard', 'pd-ssd', or 'pd-balanced' , or 'hyperdisk-balanced'). Default is 'hyperdisk-balanced'."
+  description = "Specifies the type of the disks attached to each node (e.g., 'pd-standard', 'pd-ssd', 'pd-balanced', or 'hyperdisk-balanced'). Default is 'hyperdisk-balanced'."
   type        = string
   default     = "hyperdisk-balanced"
 }
@@ -145,13 +145,13 @@ variable "data_disk_size" {
 }
 
 variable "data_disk_provisioned_iops" {
-  description = "Specifies the provisioned IOPS for the data disks. Only applicable for hyperdisk types."
+  description = "Specifies the provisioned IOPS for the data disks. Only applicable for hyperdisk types. Default is '50000'."
   type        = number
   default     = 50000
 }
 
 variable "data_disk_provisioned_throughput" {
-  description = "Specifies the provisioned throughput for the data disks in MB/s. Only applicable for hyperdisk types."
+  description = "Specifies the provisioned throughput for the data disks in MB/s. Only applicable for hyperdisk types. Default is '1200'."
   type        = number
   default     = 1200
 }

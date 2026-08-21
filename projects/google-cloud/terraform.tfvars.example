@@ -34,7 +34,7 @@ create_firewall = true
 ## -- Specifies whether the instances should be Spot (preemptible) VMs.
 spot_instance = true
 
-## -- Specifies the type of the disks attached to each node (e.g., 'pd-standard', 'pd-ssd', 'pd-balanced', or 'hyperdisk-balanced'). Default is 'hyperdisk-balanced'
+## -- Specifies the type of the disks attached to each node (e.g., 'pd-standard', 'pd-ssd', 'pd-balanced', or 'hyperdisk-balanced').
 os_disk_type = "hyperdisk-balanced"
 
 ## -- Specifies the size of the disk attached to each node, in GB.
@@ -43,7 +43,7 @@ os_disk_size = 50
 ## -- Specifies the number of additional data disks to attach to each VM instance.
 data_disk_count = 1
 
-## -- Specifies the type of the disks attached to each node (e.g., 'pd-standard', 'pd-ssd', 'pd-balanced', or 'hyperdisk-balanced'). Default is 'hyperdisk-balanced'
+## -- Specifies the type of the disks attached to each node (e.g., 'pd-standard', 'pd-ssd', 'pd-balanced', or 'hyperdisk-balanced').
 data_disk_type = "hyperdisk-balanced"
 
 ## -- Specifies the size of the additional data disks for each VM instance, in GB.

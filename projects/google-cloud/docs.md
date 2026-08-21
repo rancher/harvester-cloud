@@ -14,8 +14,8 @@
 | Name | Version |
 |------|---------|
 | <a name="provider_http"></a> [http](#provider\_http) | 3.6.0 |
-| <a name="provider_local"></a> [local](#provider\_local) | 2.9.0 |
-| <a name="provider_null"></a> [null](#provider\_null) | 3.3.1 |
+| <a name="provider_local"></a> [local](#provider\_local) | n/a |
+| <a name="provider_null"></a> [null](#provider\_null) | n/a |
 | <a name="provider_rancher2"></a> [rancher2](#provider\_rancher2) | 14.1.1 |
 | <a name="provider_ssh"></a> [ssh](#provider\_ssh) | 2.7.0 |
 
@@ -63,7 +63,7 @@
 | <a name="input_harvester_witness_node"></a> [harvester\_witness\_node](#input\_harvester\_witness\_node) | Specifies whether the Harvester cluster is deployed with one witness node. When set to 'true', the Harvester cluster must be deployed with exactly 3 nodes. Default is 'false'. | `bool` | `false` | no |
 | <a name="input_ip_cidr_range"></a> [ip\_cidr\_range](#input\_ip\_cidr\_range) | Specifies the range of private IPs available for the Google Subnet. Default is '10.10.0.0/24'. | `string` | `"10.10.0.0/24"` | no |
 | <a name="input_os_disk_size"></a> [os\_disk\_size](#input\_os\_disk\_size) | Specifies the size of the disk attached to each node, in GB. Default is '50'. | `number` | `50` | no |
-| <a name="input_os_disk_type"></a> [os\_disk\_type](#input\_os\_disk\_type) | Specifies the type of the disk attached to each node (e.g., 'pd-standard', 'pd-ssd', or 'pd-balanced' , or 'hyperdisk-balanced'). Default is 'hyperdisk-balanced'. | `string` | `"hyperdisk-balanced"` | no |
+| <a name="input_os_disk_type"></a> [os\_disk\_type](#input\_os\_disk\_type) | Specifies the type of the disk attached to each node (e.g., 'pd-standard', 'pd-ssd', 'pd-balanced', or 'hyperdisk-balanced'). Default is 'hyperdisk-balanced'. | `string` | `"hyperdisk-balanced"` | no |
 | <a name="input_prefix"></a> [prefix](#input\_prefix) | Specifies the prefix added to the names of all resources. Default is 'gcp-tf'. | `string` | `"gcp-tf"` | no |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | Specifies the Google Project ID that will contain all created resources. Default is 'gcp-tf'. | `string` | `"gcp-tf"` | no |
 | <a name="input_public_ip_source_addresses"></a> [public\_ip\_source\_addresses](#input\_public\_ip\_source\_addresses) | Specifies a list of CIDR blocks allowed to access port 22 (SSH). Default is an empty list (no restrictions defined at variable level). | `list(string)` | `[]` | no |
