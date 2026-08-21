@@ -99,12 +99,14 @@ resource "random_shuffle" "random_zone" {
 }
 
 resource "google_compute_disk" "data_disk" {
-  count  = var.data_disk_count
-  name   = "${var.prefix}-data-disk-${count.index + 1}-${random_string.random.result}"
-  type   = var.data_disk_type
-  size   = var.data_disk_size
-  zone   = random_shuffle.random_zone.result[0]
-  labels = local.common_labels
+  count                  = var.data_disk_count
+  name                   = "${var.prefix}-data-disk-${count.index + 1}-${random_string.random.result}"
+  type                   = var.data_disk_type
+  size                   = var.data_disk_size
+  provisioned_iops       = var.data_disk_provisioned_iops
+  provisioned_throughput = var.data_disk_provisioned_throughput
+  zone                   = random_shuffle.random_zone.result[0]
+  labels                 = local.common_labels
 }
 
 resource "null_resource" "download_image" {
@@ -153,6 +155,9 @@ resource "google_storage_bucket_object" "certified_image" {
 resource "google_compute_image" "upload_certified_image" {
   depends_on = [google_storage_bucket_object.certified_image]
   name       = "${var.prefix}-opensuse-certified-img"
+  guest_os_features {
+    type = "GVNIC"
+  }
   raw_disk {
     source = "https://storage.googleapis.com/${google_storage_bucket.images_bucket.name}/${google_storage_bucket_object.certified_image.name}"
   }
@@ -193,6 +198,7 @@ resource "google_compute_instance" "default" {
   network_interface {
     network    = var.vpc == null ? resource.google_compute_network.vpc[0].name : var.vpc
     subnetwork = var.subnet == null ? resource.google_compute_subnetwork.subnet[0].name : var.subnet
+    nic_type   = "GVNIC"
     access_config {}
   }
   metadata = {

@@ -5,8 +5,8 @@ data "http" "my_public_ip_address" {
 locals {
   sles_startup_script_template_file      = "../../modules/harvester/deployment-script/sles_startup_script_sh.tpl"
   sles_startup_script_file               = "${path.cwd}/sles_startup_script.sh"
-  disk_structure                         = "97"
-  data_disk_name                         = "/dev/sd"
+  disk_structure                         = ""
+  data_disk_name                         = "/dev/nvme0"
   data_disk_mount_point                  = "/mnt/datadisk"
   default_ipxe_script_template_file      = "../../modules/harvester/deployment-script/default_ipxe.tpl"
   default_ipxe_script_file               = "${path.cwd}/default.ipxe"
@@ -31,9 +31,9 @@ locals {
   kubeconfig_file                        = "${path.cwd}/${var.prefix}_kube_config.yml"
   current_public_ip_cidr                 = "${chomp(data.http.my_public_ip_address.response_body)}/32"
   instance_type = (
-    var.harvester_node_count == 1 ? (local.harvester_cluster_size == "small" ? "n2-standard-16" : "n2-standard-32") :
-    var.harvester_node_count == 3 ? (local.harvester_cluster_size == "small" ? "n2-standard-32" : "n2-standard-64") :
-    "n2-standard-64"
+    var.harvester_node_count == 1 ? (local.harvester_cluster_size == "small" ? "n4-standard-16" : "n4-standard-32") :
+    var.harvester_node_count == 3 ? (local.harvester_cluster_size == "small" ? "n4-standard-32" : "n4-standard-64") :
+    "n4-standard-64"
   )
 }
 

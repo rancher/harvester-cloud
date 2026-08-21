@@ -4,16 +4,16 @@ The following information provides an infrastructure cost estimation for deployi
 
 Please note that all estimated costs shown are generic approximations that have been rounded up and may not be 100% accurate, as the total price will vary depending on each specific scenario and GCP project.
 
-| Type   | Region       |  Mode   |  Disks |  Disk Type |  Disk Size |  Required Instance | Estimated Cost per Month ($)     |
-|--------|--------------|---------|--------|------------|------------|--------------------|----------------------------------|
-| Small  | europe-west8 | Spot    | 1      | pd-ssd     | 350 GB     | n2-standard-16     | 250                              |
-| Small  | europe-west8 | Spot    | 3      | pd-ssd     | 350 GB     | n2-standard-32     | 400                              |
-| Small  | europe-west8 | Regular | 1      | pd-ssd     | 350 GB     | n2-standard-16     | 800                              |
-| Small  | europe-west8 | Regular | 3      | pd-ssd     | 350 GB     | n2-standard-32     | 1500                             |
-| Medium | europe-west8 | Spot    | 1      | pd-ssd     | 350 GB     | n2-standard-32     | 400                              |
-| Medium | europe-west8 | Spot    | 3      | pd-ssd     | 350 GB     | n2-standard-64     | 600                              |
-| Medium | europe-west8 | Regular | 1      | pd-ssd     | 350 GB     | n2-standard-32     | 1500                             |
-| Medium | europe-west8 | Regular | 3      | pd-ssd     | 350 GB     | n2-standard-64     | 2800                             |
+| Type   | Region       |  Mode   |  Disks |  Disk Type          |  Disk Size |  Required Instance | Estimated Cost per Month ($)     |
+|--------|--------------|---------|--------|---------------------|------------|--------------------|----------------------------------|
+| Small  | europe-west8 | Spot    | 1      | hyperdisk-balanced  | 350 GB     | n4-standard-16     | 500                              |
+| Small  | europe-west8 | Spot    | 3      | hyperdisk-balanced  | 350 GB     | n4-standard-32     | 1350                             |
+| Small  | europe-west8 | Regular | 1      | hyperdisk-balanced  | 350 GB     | n4-standard-16     | 1000                             |
+| Small  | europe-west8 | Regular | 3      | hyperdisk-balanced  | 350 GB     | n4-standard-32     | 2300                             |
+| Medium | europe-west8 | Spot    | 1      | hyperdisk-balanced  | 350 GB     | n4-standard-32     | 650                              |
+| Medium | europe-west8 | Spot    | 3      | hyperdisk-balanced  | 350 GB     | n4-standard-64     | 1700                             |
+| Medium | europe-west8 | Regular | 1      | hyperdisk-balanced  | 350 GB     | n4-standard-32     | 1700                             |
+| Medium | europe-west8 | Regular | 3      | hyperdisk-balanced  | 350 GB     | n4-standard-64     | 3700                             |
 
 The calculations were done using the *[Google Cloud pricing calculator](https://cloud.google.com/calculator)*.
 
