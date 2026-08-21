@@ -142,6 +142,9 @@ for i in $(seq 1 "${count}"); do
   elif [[ "${disk_name}" == /dev/nvme ]]; then
     disk="${disk_name}$${i}n1"
     part="$${disk}p1"
+  elif [[ "${disk_name}" == /dev/nvme0 ]]; then
+    disk="${disk_name}n$((i + 1))"
+    part="$${disk}p1"
   else
     echo "Error: unsupported disk type $disk_name"
     exit 1

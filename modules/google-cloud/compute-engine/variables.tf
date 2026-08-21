@@ -109,9 +109,9 @@ variable "spot_instance" {
 }
 
 variable "os_disk_type" {
-  description = "Specifies the type of the disk attached to each node (e.g., 'pd-standard', 'pd-ssd', or 'pd-balanced'). Default is 'pd-ssd'."
+  description = "Specifies the type of the disk attached to each node (e.g., 'pd-standard', 'pd-ssd', or 'pd-balanced', or 'hyperdisk-balanced'). Default is 'pd-ssd'."
   type        = string
-  default     = "pd-ssd"
+  default     = "hyperdisk-balanced"
 }
 
 variable "os_disk_size" {
@@ -123,7 +123,7 @@ variable "os_disk_size" {
 variable "instance_type" {
   description = "Specifies the name of a Google Compute Engine machine type. Default is 'n2-standard-16'."
   type        = string
-  default     = "n2-standard-16"
+  default     = "n4-standard-16"
 }
 
 variable "data_disk_count" {
@@ -133,15 +133,27 @@ variable "data_disk_count" {
 }
 
 variable "data_disk_type" {
-  description = "Specifies the type of the disks attached to each node (e.g., 'pd-standard', 'pd-ssd', or 'pd-balanced'). Default is 'pd-ssd'."
+  description = "Specifies the type of the disks attached to each node (e.g., 'pd-standard', 'pd-ssd', or 'pd-balanced' , or 'hyperdisk-balanced'). Default is 'pd-ssd'."
   type        = string
-  default     = "pd-ssd"
+  default     = "hyperdisk-balanced"
 }
 
 variable "data_disk_size" {
   description = "Specifies the size of the additional data disks for each VM instance, in GB. Default is '350'."
   type        = number
   default     = 350
+}
+
+variable "data_disk_provisioned_iops" {
+  description = "Specifies the provisioned IOPS for the data disks. Only applicable for hyperdisk types."
+  type        = number
+  default     = 50000
+}
+
+variable "data_disk_provisioned_throughput" {
+  description = "Specifies the provisioned throughput for the data disks in MB/s. Only applicable for hyperdisk types."
+  type        = number
+  default     = 1200
 }
 
 variable "public_ip_source_addresses" {
