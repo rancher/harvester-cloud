@@ -1,3 +1,7 @@
+data "http" "my_public_ip_address" {
+  url = "https://ipv4.icanhazip.com/"
+}
+
 locals {
   private_ssh_key_path = var.ssh_private_key_path == null ? "${path.cwd}/${var.prefix}-ssh_private_key.pem" : var.ssh_private_key_path
   public_ssh_key_path  = var.ssh_public_key_path == null ? "${path.cwd}/${var.prefix}-ssh_public_key.pem" : var.ssh_public_key_path
@@ -8,6 +12,7 @@ locals {
   certified_image_name = "opensuse-leap-16-0-harv-cloud-image.x86_64.vhd"
   certified_image_url  = "https://github.com/rancher/harvester-cloud/releases/download/latest/${local.certified_image_name}"
   certified_image_sum  = "b18a460739d97206032e4dc66ea0c24e3bab98463d41571b798aee84e97d7fb4f4cba9c2bf83af42ceab88dcadd42918bcfeea1bc330fb774544b246d4d1dc55"
+  current_public_ip    = chomp(data.http.my_public_ip_address.response_body)
   common_tags = {
     Name       = "${var.prefix}"
     Workload   = "harvester"
@@ -47,7 +52,13 @@ resource "azurerm_storage_account" "vhd" {
   account_tier                    = "Standard"
   account_replication_type        = "LRS"
   allow_nested_items_to_be_public = false
-  tags                            = local.common_tags
+  public_network_access_enabled   = true
+  network_rules {
+    default_action = "Deny"
+    ip_rules       = [local.current_public_ip]
+    bypass         = ["AzureServices"]
+  }
+  tags = local.common_tags
 }
 
 resource "azurerm_storage_container" "vhds" {
