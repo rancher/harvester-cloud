@@ -2,7 +2,7 @@ locals {
   region               = "europe-west8"
   ssh_private_key_path = "${path.cwd}/${var.prefix}-ssh_private_key.pem"
   ssh_public_key_path  = "${path.cwd}/${var.prefix}-ssh_public_key.pem"
-  instance_type        = "n2-standard-16"
+  instance_type        = "n4-standard-16"
 }
 
 module "harvester_node" {
