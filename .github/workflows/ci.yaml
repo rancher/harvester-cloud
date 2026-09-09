@@ -11,16 +11,38 @@ on:
 jobs:
   terraform_lint:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.head_ref }}
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
         with:
           terraform_version: "1.14.6"
-      - name: Terraform fmt
-        id: fmt
-        run: terraform fmt -recursive -check .
+      - name: Setup terraform-docs
+        uses: terraform-docs/gh-actions@6de6da0cefcc6b4b7a5cbea4d79d97060733093c # v1.4.1
+        with:
+          working-dir: .
+      - name: Format Terraform files
+        run: terraform fmt -recursive .
+      - name: Regenerate all docs.md
+        run: |
+          find . -name docs.md -execdir sh -c 'terraform-docs markdown table . > docs.md' \;
+      - name: Commit and push changes if any
+        run: |
+          git add .
+          if ! git diff --cached --quiet; then
+            echo "Changes detected in docs.md or .tf files. Committing and pushing..."
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "chore: auto-update terraform-docs and fmt [skip ci]"
+            git push
+          else
+            echo "All docs.md and .tf files are already up to date."
+          fi
 
   gcp_terraform_plan:
     runs-on: ubuntu-24.04
