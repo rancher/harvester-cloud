@@ -10,8 +10,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Clone tf-rancher-up project
-        run: git clone https://github.com/rancher/tf-rancher-up.git tf-rancher-up
+      - name: Clone suse-ep-toolkit project
+        run: git clone https://github.com/rancher/suse-ep-toolkit.git suse-ep-toolkit
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
         with:
@@ -26,10 +26,13 @@ jobs:
           RUNNER_IP=$(curl -s https://api.ipify.org)
           echo "RUNNER_IP=$RUNNER_IP" >> $GITHUB_ENV
           echo "Detected GitHub Runner IP: $RUNNER_IP"
-      - name: Initialize Terraform (Rancher - tf-rancher-up project)
+      - name: Fix dash shell compatibility for Longhorn auth
+        run: |
+          sed -i 's/set -euo pipefail/set -eu/g' suse-ep-toolkit/modules/distribution/longhorn/main.tf
+      - name: Initialize Terraform (Rancher - suse-ep-toolkit project)
         run: terraform init
-        working-directory: tf-rancher-up/recipes/upstream/google-cloud/rke2
-      - name: Run Terraform apply (Rancher - tf-rancher-up project)
+        working-directory: suse-ep-toolkit/projects/google-cloud/rke2
+      - name: Run Terraform apply (Rancher - suse-ep-toolkit project)
         env:
           PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
           RANCHER_PASSWORD: ${{ secrets.RANCHER_PASSWORD }}
@@ -38,14 +41,18 @@ jobs:
             -var "prefix=rancher-harv-integration-wf" \
             -var "project_id=$PROJECT_ID" \
             -var "region=europe-west3" \
-            -var "rancher_password=$RANCHER_PASSWORD"
-        working-directory: tf-rancher-up/recipes/upstream/google-cloud/rke2
+            -var "instance_count=3" \
+            -var "longhorn_enabled=true" \
+            -var "longhorn_admin_password=$RANCHER_PASSWORD" \
+            -var "rancher_enabled=true" \
+            -var "rancher_bootstrap_password=$RANCHER_PASSWORD"
+        working-directory: suse-ep-toolkit/projects/google-cloud/rke2
       - name: Get Rancher endpoint from Terraform output
         id: rancher_out
         run: |
           url=$(terraform output -raw rancher_url)
           echo "RANCHER_URL=$url" >> $GITHUB_ENV
-        working-directory: tf-rancher-up/recipes/upstream/google-cloud/rke2
+        working-directory: suse-ep-toolkit/projects/google-cloud/rke2
       - name: Wait for Rancher API
         env:      
           RANCHER_URL: ${{ env.RANCHER_URL }}
@@ -56,7 +63,7 @@ jobs:
           import time
           import sys
 
-          RANCHER_URL = os.environ['RANCHER_URL']
+          RANCHER_URL = os.environ['RANCHER_URL'].replace('/dashboard', '').rstrip('/')
 
           print("Waiting Rancher API...")
 
@@ -88,7 +95,7 @@ jobs:
           import os
           import requests
 
-          RANCHER_URL = os.environ['RANCHER_URL']
+          RANCHER_URL = os.environ['RANCHER_URL'].replace('/dashboard', '').rstrip('/') 
           RANCHER_PASSWORD = os.environ['RANCHER_PASSWORD']
           GITHUB_ENV = os.environ.get('GITHUB_ENV', '/tmp/github_env')
 
@@ -181,7 +188,7 @@ jobs:
           import requests
           import sys
 
-          RANCHER_URL = os.environ['RANCHER_URL']
+          RANCHER_URL = os.environ['RANCHER_URL'].replace('/dashboard', '').rstrip('/')
           ACCESS_KEY = os.environ['RANCHER_CI_TOKEN_ACCESS_KEY']
           SECRET_KEY = os.environ['RANCHER_CI_TOKEN_SECRET_KEY']
 
@@ -236,5 +243,10 @@ jobs:
           terraform destroy -auto-approve \
             -var "prefix=rancher-harv-integration-wf" \
             -var "project_id=$PROJECT_ID" \
-            -var "rancher_password=$RANCHER_PASSWORD"
-        working-directory: tf-rancher-up/recipes/upstream/google-cloud/rke2
+            -var "region=europe-west3" \
+            -var "instance_count=3" \
+            -var "longhorn_enabled=true" \
+            -var "longhorn_admin_password=$RANCHER_PASSWORD" \
+            -var "rancher_enabled=true" \
+            -var "rancher_bootstrap_password=$RANCHER_PASSWORD"
+        working-directory: suse-ep-toolkit/projects/google-cloud/rke2
