@@ -1,8 +1,8 @@
 ## Requirements
 
 | Name | Version |
-|------|---------|
-| <a name="requirement_harvester"></a> [harvester](#requirement\_harvester) | 1.8.1 |
+| ---- | ------- |
+| <a name="requirement_harvester"></a> [harvester](#requirement\_harvester) | 1.8.2 |
 | <a name="requirement_ssh"></a> [ssh](#requirement\_ssh) | 2.7.0 |
 
 ## Providers
@@ -12,7 +12,7 @@ No providers.
 ## Modules
 
 | Name | Source | Version |
-|------|--------|---------|
+| ---- | ------ | ------- |
 | <a name="module_harvester_vm"></a> [harvester\_vm](#module\_harvester\_vm) | ../../../modules/harvester/virtual-machine | n/a |
 
 ## Resources
@@ -22,7 +22,7 @@ No resources.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_cpu"></a> [cpu](#input\_cpu) | Specifies the number of CPU cores allocated to each VM. Default is '2'. | `number` | `2` | no |
 | <a name="input_data_disk_size"></a> [data\_disk\_size](#input\_data\_disk\_size) | Specifies the size of the data disk attached to each VM, in GB. Default is '25'. | `number` | `25` | no |
 | <a name="input_harvester_url"></a> [harvester\_url](#input\_harvester\_url) | Specifies the URL of the Harvester cluster API. | `string` | n/a | yes |

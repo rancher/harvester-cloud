@@ -1,10 +1,10 @@
 ## Requirements
 
 | Name | Version |
-|------|---------|
-| <a name="requirement_digitalocean"></a> [digitalocean](#requirement\_digitalocean) | 2.95.0 |
+| ---- | ------- |
+| <a name="requirement_digitalocean"></a> [digitalocean](#requirement\_digitalocean) | 2.100.0 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | 3.2.0 |
-| <a name="requirement_http"></a> [http](#requirement\_http) | 3.6.0 |
+| <a name="requirement_http"></a> [http](#requirement\_http) | 3.6.1 |
 | <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) | 3.2.1 |
 | <a name="requirement_rancher2"></a> [rancher2](#requirement\_rancher2) | 14.1.1 |
 | <a name="requirement_ssh"></a> [ssh](#requirement\_ssh) | 2.7.0 |
@@ -12,8 +12,8 @@
 ## Providers
 
 | Name | Version |
-|------|---------|
-| <a name="provider_http"></a> [http](#provider\_http) | 3.6.0 |
+| ---- | ------- |
+| <a name="provider_http"></a> [http](#provider\_http) | 3.6.1 |
 | <a name="provider_local"></a> [local](#provider\_local) | n/a |
 | <a name="provider_null"></a> [null](#provider\_null) | n/a |
 | <a name="provider_rancher2"></a> [rancher2](#provider\_rancher2) | 14.1.1 |
@@ -22,13 +22,13 @@
 ## Modules
 
 | Name | Source | Version |
-|------|--------|---------|
+| ---- | ------ | ------- |
 | <a name="module_harvester_node"></a> [harvester\_node](#module\_harvester\_node) | ../../modules/digitalocean/droplet | n/a |
 
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [local_file.create_cloud_config_yaml](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
 | [local_file.default_ipxe_script_config](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
 | [local_file.harvester_startup_script](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
@@ -40,13 +40,13 @@
 | [null_resource.harvester_node_startup](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [rancher2_cluster.rancher_cluster](https://registry.terraform.io/providers/rancher/rancher2/14.1.1/docs/resources/cluster) | resource |
 | [ssh_resource.retrieve_kubeconfig](https://registry.terraform.io/providers/loafoe/ssh/2.7.0/docs/resources/resource) | resource |
-| [http_http.my_public_ip_address](https://registry.terraform.io/providers/hashicorp/http/3.6.0/docs/data-sources/http) | data source |
+| [http_http.my_public_ip_address](https://registry.terraform.io/providers/hashicorp/http/3.6.1/docs/data-sources/http) | data source |
 | [local_file.ssh_private_key](https://registry.terraform.io/providers/hashicorp/local/latest/docs/data-sources/file) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_create_ssh_key_pair"></a> [create\_ssh\_key\_pair](#input\_create\_ssh\_key\_pair) | Specifies whether a new SSH key pair needs to be created for the instances. Default is 'true'. | `bool` | `true` | no |
 | <a name="input_data_disk_count"></a> [data\_disk\_count](#input\_data\_disk\_count) | Specifies the number of additional data disks to attach to each VM instance. Must be at least 1. | `number` | `1` | no |
 | <a name="input_data_disk_size"></a> [data\_disk\_size](#input\_data\_disk\_size) | Specifies the size of each additional data disks attached to the Droplet, in GB. Default is '350'. | `number` | `350` | no |
@@ -73,7 +73,7 @@
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_first_instance_public_ip"></a> [first\_instance\_public\_ip](#output\_first\_instance\_public\_ip) | n/a |
 | <a name="output_harvester_url"></a> [harvester\_url](#output\_harvester\_url) | n/a |
 | <a name="output_longhorn_url"></a> [longhorn\_url](#output\_longhorn\_url) | n/a |
