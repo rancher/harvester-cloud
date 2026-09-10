@@ -9,21 +9,33 @@ on:
       - main
 
 jobs:
-  terraform_lint:
+terraform_lint:
     runs-on: ubuntu-24.04
     permissions:
       contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.head_ref }}
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
         with:
           terraform_version: "1.14.6"
-      - name: Setup terraform-docs
-        uses: terraform-docs/gh-actions@6de6da0cefcc6b4b7a5cbea4d79d97060733093c # v1.4.1
-        with:
-          working-dir: .
+      - name: Install and verify terraform-docs binary
+        run: |
+          set -e
+          TFDOCS_VERSION="v0.24.0"
+          # Defined expected SHA256 checksum for terraform-docs v0.24.0 linux-amd64
+          EXPECTED_SHA="9005daf969de0b50134493a2c00078b49f5f5b39d021cda7c89bf4d4f3d776d3"
+          # Download binary archive
+          curl -sSLo ./terraform-docs.tar.gz "https://github.com/terraform-docs/terraform-docs/releases/download/${TFDOCS_VERSION}/terraform-docs-${TFDOCS_VERSION}-linux-amd64.tar.gz"
+          # Double-check SHA256 integrity
+          echo "${EXPECTED_SHA}  ./terraform-docs.tar.gz" | sha256sum --check
+          # Extract and install binary
+          tar -xzf ./terraform-docs.tar.gz terraform-docs
+          sudo mv terraform-docs /usr/local/bin/
+          rm ./terraform-docs.tar.gz
       - name: Format Terraform files
         run: terraform fmt -recursive .
       - name: Regenerate all docs.md
@@ -36,7 +48,7 @@ jobs:
             echo "Changes detected in docs.md or .tf files. Committing and pushing..."
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git commit -m "chore: auto-update terraform-docs and fmt [skip ci]"
+            git commit -m "chore: auto-update terraform-docs and fmt [skip ci]" -m "Signed-off-by: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
             git push
           else
             echo "All docs.md and .tf files are already up to date."
