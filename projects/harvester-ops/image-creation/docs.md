@@ -1,8 +1,8 @@
 ## Requirements
 
 | Name | Version |
-|------|---------|
-| <a name="requirement_harvester"></a> [harvester](#requirement\_harvester) | 1.8.1 |
+| ---- | ------- |
+| <a name="requirement_harvester"></a> [harvester](#requirement\_harvester) | 1.8.2 |
 
 ## Providers
 
@@ -11,7 +11,7 @@ No providers.
 ## Modules
 
 | Name | Source | Version |
-|------|--------|---------|
+| ---- | ------ | ------- |
 | <a name="module_harvester_image"></a> [harvester\_image](#module\_harvester\_image) | ../../../modules/harvester/image | n/a |
 
 ## Resources
@@ -21,7 +21,7 @@ No resources.
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_create_image"></a> [create\_image](#input\_create\_image) | Specifies whether a Harvester VM image should be created. Default is 'true'. | `bool` | `true` | no |
 | <a name="input_harvester_url"></a> [harvester\_url](#input\_harvester\_url) | Specifies the URL of the Harvester cluster API. | `string` | n/a | yes |
 | <a name="input_image_name"></a> [image\_name](#input\_image\_name) | Specifies the name of the Harvester image to be created. Default is 'opensuse-leap-16-0'. | `string` | `"opensuse-leap-16-0"` | no |
