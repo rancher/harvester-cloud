@@ -2,7 +2,7 @@
 
 | Name | Version |
 | ---- | ------- |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 5.3.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 5.4.0 |
 
 ## Providers
 
