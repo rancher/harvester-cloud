@@ -2,7 +2,7 @@
 
 | Name | Version |
 | ---- | ------- |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 6.63.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 6.64.0 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | 3.3.0 |
 | <a name="requirement_http"></a> [http](#requirement\_http) | 3.6.1 |
 | <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) | 3.2.1 |
