@@ -52,7 +52,7 @@ resource "azurerm_storage_account" "vhd" {
   account_tier                    = "Standard"
   account_replication_type        = "LRS"
   allow_nested_items_to_be_public = false
-  public_network_access_enabled   = true
+  public_network_access           = "Enabled"
   network_rules {
     default_action = "Deny"
     ip_rules       = [local.current_public_ip]
