@@ -24,8 +24,8 @@ locals {
   ssh_private_key_path                   = var.ssh_private_key_path == null ? "${path.cwd}/${var.prefix}-ssh_private_key.pem" : var.ssh_private_key_path
   ssh_public_key_path                    = var.ssh_public_key_path == null ? "${path.cwd}/${var.prefix}-ssh_public_key.pem" : var.ssh_public_key_path
   create_vpc                             = var.create_vpc == true ? false : var.create_vpc
-  vpc                                    = var.vpc == null ? module.harvester_node.vpc[0].name : var.vpc
-  subnet                                 = var.subnet == null ? module.harvester_node.subnet[0].name : var.subnet
+  vpc                                    = var.vpc == null ? module.harvester_node.vpc : var.vpc
+  subnet                                 = var.subnet == null ? module.harvester_node.subnet : var.subnet
   create_firewall                        = var.create_firewall == true ? false : var.create_firewall
   ssh_username                           = "opensuse"
   kubeconfig_file                        = "${path.cwd}/${var.prefix}_kube_config.yml"

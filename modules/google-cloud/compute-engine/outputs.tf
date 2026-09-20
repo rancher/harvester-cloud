@@ -23,13 +23,13 @@ output "instance_ips" {
 }
 
 output "vpc" {
-  value = google_compute_network.vpc
+  value = var.create_vpc ? google_compute_network.vpc[0].name : null
 }
 
 output "subnet" {
-  value = google_compute_subnetwork.subnet
+  value = var.create_vpc ? google_compute_subnetwork.subnet[0].name : null
 }
 
 output "firewall" {
-  value = google_compute_firewall.cluster_plane
+  value = var.create_firewall ? google_compute_firewall.cluster_plane[0].name : null
 }
