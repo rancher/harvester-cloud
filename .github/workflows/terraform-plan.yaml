@@ -7,6 +7,7 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   gcp_terraform_plan:
@@ -26,8 +27,14 @@ jobs:
         run: terraform init
         working-directory: projects/google-cloud/
       - name: Run Terraform Plan
-        run: terraform plan
+        run: terraform plan -no-color | tee plan_output.log
         working-directory: projects/google-cloud/
+      - name: Check for Warnings
+        run: |
+          if grep -q "Warning:" projects/google-cloud/plan_output.log; then
+            echo "::error title=Terraform Warnings Found::Terraform plan generated warnings in GCP project."
+            exit 1
+          fi
   azure_terraform_plan:
     runs-on: ubuntu-24.04
     steps:
@@ -45,8 +52,14 @@ jobs:
         run: terraform init
         working-directory: projects/azure/
       - name: Run Terraform Plan
-        run: terraform plan -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}"
+        run: terraform plan -no-color -var "subscription_id=${{ secrets.AZURE_SUBSCRIPTION_ID }}" | tee plan_output.log
         working-directory: projects/azure/
+      - name: Check for Warnings
+        run: |
+          if grep -q "Warning:" projects/azure/plan_output.log; then
+            echo "::error title=Terraform Warnings Found::Terraform plan generated warnings in Azure project."
+            exit 1
+          fi
   digitalocean_terraform_plan:
     runs-on: ubuntu-24.04
     steps:
@@ -62,8 +75,14 @@ jobs:
       - name: Run Terraform Plan
         env:
           DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
-        run: terraform plan -var "do_token=$DIGITALOCEAN_TOKEN"
+        run: terraform plan -no-color -var "do_token=$DIGITALOCEAN_TOKEN" | tee plan_output.log
         working-directory: projects/digitalocean/
+      - name: Check for Warnings
+        run: |
+          if grep -q "Warning:" projects/digitalocean/plan_output.log; then
+            echo "::error title=Terraform Warnings Found::Terraform plan generated warnings in DigitalOcean project."
+            exit 1
+          fi
   aws_terraform_plan:
     runs-on: ubuntu-24.04
     steps:
@@ -83,5 +102,11 @@ jobs:
         run: terraform init
         working-directory: projects/aws/
       - name: Run Terraform Plan
-        run: terraform plan
+        run: terraform plan -no-color | tee plan_output.log
         working-directory: projects/aws/
+      - name: Check for Warnings
+        run: |
+          if grep -q "Warning:" projects/aws/plan_output.log; then
+            echo "::error title=Terraform Warnings Found::Terraform plan generated warnings in AWS project."
+            exit 1
+          fi
