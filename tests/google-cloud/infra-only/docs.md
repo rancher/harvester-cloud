@@ -2,7 +2,7 @@
 
 | Name | Version |
 | ---- | ------- |
-| <a name="requirement_google"></a> [google](#requirement\_google) | 8.2.0 |
+| <a name="requirement_google"></a> [google](#requirement\_google) | 8.3.0 |
 
 ## Providers
 
