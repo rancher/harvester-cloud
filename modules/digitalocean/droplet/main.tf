@@ -89,7 +89,7 @@ resource "digitalocean_custom_image" "upload_certified_image" {
   depends_on = [null_resource.download_image]
   name       = "${var.prefix}-opensuse-certified-img"
   url        = local.certified_image_url
-  regions    = ["nyc3", "${var.region}"]
+  regions    = distinct([var.region, "nyc3"])
 }
 
 resource "digitalocean_droplet" "nodes" {
