@@ -2,7 +2,7 @@
 
 | Name | Version |
 | ---- | ------- |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 5.5.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 5.6.0 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | 3.3.0 |
 | <a name="requirement_http"></a> [http](#requirement\_http) | 3.6.2 |
 | <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) | 3.2.1 |
