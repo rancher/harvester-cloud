@@ -30,6 +30,11 @@ jobs:
           DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
         run: terraform apply -var "do_token=$DIGITALOCEAN_TOKEN" -var "public_ip_source_addresses=[\"$RUNNER_IP/32\"]" -auto-approve
         working-directory: tests/digitalocean/infra-only
+      - name: Refresh Terraform State
+        env:
+          DIGITALOCEAN_TOKEN: ${{ secrets.DIGITALOCEAN_TOKEN }}
+        run: terraform apply -refresh-only -var "do_token=$DIGITALOCEAN_TOKEN" -var "public_ip_source_addresses=[\"$RUNNER_IP/32\"]" -auto-approve
+        working-directory: tests/digitalocean/infra-only
       - name: Get public IP from Terraform output
         id: ip
         run: |
