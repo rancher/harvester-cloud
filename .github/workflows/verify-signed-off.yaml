@@ -10,7 +10,7 @@ on:
 
 jobs:
   verify_signed_off_commits:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     if: github.actor != 'renovate-rancher[bot]' && github.actor != 'github-actions[bot]'
     steps:
       - name: Checkout code
