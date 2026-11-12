@@ -2,7 +2,7 @@
 
 | Name | Version |
 | ---- | ------- |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 6.71.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | 6.72.0 |
 
 ## Providers
 
