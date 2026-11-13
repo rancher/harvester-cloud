@@ -12,6 +12,8 @@ on:
 jobs:
   gcp_terraform_plan:
     runs-on: ubuntu-26.04
+    # Do not execute cloud authentication and plan on untrusted fork PRs
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -37,6 +39,8 @@ jobs:
           fi
   azure_terraform_plan:
     runs-on: ubuntu-26.04
+    # Do not execute cloud authentication and plan on untrusted fork PRs
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -62,6 +66,8 @@ jobs:
           fi
   digitalocean_terraform_plan:
     runs-on: ubuntu-26.04
+    # Do not execute cloud authentication and plan on untrusted fork PRs
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -85,6 +91,8 @@ jobs:
           fi
   aws_terraform_plan:
     runs-on: ubuntu-26.04
+    # Do not execute cloud authentication and plan on untrusted fork PRs
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
