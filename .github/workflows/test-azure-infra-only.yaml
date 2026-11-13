@@ -3,6 +3,10 @@ name: Test Azure VM deploy and destroy
 on:
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
 jobs:
   azure_vm_terraform_deploy:
     runs-on: ubuntu-26.04
