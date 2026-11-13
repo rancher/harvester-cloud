@@ -14,7 +14,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ github.head_ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
         with:
@@ -38,7 +39,9 @@ jobs:
       - name: Regenerate all docs.md
         run: |
           find . -name docs.md -execdir sh -c 'terraform-docs markdown table . > docs.md' \;
+      # Internal PR: automatically commit and push documentation and formatting updates
       - name: Commit and push changes if any
+        if: github.event.pull_request.head.repo.full_name == github.repository
         run: |
           git add .
           if ! git diff --cached --quiet; then
@@ -49,4 +52,13 @@ jobs:
             git push
           else
             echo "All docs.md and .tf files are already up to date."
+          fi
+      # Fork PR: GITHUB_TOKEN lacks write permissions to external forks; validate and fail on diff
+      - name: Validate formatting and documentation (Fork PR)
+        if: github.event.pull_request.head.repo.full_name != github.repository
+        run: |
+          if ! git diff --quiet; then
+            echo "::error title=Uncommitted Changes Detected::Terraform files or docs.md require updates. Please run 'terraform fmt -recursive .' and regenerate docs.md locally, then commit the changes."
+            git diff --stat
+            exit 1
           fi
