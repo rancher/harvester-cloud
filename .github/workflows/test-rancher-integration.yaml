@@ -3,6 +3,10 @@ name: Rancher integration testing on Google Cloud infrastructure
 on:
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
 jobs:
   rancher_harvester_ci:
     runs-on: ubuntu-26.04

@@ -3,6 +3,10 @@ name: Harvester cluster performance benchmark
 on:
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
 env:
   PREFIX: harv-benchmark-wf
   HARVESTER_PASSWORD: harvester
