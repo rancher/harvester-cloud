@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<image schemaversion="7.5" name="opensuse-leap-16-0-harv-cloud-image">
+<image schemaversion="7.5" name="opensuse-leap-16-1-harv-cloud-image">
     <description type="system">
         <author>harvester-cloud maintainers</author>
         <contact>none</contact>
-        <specification>openSUSE Leap 16.0 image certified for harvester-cloud</specification>
+        <specification>openSUSE Leap 16.1 image certified for harvester-cloud</specification>
     </description>
     <preferences>
         <version>1.0.0</version>
