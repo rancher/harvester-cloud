@@ -1,0 +1,114 @@
+name: Test AWS Infra, Harvester & Ops
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  aws_harvester_ops_test:
+    runs-on: ubuntu-26.04
+    timeout-minutes: 60
+    env:
+      PREFIX: harvcloudfulltest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Ensure netcat and kubectl are installed
+        run: |
+          sudo apt-get update && sudo apt-get install -y netcat-openbsd curl jq
+          curl -fsSL "https://dl.k8s.io/release/$(curl -fsSL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" -o kubectl
+          sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+          rm -f kubectl
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+        with:
+          terraform_version: "v1.17.2"
+      - name: Authenticate to AWS Cloud
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Get public IP from the GitHub Runner (security purpose)
+        id: get_ip
+        run: |
+          RUNNER_IP=$(curl -s https://api.ipify.org)
+          echo "RUNNER_IP=$RUNNER_IP" >> $GITHUB_ENV
+          echo "Detected GitHub Runner IP: $RUNNER_IP"
+      - name: Initialize Terraform (AWS & Harvester)
+        run: terraform init
+        working-directory: projects/aws
+      - name: Run Terraform apply (AWS & Harvester)
+        run: |
+          terraform apply \
+            -var "prefix=$PREFIX" \
+            -var "region=${{ secrets.AWS_REGION }}" \
+            -var "spot_instance=false" \
+            -var "public_ip_source_addresses=[\"$RUNNER_IP/32\"]" \
+            -auto-approve
+        working-directory: projects/aws
+      - name: Get Harvester URL and Instance IP from Terraform output
+        id: outputs
+        run: |
+          ip=$(terraform output -json first_instance_public_ip | jq -r '.')
+          url=$(terraform output -raw harvester_url)
+          echo "INSTANCE_IP=$ip" >> $GITHUB_ENV
+          echo "HARVESTER_URL=$url" >> $GITHUB_ENV
+          echo "Detected Instance IP: $ip"
+          echo "Detected Harvester URL: $url"
+        working-directory: projects/aws
+      - name: Wait for SSH (port 22) to become available
+        run: |
+          echo "Waiting for port 22 on $INSTANCE_IP..."
+          for i in {1..30}; do
+            if nc -zv $INSTANCE_IP 22; then
+              echo "Port 22 is open."
+              exit 0
+            fi
+            echo "Attempt $i failed, retrying in 10s..."
+            sleep 10
+          done
+          echo "SSH not available after 30 attempts. Failing."
+          exit 1
+      - name: Initialize Terraform (Harvester-Ops)
+        run: terraform init
+        working-directory: tests/harvester-ops
+      - name: Run Terraform apply (Harvester-Ops)
+        run: |
+          terraform apply \
+            -var "harvester_url=$HARVESTER_URL" \
+            -var "kubeconfig_file_path=${{ github.workspace }}/projects/aws" \
+            -var "kubeconfig_file_name=${PREFIX}_kube_config.yml" \
+            -var "private_ssh_key_file_path=${{ github.workspace }}/projects/aws" \
+            -var "private_ssh_key_file_name=${PREFIX}-ssh_private_key.pem" \
+            -auto-approve
+        working-directory: tests/harvester-ops
+      - name: Validate Harvester Resources via Terraform Output
+        run: |
+          echo "=== Harvester-Ops Status ==="
+          terraform output -raw harvester_ops_status
+        working-directory: tests/harvester-ops
+      - name: Run Terraform Destroy (Harvester-Ops)
+        if: always() && env.HARVESTER_URL != ''
+        run: |
+          terraform destroy \
+            -var "harvester_url=$HARVESTER_URL" \
+            -var "kubeconfig_file_path=${{ github.workspace }}/projects/aws" \
+            -var "kubeconfig_file_name=${PREFIX}_kube_config.yml" \
+            -var "private_ssh_key_file_path=${{ github.workspace }}/projects/aws" \
+            -var "private_ssh_key_file_name=${PREFIX}-ssh_private_key.pem" \
+            -auto-approve
+        working-directory: tests/harvester-ops
+      - name: Run Terraform Destroy (AWS & Harvester)
+        if: always()
+        run: |
+          terraform destroy \
+            -var "prefix=$PREFIX" \
+            -var "region=${{ secrets.AWS_REGION }}" \
+            -var "spot_instance=false" \
+            -var "public_ip_source_addresses=[\"$RUNNER_IP/32\"]" \
+            -auto-approve
+        working-directory: projects/aws
