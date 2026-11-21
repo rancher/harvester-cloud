@@ -2,7 +2,7 @@
 
 | Name | Version |
 | ---- | ------- |
-| <a name="requirement_harvester"></a> [harvester](#requirement\_harvester) | 1.9.0 |
+| <a name="requirement_harvester"></a> [harvester](#requirement\_harvester) | 1.9.1 |
 
 ## Providers
 
