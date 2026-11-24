@@ -221,7 +221,9 @@ data "external" "verify_harvester_ops" {
     "/bin/bash",
     "-c",
     <<-EOF
+      set -euo pipefail
       OUTPUT=$(
+        set -euo pipefail
         echo "=== Harvester VM Images ==="
         kubectl --kubeconfig="${local.kubeconfig_file}" get virtualmachineimages.harvesterhci.io -n ${var.image_namespace}
         echo ""
