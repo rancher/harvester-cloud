@@ -8,6 +8,10 @@ terraform {
       source  = "loafoe/ssh"
       version = "2.9.0"
     }
+    external = {
+      source  = "hashicorp/external"
+      version = "2.3.5"
+    }
   }
 }
 
