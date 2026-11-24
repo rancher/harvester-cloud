@@ -1,15 +1,16 @@
 ## Requirements
 
 | Name | Version |
-| ---- | ------- |
+|------|---------|
+| <a name="requirement_external"></a> [external](#requirement\_external) | 2.3.5 |
 | <a name="requirement_harvester"></a> [harvester](#requirement\_harvester) | 1.9.0 |
 | <a name="requirement_ssh"></a> [ssh](#requirement\_ssh) | 2.9.0 |
 
 ## Providers
 
 | Name | Version |
-| ---- | ------- |
-| <a name="provider_external"></a> [external](#provider\_external) | n/a |
+|------|---------|
+| <a name="provider_external"></a> [external](#provider\_external) | 2.3.5 |
 | <a name="provider_local"></a> [local](#provider\_local) | n/a |
 | <a name="provider_null"></a> [null](#provider\_null) | n/a |
 | <a name="provider_ssh"></a> [ssh](#provider\_ssh) | 2.9.0 |
@@ -17,7 +18,7 @@
 ## Modules
 
 | Name | Source | Version |
-| ---- | ------ | ------- |
+|------|--------|---------|
 | <a name="module_harvester_image"></a> [harvester\_image](#module\_harvester\_image) | ../../modules/harvester/image | n/a |
 | <a name="module_harvester_network"></a> [harvester\_network](#module\_harvester\_network) | ../../modules/harvester/network | n/a |
 | <a name="module_harvester_vm"></a> [harvester\_vm](#module\_harvester\_vm) | ../../modules/harvester/virtual-machine | n/a |
@@ -25,7 +26,7 @@
 ## Resources
 
 | Name | Type |
-| ---- | ---- |
+|------|------|
 | [local_file.qemu_vlanx_config](https://registry.terraform.io/providers/hashicorp/local/latest/docs/resources/file) | resource |
 | [null_resource.copy_qemu_vlanx_xml_file_to_first_node](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [null_resource.wait_harvester_services_startup](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
@@ -33,17 +34,17 @@
 | [ssh_resource.create_vlanx](https://registry.terraform.io/providers/loafoe/ssh/2.9.0/docs/resources/resource) | resource |
 | [ssh_resource.creating_subnet_nftables_rule](https://registry.terraform.io/providers/loafoe/ssh/2.9.0/docs/resources/resource) | resource |
 | [ssh_resource.harvester_airgapped](https://registry.terraform.io/providers/loafoe/ssh/2.9.0/docs/resources/resource) | resource |
-| [external_external.verify_harvester_ops](https://registry.terraform.io/providers/hashicorp/external/latest/docs/data-sources/external) | data source |
+| [external_external.verify_harvester_ops](https://registry.terraform.io/providers/hashicorp/external/2.3.5/docs/data-sources/external) | data source |
 | [local_file.load_kubeconfig_file](https://registry.terraform.io/providers/hashicorp/local/latest/docs/data-sources/file) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-| ---- | ----------- | ---- | ------- | :------: |
+|------|-------------|------|---------|:--------:|
 | <a name="input_cluster_network_count"></a> [cluster\_network\_count](#input\_cluster\_network\_count) | Specifies the number of networks to be created on Harvester Nested VM's. Default is '1'. | `number` | `1` | no |
 | <a name="input_cluster_network_name"></a> [cluster\_network\_name](#input\_cluster\_network\_name) | Specifies the name of the Harvester Cluster Network. Default is 'cluster-vlan'. | `string` | `"cluster-vlan"` | no |
 | <a name="input_cluster_network_vlan_bond_mode"></a> [cluster\_network\_vlan\_bond\_mode](#input\_cluster\_network\_vlan\_bond\_mode) | Specifies the bond mode for the Harvester Cluster Network VLAN. Default is 'active-backup'. | `string` | `"active-backup"` | no |
-| <a name="input_cluster_network_vlan_nics"></a> [cluster\_network\_vlan\_nics](#input\_cluster\_network\_vlan\_nics) | Specifies the list of NICs used for the Harvester Cluster Network VLAN. Default is '["virbr2"]'. | `list(any)` | <pre>[<br/>  "virbr2"<br/>]</pre> | no |
+| <a name="input_cluster_network_vlan_nics"></a> [cluster\_network\_vlan\_nics](#input\_cluster\_network\_vlan\_nics) | Specifies the list of NICs used for the Harvester Cluster Network VLAN. Default is '["virbr2"]'. | `list(any)` | <pre>[<br>  "virbr2"<br>]</pre> | no |
 | <a name="input_cluster_network_vlanconfig_name"></a> [cluster\_network\_vlanconfig\_name](#input\_cluster\_network\_vlanconfig\_name) | Specifies the name of the VLAN configuration for the Harvester Cluster Network. Default is 'cluster-vlan-all-nodes'. | `string` | `"cluster-vlan-all-nodes"` | no |
 | <a name="input_cpu"></a> [cpu](#input\_cpu) | Specifies the number of CPU cores allocated to each VM. Default is '2'. | `number` | `2` | no |
 | <a name="input_create_image"></a> [create\_image](#input\_create\_image) | Specifies whether a Harvester VM image should be created. Default is 'true'. | `bool` | `true` | no |
@@ -75,5 +76,5 @@
 ## Outputs
 
 | Name | Description |
-| ---- | ----------- |
+|------|-------------|
 | <a name="output_harvester_ops_status"></a> [harvester\_ops\_status](#output\_harvester\_ops\_status) | n/a |
