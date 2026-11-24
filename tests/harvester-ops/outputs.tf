@@ -1,3 +1,3 @@
 output "harvester_ops_status" {
-  value = ssh_resource.verify_harvester_ops.result
+  value = data.external.verify_harvester_ops.result.status
 }

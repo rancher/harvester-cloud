@@ -215,26 +215,25 @@ module "harvester_vm" {
   startup_script  = var.startup_script
 }
 
-resource "ssh_resource" "verify_harvester_ops" {
-  depends_on  = [module.harvester_vm]
-  host        = local.harvester_public_ip
-  user        = local.ssh_username
-  private_key = file("${var.private_ssh_key_file_path}/${var.private_ssh_key_file_name}")
-  commands = [
-    <<-EOT
-      NODE_IP=$(sudo virsh domifaddr harvester-node-1 | awk '/ipv4/ {print $4}' | cut -d'/' -f1)
-      ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null rancher@$NODE_IP "
-        echo '=== Harvester VM Images ==='
-        kubectl get virtualmachineimages.harvesterhci.io -n ${var.image_namespace}
-        echo ''
-        echo '=== Harvester Cluster Networks & VM Networks ==='
-        kubectl get clusternetworks.network.harvesterhci.io
-        kubectl get network-attachment-definitions.k8s.cni.cncf.io -n ${var.network_namespace}
-        echo ''
-        echo '=== Harvester Virtual Machines ==='
-        kubectl get virtualmachines.kubevirt.io -n ${var.vm_namespace} -o wide
-        kubectl get virtualmachineinstances.kubevirt.io -n ${var.vm_namespace} -o wide
-      "
-    EOT
+data "external" "verify_harvester_ops" {
+  depends_on = [module.harvester_vm]
+  program = [
+    "/bin/bash",
+    "-c",
+    <<-EOF
+      OUTPUT=$(
+        echo "=== Harvester VM Images ==="
+        kubectl --kubeconfig="${local.kubeconfig_file}" get virtualmachineimages.harvesterhci.io -n ${var.image_namespace}
+        echo ""
+        echo "=== Harvester Cluster Networks & VM Networks ==="
+        kubectl --kubeconfig="${local.kubeconfig_file}" get clusternetworks.network.harvesterhci.io
+        kubectl --kubeconfig="${local.kubeconfig_file}" get network-attachment-definitions.k8s.cni.cncf.io -n ${var.network_namespace}
+        echo ""
+        echo "=== Harvester Virtual Machines ==="
+        kubectl --kubeconfig="${local.kubeconfig_file}" get virtualmachines.kubevirt.io -n ${var.vm_namespace} -o wide
+        kubectl --kubeconfig="${local.kubeconfig_file}" get virtualmachineinstances.kubevirt.io -n ${var.vm_namespace} -o wide
+      )
+      jq -n --arg status "$OUTPUT" '{"status": $status}'
+    EOF
   ]
 }

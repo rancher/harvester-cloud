@@ -9,6 +9,7 @@
 
 | Name | Version |
 |------|---------|
+| <a name="provider_external"></a> [external](#provider\_external) | n/a |
 | <a name="provider_local"></a> [local](#provider\_local) | n/a |
 | <a name="provider_null"></a> [null](#provider\_null) | n/a |
 | <a name="provider_ssh"></a> [ssh](#provider\_ssh) | 2.9.0 |
@@ -32,7 +33,7 @@
 | [ssh_resource.create_vlanx](https://registry.terraform.io/providers/loafoe/ssh/2.9.0/docs/resources/resource) | resource |
 | [ssh_resource.creating_subnet_nftables_rule](https://registry.terraform.io/providers/loafoe/ssh/2.9.0/docs/resources/resource) | resource |
 | [ssh_resource.harvester_airgapped](https://registry.terraform.io/providers/loafoe/ssh/2.9.0/docs/resources/resource) | resource |
-| [ssh_resource.verify_harvester_ops](https://registry.terraform.io/providers/loafoe/ssh/2.9.0/docs/resources/resource) | resource |
+| [external_external.verify_harvester_ops](https://registry.terraform.io/providers/hashicorp/external/latest/docs/data-sources/external) | data source |
 | [local_file.load_kubeconfig_file](https://registry.terraform.io/providers/hashicorp/local/latest/docs/data-sources/file) | data source |
 
 ## Inputs
