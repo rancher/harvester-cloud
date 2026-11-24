@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "5.13.0"
+      version = "5.14.0"
     }
     ssh = {
       source  = "loafoe/ssh"
@@ -22,7 +22,7 @@ terraform {
     }
     rancher2 = {
       source  = "rancher/rancher2"
-      version = "15.1.2"
+      version = "15.3.0"
     }
   }
 }
